@@ -2,7 +2,7 @@
  * SERVICIO DE EXTRACCIÓN INTELIGENTE DE COMPROBANTES Y FACTURAS (OCR / VISIÓN IA)
  * ME VARIEDADES — DIGITALIZACIÓN Y RECONOCIMIENTO FINANCIERO AVANZADO
  * 
- * Extrae con alta precisión quirúrgica:
+ * Extrae con precisión quirúrgica:
  * 1. referenceNumber (Nº de comprobante, referencia, autorización, clave)
  * 2. amount (Monto normalizado a float limpio, ej: "₡2.600,00" -> 2600, "₡12,287.38" -> 12287.38)
  * 3. date (Fecha normalizada a formato ISO YYYY-MM-DD, ej: "22 de agosto, 2026" -> "2026-08-22")
@@ -84,81 +84,62 @@ const MAPA_MESES = {
 };
 
 /**
- * 1. PARSEO ESTRICTO DEL MONTO (Regex + Parser estricto de separadores mixtos y limpieza de ₡)
- * Resuelve la confusión del glifo '₡' interpretado como '2' o '21' por el OCR
+ * 1. LIMPIEZA Y NORMALIZACIÓN QUIRÚRGICA DEL MONTO (Regex + Parser estricto)
+ * Elimina el prefijo fantasma '2' o '21' que produce el glifo '₡' y normaliza separadores mixtos.
  */
-export function parseAmountFromOCR(rawText) {
+export function cleanAndParseAmount(rawText) {
   if (!rawText) return null;
+
   const lines = rawText.split('\n').map(l => l.trim()).filter(Boolean);
+  const amountLine = lines.find(l => /monto\s*(transferido|pagado|total pagado|total|debitado)|total\s*(pagado|transferido|debitado)?|importe|valor/i.test(l)) || rawText;
 
-  // 1. Priorizar líneas que contengan etiquetas clave de montos
-  let targetLine = lines.find(l => /monto\s*(total pagado|transferido|pagado|debitado|enviado)?|total\s*(pagado|transferido|debitado)?|importe|valor/i.test(l)) || rawText;
+  // 1. Eliminar etiquetas de texto y palabras no numéricas
+  let str = amountLine
+    .replace(/monto\s+(transferido|pagado|total pagado|total|debitado)\s*:?/gi, '')
+    .replace(/total\s*:?/gi, '')
+    .replace(/[₡¢$€£¥]|CRC|USD|colones|dolares/gi, '')
+    .trim();
 
-  // 2. Limpieza de prefijos de moneda y palabras no numéricas
-  let cleaned = targetLine
-    .replace(/[₡¢$€£¥]/gi, ' ')
-    .replace(/\b(?:CRC|USD|colones|dolares|crc|usd)\b/gi, ' ');
-
-  // 3. Extraer todos los bloques numéricos con separadores
-  const matches = cleaned.match(/\b\d+(?:[.,]\d+)*\b/g);
-  if (!matches) {
-    // Si no encontró en la línea prioritaria, buscar en todo el texto
-    const allMatches = rawText
-      .replace(/[₡¢$€£¥]/gi, ' ')
-      .replace(/\b(?:CRC|USD|colones|dolares)\b/gi, ' ')
-      .match(/\b\d+(?:[.,]\d+)*\b/g);
-    if (!allMatches) return null;
-    cleaned = allMatches[allMatches.length - 1];
-  } else {
-    // Filtrar tokens pequeños que sean artefactos como '2' o '21' aislados antes de un número mayor
-    let candidates = matches.map(m => m.trim());
-    if (candidates.length >= 2) {
-      if ((candidates[0] === '2' || candidates[0] === '21') && candidates[1].length >= 3) {
-        candidates = candidates.slice(1);
-      }
-    }
-    cleaned = candidates[candidates.length - 1];
+  // 2. Corrección de error de OCR: Si quedó un '21' o '2' pegado al inicio de un monto con formato conocido (ej: '22.600,00' o '2112,287.38')
+  if (/^21\s*(\d{1,3}[.,]\d{3}(?:[.,]\d{2})?)$/.test(str)) {
+    str = str.replace(/^21\s*/, '');
+  } else if (/^2\s*(\d{1,3}[.,]\d{3}(?:[.,]\d{2})?)$/.test(str)) {
+    str = str.replace(/^2\s*/, '');
+  } else if (/^21\s+(\d+)/.test(str)) {
+    str = str.replace(/^21\s+/, '');
+  } else if (/^2\s+(\d+)/.test(str)) {
+    str = str.replace(/^2\s+/, '');
   }
 
-  let rawNumber = cleaned;
-
-  // Normalizar separadores:
-  if (rawNumber.includes('.') && rawNumber.includes(',')) {
-    if (rawNumber.lastIndexOf(',') > rawNumber.lastIndexOf('.')) {
-      // Formato latino: 2.600,00 -> 2600.00
-      rawNumber = rawNumber.replace(/\./g, '').replace(',', '.');
+  // 3. Normalizar separadores a formato float estándar
+  if (str.includes('.') && str.includes(',')) {
+    if (str.lastIndexOf(',') > str.lastIndexOf('.')) {
+      str = str.replace(/\./g, '').replace(',', '.'); // Formato latino: 2.600,00 -> 2600.00
     } else {
-      // Formato anglosajón: 12,287.38 -> 12287.38
-      rawNumber = rawNumber.replace(/,/g, '');
+      str = str.replace(/,/g, ''); // Formato anglosajón: 12,287.38 -> 12287.38
     }
-  } else if (rawNumber.includes(',')) {
-    const partes = rawNumber.split(',');
-    if (partes.length === 2 && partes[1].length === 2) {
-      // Decimal latino con 2 dígitos: "2600,00" -> "2600.00"
-      rawNumber = partes[0].replace(/\./g, '') + '.' + partes[1];
-    } else if (partes.length >= 2 && partes[partes.length - 1].length === 3) {
-      // Separador de miles: "25,000" -> "25000"
-      rawNumber = rawNumber.replace(/,/g, '');
-    } else {
-      rawNumber = rawNumber.replace(',', '.');
-    }
-  } else if (rawNumber.includes('.')) {
-    const partes = rawNumber.split('.');
+  } else if (str.includes(',')) {
+    const partes = str.split(',');
     if (partes.length === 2 && partes[1].length === 3) {
-      // Separador de miles con punto: "2.600" -> "2600"
-      rawNumber = partes[0] + partes[1];
+      str = str.replace(/,/g, '');
+    } else {
+      str = str.replace(',', '.');
+    }
+  } else if (str.includes('.')) {
+    const partes = str.split('.');
+    if (partes.length === 2 && partes[1].length === 3) {
+      str = str.replace(/\./g, '');
     } else if (partes.length > 2) {
-      // Millones: "1.200.000" -> "1200000"
-      rawNumber = rawNumber.replace(/\./g, '');
+      str = str.replace(/\./g, '');
     }
   }
 
-  const parsed = parseFloat(rawNumber);
-  return isNaN(parsed) ? null : Math.round(parsed * 100) / 100;
+  const result = parseFloat(str.replace(/[^0-9.]/g, ''));
+  return isNaN(result) ? null : Math.round(result * 100) / 100;
 }
 
 /**
- * 2. PARSEO DE REFERENCIA / Nº DE DOCUMENTO
+ * 2. EXTRACCIÓN ESTRICTA DE REFERENCIA / Nº DE DOCUMENTO
  * Extrae el identificador numérico o alfanumérico exacto y rechaza términos genéricos
  */
 export function parseReferenceFromOCR(rawText) {
@@ -269,7 +250,7 @@ export function parseDateFromOCR(rawText) {
 }
 
 /**
- * Intento de extracción con Gemini 1.5 Flash Vision AI si la API Key está disponible
+ * Extracción con Gemini Vision LLM con System Prompt estricto para Costa Rica
  */
 async function extraerConGeminiVision(fileOrDataUrl, apiKey) {
   if (!apiKey) return null;
@@ -291,22 +272,18 @@ async function extraerConGeminiVision(fileOrDataUrl, apiKey) {
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const promptText = `
-Actúa como un extractor de alta precisión de comprobantes bancarios (SINPE Móvil, transferencias y facturas).
-Analiza la imagen y extrae:
-
-1. "referenceNumber": Código numérico/alfanumérico exacto del documento (ej: "2026082215284002178009698", "78009698", "SINPE-94827103", "AUT-582914").
-   - NUNCA devuelvas términos genéricos como "Transferencia", "SINPE", "Pago", "Comprobante".
-   - Si no hay código específico, devuelve null.
-2. "amount": Monto transferido o pagado como número flotante limpio (ej: "₡2.600,00" -> 2600.0, "₡12,287.38" -> 12287.38).
-   - NUNCA confundas ₡ con 2 o 21. Si dice ₡2.600,00 es 2600. Si dice ₡12,287.38 es 12287.38.
-   - Si no se detecta, devuelve null.
-3. "date": Fecha del documento en formato YYYY-MM-DD (ej: "22 de agosto, 2026" -> "2026-08-22"). Si no se detecta, devuelve null.
-
-Responde ÚNICAMENTE un JSON:
+Eres un extractor contable experto para Costa Rica.
+ATENCIÓN CRÍTICA:
+- El símbolo de colones '₡' NUNCA debe interpretarse como el dígito '2' o '21'.
+  Ejemplo: '₡2.600,00' es exactamente 2600 (NO 22600).
+  Ejemplo: '₡12,287.38' es exactamente 12287.38 (NO 212287.38).
+- Extrae la fecha exacta del encabezado (ej: '22 de agosto, 2026' -> '2026-08-22').
+- Extrae la referencia o número de documento numérico.
+Devuelve ÚNICAMENTE un JSON válido:
 {
-  "referenceNumber": string | null,
-  "amount": number | null,
-  "date": string | null
+  "referenceNumber": "2026082215284002178009698",
+  "amount": 2600.00,
+  "date": "2026-08-22"
 }
 `.trim();
 
@@ -344,7 +321,7 @@ Responde ÚNICAMENTE un JSON:
 
     return {
       referenceNumber: parsed.referenceNumber ? parseReferenceFromOCR(parsed.referenceNumber) || parsed.referenceNumber : null,
-      amount: parsed.amount !== null && parsed.amount !== undefined ? parseAmountFromOCR(String(parsed.amount)) : null,
+      amount: parsed.amount !== null && parsed.amount !== undefined ? cleanAndParseAmount(String(parsed.amount)) : null,
       date: parsed.date ? parseDateFromOCR(parsed.date) : null
     };
   } catch (err) {
@@ -401,7 +378,7 @@ export async function extraerDatosComprobante(fileOrDataUrl, onProgress = null) 
 
     const resultadoOCR = {
       referenceNumber: parseReferenceFromOCR(text),
-      amount: parseAmountFromOCR(text),
+      amount: cleanAndParseAmount(text),
       date: parseDateFromOCR(text)
     };
 
