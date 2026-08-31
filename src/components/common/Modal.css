@@ -146,3 +146,32 @@
   font-size: 0.82rem;
   color: var(--color-texto-secundario);
 }
+
+/* ===================================================
+   RESPONSIVE: MODALES EN PANTALLAS MÓVILES
+   =================================================== */
+@media (max-width: 640px) {
+  .modal-backdrop {
+    padding: 0.65rem;
+  }
+
+  .modal-card {
+    max-height: 92vh;
+    border-radius: 14px;
+  }
+
+  .modal-header {
+    padding: 1rem 1.15rem;
+  }
+
+  .modal-body,
+  .modal-body-content {
+    padding: 1rem 1.15rem;
+  }
+
+  .modal-footer {
+    padding: 0.85rem 1.15rem;
+    gap: 0.5rem;
+  }
+}
+

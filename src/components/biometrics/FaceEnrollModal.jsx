@@ -116,7 +116,7 @@ export default function FaceEnrollModal({ isOpen, onClose, onEnrolled }) {
       onClose={handleClose}
       title="Registrar Rostro"
       subtitle="Enrolamiento seguro de credencial biométrica"
-      cardClassName="modal-face-card"
+      cardClassName="modal-face-card modal-face-enroll"
       icon={
         <div className="icon-circle-badge" style={{ background: 'rgba(244, 114, 182, 0.15)', color: '#f472b6', border: '1px solid rgba(244, 114, 182, 0.3)' }}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -129,12 +129,12 @@ export default function FaceEnrollModal({ isOpen, onClose, onEnrolled }) {
       }
       footer={
         <>
-          <button type="button" className="btn-secondary-action" onClick={handleClose}>
+          <button type="button" className="btn-secondary-action btn-cancel" onClick={handleClose}>
             Cancelar
           </button>
           <button
             type="button"
-            className="btn-primary-action"
+            className="btn-primary-action btn-confirm-biometric"
             onClick={handleVerificarYCapturar}
             disabled={capturing}
           >
@@ -146,7 +146,7 @@ export default function FaceEnrollModal({ isOpen, onClose, onEnrolled }) {
       <div className="face-scanner-body">
         {/* Banner de Error de Autenticación */}
         {errorAuth && (
-          <div className="alerta-error" style={{ width: '100%', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', padding: '0.65rem 0.85rem', borderRadius: '8px', fontSize: '0.85rem' }}>
+          <div className="auth-error-banner" style={{ width: '100%', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', padding: '0.65rem 0.85rem', borderRadius: '8px', fontSize: '0.85rem' }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="10"></circle>
               <line x1="12" y1="8" x2="12" y2="12"></line>
@@ -156,9 +156,9 @@ export default function FaceEnrollModal({ isOpen, onClose, onEnrolled }) {
           </div>
         )}
 
-        {/* Formulario de Credenciales de Seguridad */}
-        <div style={{ width: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.5rem' }}>
-          <div className="grupo-campo" style={{ marginBottom: 0 }}>
+        {/* Formulario de Credenciales de Seguridad (1 col en mobile, 2 cols en desktop) */}
+        <div className="face-enroll-auth-grid">
+          <div className="grupo-campo form-group-modal" style={{ marginBottom: 0 }}>
             <label htmlFor="enroll-usuario-input" className="etiqueta">
               Usuario Administrador *
             </label>
@@ -177,11 +177,11 @@ export default function FaceEnrollModal({ isOpen, onClose, onEnrolled }) {
             />
           </div>
 
-          <div className="grupo-campo" style={{ marginBottom: 0 }}>
+          <div className="grupo-campo form-group-modal" style={{ marginBottom: 0 }}>
             <label htmlFor="enroll-contrasena-input" className="etiqueta">
               Contraseña *
             </label>
-            <div className="contenedor-contrasena">
+            <div className="contenedor-contrasena input-password-wrapper">
               <input
                 type={showPassword ? 'text' : 'password'}
                 id="enroll-contrasena-input"
@@ -196,7 +196,7 @@ export default function FaceEnrollModal({ isOpen, onClose, onEnrolled }) {
               />
               <button
                 type="button"
-                className="boton-toggle"
+                className="boton-toggle btn-toggle-pass"
                 onClick={() => setShowPassword(!showPassword)}
                 aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
               >
