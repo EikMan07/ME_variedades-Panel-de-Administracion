@@ -4,8 +4,8 @@
  * 
  * Extrae con alta precisión:
  * 1. referenceNumber (Nº de comprobante, referencia, autorización, clave)
- * 2. amount (Monto normalizado a float limpio, ej: "₡2.600,00" -> 2600)
- * 3. date (Fecha normalizada a formato ISO YYYY-MM-DD)
+ * 2. amount (Monto normalizado a float limpio, ej: "₡2.600,00" -> 2600, "₡12,287.38" -> 12287.38)
+ * 3. date (Fecha normalizada a formato ISO YYYY-MM-DD, ej: "22 de agosto, 2026" -> "2026-08-22")
  */
 
 // Palabras genéricas y términos de parada que NUNCA deben asignarse como número de referencia
@@ -64,7 +64,8 @@ const PALABRAS_PROHIBIDAS = new Set([
   'saldo',
   'pendiente',
   'debito',
-  'credito'
+  'credito',
+  'transaccion'
 ]);
 
 const MAPA_MESES = {
@@ -76,7 +77,7 @@ const MAPA_MESES = {
   junio: '06', jun: '06',
   julio: '07', jul: '07',
   agosto: '08', ago: '08',
-  septiembre: '09', sep: '09', sept: '09',
+  septiembre: '09', sep: '09', sept: '09', setiembre: '09', set: '09',
   octubre: '10', oct: '10',
   noviembre: '11', nov: '11',
   diciembre: '12', dic: '12'
@@ -91,7 +92,7 @@ export function validarYLimpiarReferencia(candidato) {
   // Limpiar caracteres de puntuación al inicio/final
   let limpio = candidato.trim().replace(/^[:#\-\s.,;()]+|[:#\-\s.,;()]+$/g, '').trim();
 
-  // Si contiene espacios múltiples, tomar el primer bloque o limpiar
+  // Si contiene espacios múltiples, tomar el bloque relevante
   if (limpio.includes(' ')) {
     const partes = limpio.split(/\s+/);
     // Si la primera parte parece una etiqueta como "No." o "#", tomar la segunda
@@ -123,8 +124,9 @@ export function validarYLimpiarReferencia(candidato) {
 }
 
 /**
- * Normaliza montos en colones o dólares con distintos separadores de miles y decimales
- * Ejemplos: "₡2.600,00" -> 2600 | "₡ 25,000.00" -> 25000 | "¢15.000" -> 15000 | "2600,50" -> 2600.5
+ * Normaliza montos con alta precisión:
+ * - Limpia explícitamente símbolos de moneda (₡, $, USD, CRC, ¢) y artefactos de OCR (₡ leído como 2 o 21).
+ * - Distingue formato latino (12.300,00) vs formato estándar (12,307.38).
  */
 export function normalizarMonto(rawMonto) {
   if (rawMonto === null || rawMonto === undefined || rawMonto === '') return null;
@@ -132,46 +134,64 @@ export function normalizarMonto(rawMonto) {
 
   let str = String(rawMonto).trim();
 
-  // Limpiar símbolos de moneda y caracteres no numéricos excepto puntos, comas y espacios
-  str = str.replace(/[₡¢$€]|CRC|USD|colones|dolares|monto|total|:/gi, '').trim();
+  // 1. Limpieza explícita de símbolos de moneda, palabras y prefijos ANTES de extraer dígitos
+  str = str.replace(/[₡¢$€£¥]/g, ' ');
+  str = str.replace(/\b(?:CRC|USD|colones|dolares|monto|total|debitado|transferido|pagado|importe|valor)\b/gi, ' ');
+  str = str.replace(/[:=]/g, ' ').trim();
 
-  if (!str) return null;
+  // 2. Limpieza de artefactos OCR donde ₡ se reconoce como '2', '21' o 'C' antes de un número
+  str = str.replace(/^(?:21|2|c|e|¢)\s+(?=\d)/i, '');
 
   // Eliminar espacios intermedios
   str = str.replace(/\s+/g, '');
 
-  // Caso 1: Tiene tanto punto como coma (ej: 2.600,00 o 2,600.00)
-  if (str.includes('.') && str.includes(',')) {
-    const ultimoPunto = str.lastIndexOf('.');
-    const ultimaComa = str.lastIndexOf(',');
+  const matchNum = str.match(/[\d.,]+/);
+  if (!matchNum) return null;
+  str = matchNum[0];
+  str = str.replace(/^[.,]+|[.,]+$/g, '');
+  if (!str) return null;
 
-    if (ultimoPunto > ultimaComa) {
-      // Formato US: 2,600.00 -> quitar comas
-      str = str.replace(/,/g, '');
-    } else {
-      // Formato Europeo/Latino: 2.600,00 -> quitar puntos y coma a punto
+  // A) Si el monto tiene punto Y coma:
+  if (str.includes('.') && str.includes(',')) {
+    const primerPunto = str.indexOf('.');
+    const primeraComa = str.indexOf(',');
+    if (primerPunto < primeraComa) {
+      // Punto antes de coma (ej: "2.600,00" o "12.300,00"): punto es miles, coma es decimal -> 2600.00 / 12300.00
       str = str.replace(/\./g, '').replace(/,/g, '.');
+    } else {
+      // Coma antes de punto (ej: "12,287.38" o "12,307.38"): coma es miles, punto es decimal -> 12287.38 / 12307.38
+      str = str.replace(/,/g, '');
     }
   }
-  // Caso 2: Solo tiene comas (ej: 2,600 o 2600,00 o 25,000)
+  // B) Si solo tiene coma:
   else if (str.includes(',')) {
     const partes = str.split(',');
+    // Si la última parte tiene 2 dígitos (ej: "2600,00" o "287,38" o "12307,38") -> decimal
     if (partes.length === 2 && partes[1].length === 2) {
-      // Decimal con 2 dígitos: 2600,00 -> 2600.00
       str = partes[0].replace(/\./g, '') + '.' + partes[1];
-    } else {
-      // Separador de miles: 25,000 -> 25000
+    }
+    // Si tiene 3 dígitos (ej: "2,600" o "12,300" o "25,000") -> miles
+    else if (partes.length >= 2 && partes[partes.length - 1].length === 3) {
       str = str.replace(/,/g, '');
     }
+    // Otro caso con coma (ej: decimales con 1 dígito "2600,5")
+    else if (partes.length === 2) {
+      str = partes[0] + '.' + partes[1];
+    }
   }
-  // Caso 3: Solo tiene puntos (ej: 2.600 o 25.000 o 2600.00)
+  // C) Si solo tiene punto:
   else if (str.includes('.')) {
     const partes = str.split('.');
+    // Si solo tiene punto seguido de 2 dígitos al final (ej: "2600.00" o "287.38" o "12307.38") -> decimal
     if (partes.length === 2 && partes[1].length === 2) {
-      // Decimal con 2 dígitos: 2600.00 -> 2600.00
       str = partes[0] + '.' + partes[1];
-    } else if (partes.length >= 2 && (partes[1].length === 3 || partes.length > 2)) {
-      // Separador de miles: 2.600 -> 2600
+    }
+    // Si solo tiene punto seguido de 3 dígitos (ej: "2.600" o "12.300" o "25.000") -> miles
+    else if (partes.length === 2 && partes[1].length === 3) {
+      str = str.replace(/\./g, '');
+    }
+    // Si tiene múltiples puntos (ej: "1.200.000") -> miles
+    else if (partes.length > 2) {
       str = str.replace(/\./g, '');
     }
   }
@@ -207,7 +227,19 @@ export function normalizarFechaEspanol(rawFecha) {
     }
   }
 
-  // 3. Formato numérico latino: DD/MM/YYYY o DD-MM-YYYY
+  // 3. Formato mes primero en español: "Agosto 22, 2026"
+  const matchMesPrimero = str.match(/\b([a-záéíóú]+)\s*(0?[1-9]|[12]\d|3[01])\s*(?:,|\.|de|del)?\s*(20\d{2})\b/i);
+  if (matchMesPrimero) {
+    const mesTexto = matchMesPrimero[1].normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const dia = matchMesPrimero[2].padStart(2, '0');
+    const anio = matchMesPrimero[3];
+    const mesNum = MAPA_MESES[mesTexto];
+    if (mesNum) {
+      return `${anio}-${mesNum}-${dia}`;
+    }
+  }
+
+  // 4. Formato numérico latino: DD/MM/YYYY o DD-MM-YYYY
   const matchLatino = str.match(/\b(0?[1-9]|[12]\d|3[01])[-/.](0?[1-9]|1[0-2])[-/.](20\d{2})\b/);
   if (matchLatino) {
     const dia = matchLatino[1].padStart(2, '0');
@@ -216,7 +248,7 @@ export function normalizarFechaEspanol(rawFecha) {
     return `${anio}-${mes}-${dia}`;
   }
 
-  // 4. Formato corto: DD/MM/YY (ej: 22/08/26)
+  // 5. Formato corto: DD/MM/YY (ej: 22/08/26)
   const matchCorto = str.match(/\b(0?[1-9]|[12]\d|3[01])[-/.](0?[1-9]|1[0-2])[-/.](2\d)\b/);
   if (matchCorto) {
     const dia = matchCorto[1].padStart(2, '0');
@@ -251,14 +283,17 @@ async function extraerConGeminiVision(fileOrDataUrl, apiKey) {
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const promptText = `
-Actúa como un sistema OCR de visión computacional de alta precisión especializado en comprobantes bancarios (SINPE Móvil, transferencias, tiquetes y facturas).
-Analiza la imagen del comprobante y extrae:
+Actúa como un sistema OCR y Visión de datos financieros para comprobantes bancarios (SINPE Móvil, transferencias bancarias, recibos y facturas).
+Analiza cuidadosamente la imagen y extrae:
 
-1. "referenceNumber": El código numérico o alfanumérico EXACTO del documento (ejemplos: "2026082215284002178009698", "78009698", "SINPE-94827103", "AUT-582914", "FAC-001-00293").
-   - NUNCA devuelvas palabras genéricas como "Transferencia", "SINPE", "Pago", "Comprobante", "Detalle", "Monto", etc.
-   - Si no hay un número de referencia o código específico, devuelve null.
-2. "amount": El valor del monto transferido o total como número decimal limpio sin símbolos de moneda (ej: "₡2.600,00" -> 2600.0, "₡25.000" -> 25000.0). Si no se detecta, devuelve null.
-3. "date": La fecha del comprobante en formato YYYY-MM-DD (ej: "22 de agosto, 2026" -> "2026-08-22"). Si no se detecta, devuelve null.
+1. "referenceNumber": El código numérico o alfanumérico EXACTO del comprobante (ej: "2026082215284002178009698", "78009698", "SINPE-94827103", "AUT-582914", "FAC-001-00293").
+   - IMPORTANTE: NUNCA devuelvas palabras genéricas como "Transferencia", "SINPE", "Pago", "Comprobante", "Detalle", "Monto", etc.
+   - Si no hay un código numérico o alfanumérico específico, devuelve null.
+2. "amount": El valor del monto total transferido o pagado como un número decimal limpio sin símbolos de moneda ni letras (ej: "₡2.600,00" -> 2600.0, "₡12,287.38" -> 12287.38, "₡25.000" -> 25000.0).
+   - IMPORTANTE: NUNCA confundas el símbolo de colones ₡ con los dígitos 2 o 21. Si dice ₡2.600,00 el monto es 2600, NO 22600. Si dice ₡12,287.38 el monto es 12287.38, NO 212287.38.
+   - Si no se detecta el monto, devuelve null.
+3. "date": La fecha del comprobante en formato ISO estricto YYYY-MM-DD (ej: "22 de agosto, 2026" -> "2026-08-22", "31/08/2026" -> "2026-08-31").
+   - Si no se detecta la fecha, devuelve null.
 
 Responde EXCLUSIVAMENTE con un JSON válido con esta estructura:
 {
@@ -368,15 +403,24 @@ function parsearTextoOCR(rawText) {
     }
   }
 
-  // 2. Búsqueda de Monto (ej: "Monto transferido: ₡2.600,00" o "Total: ₡25.000")
-  const regexMontos = /(?:monto(?:\s*transferido|\s*debitado|\s*enviado|\s*pagado)?|total|importe|valor)\s*[:=]?\s*([₡¢$€A-Za-z\s]*[\d.,\s]+)/i;
+  // 2. Búsqueda de Monto (Campos prioritarios: "Monto total pagado", "Monto transferido", "Monto pagado", "Monto debitado", "Total")
+  const regexMontosPrioritarios = /(?:monto\s*(?:total\s*)?(?:transferido|pagado|debitado|enviado)?|total\s*(?:transferido|pagado|debitado)?|importe|valor\s*(?:total)?)\s*[:=]?\s*([^\n\r]+)/i;
 
-  for (const linea of lineas) {
-    const match = linea.match(regexMontos);
+  for (let i = 0; i < lineas.length; i++) {
+    const linea = lineas[i];
+    const match = linea.match(regexMontosPrioritarios);
     if (match && match[1]) {
       const m = normalizarMonto(match[1]);
       if (m) {
         amount = m;
+        break;
+      }
+    }
+    // Si la etiqueta está sola en la línea, verificar la siguiente línea
+    if (/(?:monto\s*(?:total\s*)?(?:transferido|pagado|debitado)?|total)\s*[:=]?$/i.test(linea) && i < lineas.length - 1) {
+      const mSig = normalizarMonto(lineas[i + 1]);
+      if (mSig) {
+        amount = mSig;
         break;
       }
     }
@@ -396,9 +440,9 @@ function parsearTextoOCR(rawText) {
     }
   }
 
-  // 3. Búsqueda de Fecha (ej: "22 de agosto, 2026" o "22/08/2026")
-  for (const linea of lineas) {
-    const f = normalizarFechaEspanol(linea);
+  // 3. Búsqueda de Fecha en todo el texto (priorizando el encabezado)
+  for (let i = 0; i < lineas.length; i++) {
+    const f = normalizarFechaEspanol(lineas[i]);
     if (f) {
       date = f;
       break;

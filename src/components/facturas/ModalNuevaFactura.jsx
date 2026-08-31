@@ -143,6 +143,14 @@ export default function ModalNuevaFactura({ isOpen, onClose, clientePreseleccion
           monto: resultado.amount !== null && resultado.amount !== undefined ? String(resultado.amount) : prev.monto,
           fecha_emision: resultado.date || prev.fecha_emision
         }));
+
+        setErrores(prev => {
+          const nuevo = { ...prev };
+          if (resultado.date) delete nuevo.fecha_emision;
+          if (resultado.referenceNumber) delete nuevo.referencia_id;
+          return nuevo;
+        });
+
         setOcrSuccess(true);
 
         const detalles = [];
