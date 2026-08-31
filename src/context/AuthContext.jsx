@@ -45,7 +45,7 @@ export function AuthProvider({ children }) {
       setUser(nombreFormateado);
       return { success: true };
     } else {
-      throw new Error('Credenciales incorrectas. Para ingresar usa Usuario: maria_admin | Contraseña: admin123');
+      throw new Error('Usuario o contraseña incorrectos. Por favor intenta de nuevo.');
     }
   };
 

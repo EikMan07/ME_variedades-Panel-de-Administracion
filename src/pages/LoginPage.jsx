@@ -113,7 +113,7 @@ export default function LoginPage() {
                   id="usuario"
                   name="usuario"
                   className={`input ${errorUsuario ? 'input-error' : ''}`}
-                  placeholder="Ej. maria_admin"
+                  placeholder="Ingresa tu usuario"
                   autoComplete="username"
                   value={usuario}
                   onChange={(e) => {

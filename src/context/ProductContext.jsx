@@ -4,26 +4,7 @@ import { api } from '../services/api';
 const ProductContext = createContext(null);
 
 export function ProductProvider({ children }) {
-  const [productos, setProductos] = useState(() => {
-    try {
-      const guardados = localStorage.getItem('me_productos_data');
-      if (guardados) {
-        const parsed = JSON.parse(guardados);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed.map((p, i) => ({
-            ...p,
-            id: Number(p.id) || i + 1,
-            costo: Number(p.costo) || 0,
-            stock: Math.max(0, Number(p.stock) || 0)
-          }));
-        }
-      }
-    } catch {
-      // Ignorar error de JSON corrupto
-    }
-    return [];
-  });
-
+  const [productos, setProductos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Carga inicial desde Supabase
@@ -31,12 +12,17 @@ export function ProductProvider({ children }) {
     try {
       setIsLoading(true);
       const datosRemotos = await api.getProductos();
-      if (datosRemotos && Array.isArray(datosRemotos) && datosRemotos.length > 0) {
-        setProductos(datosRemotos);
-        localStorage.setItem('me_productos_data', JSON.stringify(datosRemotos));
-      }
+      setProductos(Array.isArray(datosRemotos) ? datosRemotos : []);
+      localStorage.setItem('me_productos_data', JSON.stringify(datosRemotos || []));
     } catch (err) {
-      console.warn('Usando productos de caché local (Supabase offline o en proceso de migración):', err);
+      console.warn('Usando productos de caché local:', err);
+      try {
+        const guardados = localStorage.getItem('me_productos_data');
+        if (guardados) {
+          const parsed = JSON.parse(guardados);
+          if (Array.isArray(parsed)) setProductos(parsed);
+        }
+      } catch { /* ignorar */ }
     } finally {
       setIsLoading(false);
     }
