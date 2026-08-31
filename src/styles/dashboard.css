@@ -1049,4 +1049,80 @@
   }
 }
 
+/* ===================================================
+   RESPONSIVE MOBILE-FIRST: ANALYTICS CHART WIDGET
+   =================================================== */
+@media (max-width: 640px) {
+  .analytics-chart-section {
+    padding: 1.1rem 0.85rem !important;
+    gap: 0.85rem !important;
+    border-radius: 14px !important;
+  }
+
+  .analytics-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+
+  .analytics-title-group {
+    gap: 0.65rem !important;
+  }
+
+  .analytics-icon-badge {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 8px !important;
+  }
+
+  .analytics-heading {
+    font-size: 1rem !important;
+  }
+
+  .analytics-subheading {
+    font-size: 0.74rem !important;
+  }
+
+  .timeframe-toggle-wrapper {
+    width: 100% !important;
+  }
+
+  .btn-timeframe-toggle {
+    flex: 1 !important;
+    justify-content: center !important;
+    padding: 0.35rem 0.45rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .metric-pills-bar {
+    gap: 0.35rem !important;
+    padding-bottom: 0.65rem !important;
+  }
+
+  .metric-pill-btn {
+    padding: 0.35rem 0.55rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  .chart-legend-row {
+    gap: 0.65rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  .chart-canvas-container {
+    height: 220px !important;
+  }
+
+  .analytics-footer-summary {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.45rem !important;
+  }
+
+  .summary-stat-chip {
+    font-size: 0.74rem !important;
+  }
+}
+
+
 

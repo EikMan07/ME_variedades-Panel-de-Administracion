@@ -35,14 +35,14 @@ export default function Topbar({
         </button>
 
         {/* Breadcrumb Contextual */}
-        <div className="topbar-breadcrumb">
+        <div className="topbar-breadcrumb topbar-brand-breadcrumb">
           <div className="breadcrumb-logo-circle">
-            <img src={logoImg} alt="M" className="breadcrumb-logo-img" />
+            <img src={logoImg} alt="ME Variedades" className="breadcrumb-logo-img topbar-logo-img" />
           </div>
-          <div className="breadcrumb-text">
-            <span className="breadcrumb-brand">ME Variedades</span>
+          <div className="breadcrumb-text topbar-titles-wrapper">
+            <span className="breadcrumb-brand brand-prefix-text">ME VARIEDADES</span>
             <span className="breadcrumb-separator">/</span>
-            <span className="breadcrumb-current">{breadcrumb}</span>
+            <h1 className="breadcrumb-current current-module-title">{breadcrumb}</h1>
           </div>
         </div>
       </div>

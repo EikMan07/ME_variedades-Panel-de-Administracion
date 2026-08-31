@@ -601,15 +601,17 @@ header.app-header {
 }
 
 /* Topbar Breadcrumb */
-.topbar-breadcrumb {
+.topbar-breadcrumb,
+.topbar-brand-breadcrumb {
   display: flex;
   align-items: center;
   gap: 0.65rem;
+  min-width: 0;
 }
 
 .breadcrumb-logo-circle {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   overflow: hidden;
   border: 1.5px solid var(--rose-soft);
@@ -619,23 +621,27 @@ header.app-header {
   flex-shrink: 0;
 }
 
-.breadcrumb-logo-img {
+.breadcrumb-logo-img,
+.topbar-logo-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   clip-path: circle(50% at 50% 50%);
 }
 
-.breadcrumb-text {
+.breadcrumb-text,
+.topbar-titles-wrapper {
   display: flex;
   align-items: center;
   gap: 0.45rem;
   font-size: 0.88rem;
   font-weight: 500;
   white-space: nowrap;
+  min-width: 0;
 }
 
-.breadcrumb-brand {
+.breadcrumb-brand,
+.brand-prefix-text {
   color: var(--color-texto-principal);
   font-weight: 600;
 }
@@ -644,9 +650,15 @@ header.app-header {
   color: #71717a;
 }
 
-.breadcrumb-current {
+.breadcrumb-current,
+.current-module-title {
   color: var(--rose-soft);
   font-weight: 600;
+  font-size: 0.92rem;
+  margin: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .topbar-right,
@@ -1221,3 +1233,71 @@ header.app-header {
     right: -60px;
   }
 }
+
+/* ===================================================
+   RESPONSIVE MOBILE-FIRST: TOPBAR & NAVEGACIÓN
+   =================================================== */
+@media (max-width: 640px) {
+  .app-topbar {
+    padding: 0 0.75rem !important;
+    gap: 0.5rem !important;
+    height: 60px !important;
+    min-height: 60px !important;
+  }
+
+  .topbar-left {
+    gap: 0.5rem !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
+  /* Ocultar el prefijo de marca y separador en móvil para evitar texto truncado */
+  .brand-prefix-text,
+  .breadcrumb-brand,
+  .breadcrumb-separator {
+    display: none !important;
+  }
+
+  .current-module-title,
+  .breadcrumb-current {
+    font-size: 0.95rem !important;
+    max-width: 170px !important;
+    font-weight: 700 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  /* Ocultar la fecha en móvil para que el botón de acción y notificaciones no se corten */
+  .date-badge,
+  .topbar-date,
+  #current-date-badge {
+    display: none !important;
+  }
+
+  .topbar-right {
+    gap: 0.45rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  .topbar-right .btn-primary-action,
+  .topbar-right .btn-primary {
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 0.65rem !important;
+    font-size: 0.76rem !important;
+    gap: 0.35rem !important;
+    white-space: nowrap !important;
+  }
+
+  .btn-topbar-action {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  .notif-dropdown {
+    width: calc(100vw - 16px) !important;
+    right: -10px !important;
+  }
+}
+
