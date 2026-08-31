@@ -6,9 +6,10 @@ import { formatBytes } from './facturasUtils';
 import CustomDatePicker from '../common/CustomDatePicker';
 import Modal from '../common/Modal';
 import ModalCapturaCamara from './ModalCapturaCamara';
+import { extraerDatosComprobante } from '../../services/receiptOcrService';
 
 /**
- * Modal para digitalizar y subir una nueva Factura o Comprobante.
+ * Modal para digitalizar y subir una nueva Factura o Comprobante con OCR inteligente.
  */
 export default function ModalNuevaFactura({ isOpen, onClose, clientePreseleccionado = null }) {
   const { clientes } = useClients();
@@ -19,6 +20,9 @@ export default function ModalNuevaFactura({ isOpen, onClose, clientePreseleccion
   const autocompleteRef = useRef(null);
 
   const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
+  const [isOcrAnalyzing, setIsOcrAnalyzing] = useState(false);
+  const [ocrStatus, setOcrStatus] = useState('');
+  const [ocrSuccess, setOcrSuccess] = useState(false);
 
   const initialForm = {
     clienteBusqueda: '',
@@ -44,6 +48,9 @@ export default function ModalNuevaFactura({ isOpen, onClose, clientePreseleccion
 
   useEffect(() => {
     if (isOpen) {
+      setIsOcrAnalyzing(false);
+      setOcrSuccess(false);
+      setOcrStatus('');
       if (clientePreseleccionado) {
         setForm({
           ...initialForm,
@@ -116,6 +123,38 @@ export default function ModalNuevaFactura({ isOpen, onClose, clientePreseleccion
     }
   };
 
+  // Extracción automática OCR de referencias en segundo plano
+  const ejecutarOcrComprobante = async (fileOrDataUrl) => {
+    if (!fileOrDataUrl) return;
+
+    try {
+      setIsOcrAnalyzing(true);
+      setOcrSuccess(false);
+      setOcrStatus('Escaneando comprobante...');
+
+      const resultado = await extraerDatosComprobante(fileOrDataUrl, (progreso, msg) => {
+        setOcrStatus(msg);
+      });
+
+      if (resultado && resultado.referenceNumber) {
+        setForm(prev => ({
+          ...prev,
+          referencia_id: prev.referencia_id || resultado.referenceNumber,
+          monto: (!prev.monto && resultado.monto) ? String(resultado.monto) : prev.monto
+        }));
+        setOcrSuccess(true);
+        showToast({
+          tipo: 'success',
+          mensaje: `Referencia detectada: ${resultado.referenceNumber}`
+        });
+      }
+    } catch (err) {
+      console.warn('Escaneo OCR completado sin coincidencias:', err);
+    } finally {
+      setIsOcrAnalyzing(false);
+    }
+  };
+
   // Procesamiento del archivo a Base64 Data URL
   const procesarArchivo = (file) => {
     if (!file) return;
@@ -142,14 +181,20 @@ export default function ModalNuevaFactura({ isOpen, onClose, clientePreseleccion
 
     const reader = new FileReader();
     reader.onload = (e) => {
+      const dataUrl = e.target.result;
       setForm(prev => ({
         ...prev,
         archivo_nombre: file.name,
         archivo_tipo: isPdf ? 'pdf' : 'image',
-        archivo_data: e.target.result,
+        archivo_data: dataUrl,
         archivo_size: file.size,
       }));
       setErrores(prev => ({ ...prev, archivo_data: null }));
+
+      // Ejecutar OCR en segundo plano si es imagen
+      if (isImg) {
+        ejecutarOcrComprobante(dataUrl);
+      }
     };
     reader.readAsDataURL(file);
   };
@@ -174,6 +219,7 @@ export default function ModalNuevaFactura({ isOpen, onClose, clientePreseleccion
       archivo_data: null,
       archivo_size: 0,
     }));
+    setOcrSuccess(false);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -186,7 +232,11 @@ export default function ModalNuevaFactura({ isOpen, onClose, clientePreseleccion
       archivo_size,
     }));
     setErrores(prev => ({ ...prev, archivo_data: null }));
-    showToast('Fotografía capturada y adjuntada.', 'success');
+    showToast({
+      tipo: 'success',
+      mensaje: 'Fotografía capturada y adjuntada.'
+    });
+    ejecutarOcrComprobante(archivo_data);
   };
 
   const handleSubmit = async (e) => {
@@ -323,18 +373,35 @@ export default function ModalNuevaFactura({ isOpen, onClose, clientePreseleccion
               </select>
             </div>
 
-            {/* Identificador / Referencia */}
+            {/* Identificador / Referencia con OCR */}
             <div className="form-group">
-              <label className="form-label" htmlFor="input-ref-factura">
-                Referencia o N° Documento
+              <label className="form-label" htmlFor="input-ref-factura" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span>Referencia o N° Documento</span>
+                {isOcrAnalyzing && (
+                  <span className="ocr-detection-badge ocr-badge-scanning" title={ocrStatus}>
+                    <span className="ocr-mini-spinner" />
+                    <span>Detectando...</span>
+                  </span>
+                )}
+                {ocrSuccess && !isOcrAnalyzing && (
+                  <span className="ocr-detection-badge ocr-badge-success" title="Referencia detectada automáticamente por OCR">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>Detectado</span>
+                  </span>
+                )}
               </label>
               <input
                 id="input-ref-factura"
                 type="text"
                 className="input-form"
-                placeholder="Ej: #PED-001, Factura #458, SINPE #1234"
+                placeholder={isOcrAnalyzing ? 'Escaneando comprobante...' : 'Ej: #PED-001, Factura #458, SINPE #1234'}
                 value={form.referencia_id}
-                onChange={(e) => handleChange('referencia_id', e.target.value)}
+                onChange={(e) => {
+                  handleChange('referencia_id', e.target.value);
+                  if (ocrSuccess) setOcrSuccess(false);
+                }}
               />
             </div>
           </div>
