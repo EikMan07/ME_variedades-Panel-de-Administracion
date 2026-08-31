@@ -123,33 +123,40 @@ export default function ModalNuevaFactura({ isOpen, onClose, clientePreseleccion
     }
   };
 
-  // Extracción automática OCR de referencias en segundo plano
+  // Extracción automática OCR / Visión de datos en segundo plano
   const ejecutarOcrComprobante = async (fileOrDataUrl) => {
     if (!fileOrDataUrl) return;
 
     try {
       setIsOcrAnalyzing(true);
       setOcrSuccess(false);
-      setOcrStatus('Escaneando comprobante...');
+      setOcrStatus('Analizando comprobante...');
 
       const resultado = await extraerDatosComprobante(fileOrDataUrl, (progreso, msg) => {
         setOcrStatus(msg);
       });
 
-      if (resultado && resultado.referenceNumber) {
+      if (resultado && (resultado.referenceNumber || resultado.amount || resultado.date)) {
         setForm(prev => ({
           ...prev,
-          referencia_id: prev.referencia_id || resultado.referenceNumber,
-          monto: (!prev.monto && resultado.monto) ? String(resultado.monto) : prev.monto
+          referencia_id: resultado.referenceNumber || prev.referencia_id,
+          monto: resultado.amount !== null && resultado.amount !== undefined ? String(resultado.amount) : prev.monto,
+          fecha_emision: resultado.date || prev.fecha_emision
         }));
         setOcrSuccess(true);
+
+        const detalles = [];
+        if (resultado.referenceNumber) detalles.push(`Ref: ${resultado.referenceNumber}`);
+        if (resultado.amount) detalles.push(`Monto: ₡${resultado.amount.toLocaleString('es-CR')}`);
+        if (resultado.date) detalles.push(`Fecha: ${resultado.date}`);
+
         showToast({
           tipo: 'success',
-          mensaje: `Referencia detectada: ${resultado.referenceNumber}`
+          mensaje: `Comprobante analizado: ${detalles.join(' | ')}`
         });
       }
     } catch (err) {
-      console.warn('Escaneo OCR completado sin coincidencias:', err);
+      console.warn('Escaneo de comprobante completado sin datos detectados:', err);
     } finally {
       setIsOcrAnalyzing(false);
     }
@@ -435,7 +442,7 @@ export default function ModalNuevaFactura({ isOpen, onClose, clientePreseleccion
                   id="input-monto-factura"
                   type="number"
                   min="0"
-                  step="100"
+                  step="any"
                   className="input-form"
                   placeholder="0"
                   value={form.monto}
