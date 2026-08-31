@@ -1,8 +1,8 @@
 /**
  * SERVICIO DE EXTRACCIÓN INTELIGENTE DE COMPROBANTES Y FACTURAS (OCR / VISIÓN IA)
- * ME VARIEDADES — DIGITALIZACIÓN Y RECONOCIMIENTO AVANZADO
+ * ME VARIEDADES — DIGITALIZACIÓN Y RECONOCIMIENTO FINANCIERO AVANZADO
  * 
- * Extrae con alta precisión:
+ * Extrae con alta precisión quirúrgica:
  * 1. referenceNumber (Nº de comprobante, referencia, autorización, clave)
  * 2. amount (Monto normalizado a float limpio, ej: "₡2.600,00" -> 2600, "₡12,287.38" -> 12287.38)
  * 3. date (Fecha normalizada a formato ISO YYYY-MM-DD, ej: "22 de agosto, 2026" -> "2026-08-22")
@@ -84,184 +84,192 @@ const MAPA_MESES = {
 };
 
 /**
- * Normaliza y valida que un string sea un código de referencia legítimo
+ * 1. PARSEO ESTRICTO DEL MONTO (Regex + Parser estricto de separadores mixtos y limpieza de ₡)
+ * Resuelve la confusión del glifo '₡' interpretado como '2' o '21' por el OCR
  */
-export function validarYLimpiarReferencia(candidato) {
-  if (!candidato || typeof candidato !== 'string') return null;
+export function parseAmountFromOCR(rawText) {
+  if (!rawText) return null;
+  const lines = rawText.split('\n').map(l => l.trim()).filter(Boolean);
 
-  // Limpiar caracteres de puntuación al inicio/final
-  let limpio = candidato.trim().replace(/^[:#\-\s.,;()]+|[:#\-\s.,;()]+$/g, '').trim();
+  // 1. Priorizar líneas que contengan etiquetas clave de montos
+  let targetLine = lines.find(l => /monto\s*(total pagado|transferido|pagado|debitado|enviado)?|total\s*(pagado|transferido|debitado)?|importe|valor/i.test(l)) || rawText;
 
-  // Si contiene espacios múltiples, tomar el bloque relevante
-  if (limpio.includes(' ')) {
-    const partes = limpio.split(/\s+/);
-    // Si la primera parte parece una etiqueta como "No." o "#", tomar la segunda
-    if (/^(?:no|n[oº]|#|num|numero)$/i.test(partes[0]) && partes.length > 1) {
-      limpio = partes[1];
-    } else if (partes.length === 1) {
-      limpio = partes[0];
+  // 2. Limpieza de prefijos de moneda y palabras no numéricas
+  let cleaned = targetLine
+    .replace(/[₡¢$€£¥]/gi, ' ')
+    .replace(/\b(?:CRC|USD|colones|dolares|crc|usd)\b/gi, ' ');
+
+  // 3. Extraer todos los bloques numéricos con separadores
+  const matches = cleaned.match(/\b\d+(?:[.,]\d+)*\b/g);
+  if (!matches) {
+    // Si no encontró en la línea prioritaria, buscar en todo el texto
+    const allMatches = rawText
+      .replace(/[₡¢$€£¥]/gi, ' ')
+      .replace(/\b(?:CRC|USD|colones|dolares)\b/gi, ' ')
+      .match(/\b\d+(?:[.,]\d+)*\b/g);
+    if (!allMatches) return null;
+    cleaned = allMatches[allMatches.length - 1];
+  } else {
+    // Filtrar tokens pequeños que sean artefactos como '2' o '21' aislados antes de un número mayor
+    let candidates = matches.map(m => m.trim());
+    if (candidates.length >= 2) {
+      if ((candidates[0] === '2' || candidates[0] === '21') && candidates[1].length >= 3) {
+        candidates = candidates.slice(1);
+      }
     }
+    cleaned = candidates[candidates.length - 1];
   }
 
-  const enMinuscula = limpio.toLowerCase().trim();
+  let rawNumber = cleaned;
 
-  // 1. Descartar si es una palabra genérica prohibida
-  if (PALABRAS_PROHIBIDAS.has(enMinuscula)) {
-    return null;
-  }
-
-  // 2. Descartar si solo contiene letras y tiene menos de 5 caracteres sin dígitos
-  if (/^[A-Za-z]+$/.test(limpio) && limpio.length < 8) {
-    return null;
-  }
-
-  // 3. Debe tener entre 4 y 50 caracteres y contener al menos 1 número o ser un código estructurado
-  if (limpio.length >= 4 && limpio.length <= 50 && (/\d/.test(limpio) || /^[A-Z0-9\-_]{6,}$/i.test(limpio))) {
-    return limpio;
-  }
-
-  return null;
-}
-
-/**
- * Normaliza montos con alta precisión:
- * - Limpia explícitamente símbolos de moneda (₡, $, USD, CRC, ¢) y artefactos de OCR (₡ leído como 2 o 21).
- * - Distingue formato latino (12.300,00) vs formato estándar (12,307.38).
- */
-export function normalizarMonto(rawMonto) {
-  if (rawMonto === null || rawMonto === undefined || rawMonto === '') return null;
-  if (typeof rawMonto === 'number' && !isNaN(rawMonto)) return rawMonto > 0 ? rawMonto : null;
-
-  let str = String(rawMonto).trim();
-
-  // 1. Limpieza explícita de símbolos de moneda, palabras y prefijos ANTES de extraer dígitos
-  str = str.replace(/[₡¢$€£¥]/g, ' ');
-  str = str.replace(/\b(?:CRC|USD|colones|dolares|monto|total|debitado|transferido|pagado|importe|valor)\b/gi, ' ');
-  str = str.replace(/[:=]/g, ' ').trim();
-
-  // 2. Limpieza de artefactos OCR donde ₡ se reconoce como '2', '21' o 'C' antes de un número
-  str = str.replace(/^(?:21|2|c|e|¢)\s+(?=\d)/i, '');
-
-  // Eliminar espacios intermedios
-  str = str.replace(/\s+/g, '');
-
-  const matchNum = str.match(/[\d.,]+/);
-  if (!matchNum) return null;
-  str = matchNum[0];
-  str = str.replace(/^[.,]+|[.,]+$/g, '');
-  if (!str) return null;
-
-  // A) Si el monto tiene punto Y coma:
-  if (str.includes('.') && str.includes(',')) {
-    const primerPunto = str.indexOf('.');
-    const primeraComa = str.indexOf(',');
-    if (primerPunto < primeraComa) {
-      // Punto antes de coma (ej: "2.600,00" o "12.300,00"): punto es miles, coma es decimal -> 2600.00 / 12300.00
-      str = str.replace(/\./g, '').replace(/,/g, '.');
+  // Normalizar separadores:
+  if (rawNumber.includes('.') && rawNumber.includes(',')) {
+    if (rawNumber.lastIndexOf(',') > rawNumber.lastIndexOf('.')) {
+      // Formato latino: 2.600,00 -> 2600.00
+      rawNumber = rawNumber.replace(/\./g, '').replace(',', '.');
     } else {
-      // Coma antes de punto (ej: "12,287.38" o "12,307.38"): coma es miles, punto es decimal -> 12287.38 / 12307.38
-      str = str.replace(/,/g, '');
+      // Formato anglosajón: 12,287.38 -> 12287.38
+      rawNumber = rawNumber.replace(/,/g, '');
     }
-  }
-  // B) Si solo tiene coma:
-  else if (str.includes(',')) {
-    const partes = str.split(',');
-    // Si la última parte tiene 2 dígitos (ej: "2600,00" o "287,38" o "12307,38") -> decimal
+  } else if (rawNumber.includes(',')) {
+    const partes = rawNumber.split(',');
     if (partes.length === 2 && partes[1].length === 2) {
-      str = partes[0].replace(/\./g, '') + '.' + partes[1];
+      // Decimal latino con 2 dígitos: "2600,00" -> "2600.00"
+      rawNumber = partes[0].replace(/\./g, '') + '.' + partes[1];
+    } else if (partes.length >= 2 && partes[partes.length - 1].length === 3) {
+      // Separador de miles: "25,000" -> "25000"
+      rawNumber = rawNumber.replace(/,/g, '');
+    } else {
+      rawNumber = rawNumber.replace(',', '.');
     }
-    // Si tiene 3 dígitos (ej: "2,600" o "12,300" o "25,000") -> miles
-    else if (partes.length >= 2 && partes[partes.length - 1].length === 3) {
-      str = str.replace(/,/g, '');
-    }
-    // Otro caso con coma (ej: decimales con 1 dígito "2600,5")
-    else if (partes.length === 2) {
-      str = partes[0] + '.' + partes[1];
-    }
-  }
-  // C) Si solo tiene punto:
-  else if (str.includes('.')) {
-    const partes = str.split('.');
-    // Si solo tiene punto seguido de 2 dígitos al final (ej: "2600.00" o "287.38" o "12307.38") -> decimal
-    if (partes.length === 2 && partes[1].length === 2) {
-      str = partes[0] + '.' + partes[1];
-    }
-    // Si solo tiene punto seguido de 3 dígitos (ej: "2.600" o "12.300" o "25.000") -> miles
-    else if (partes.length === 2 && partes[1].length === 3) {
-      str = str.replace(/\./g, '');
-    }
-    // Si tiene múltiples puntos (ej: "1.200.000") -> miles
-    else if (partes.length > 2) {
-      str = str.replace(/\./g, '');
+  } else if (rawNumber.includes('.')) {
+    const partes = rawNumber.split('.');
+    if (partes.length === 2 && partes[1].length === 3) {
+      // Separador de miles con punto: "2.600" -> "2600"
+      rawNumber = partes[0] + partes[1];
+    } else if (partes.length > 2) {
+      // Millones: "1.200.000" -> "1200000"
+      rawNumber = rawNumber.replace(/\./g, '');
     }
   }
 
-  const parsed = parseFloat(str);
-  return (!isNaN(parsed) && parsed > 0) ? Math.round(parsed * 100) / 100 : null;
+  const parsed = parseFloat(rawNumber);
+  return isNaN(parsed) ? null : Math.round(parsed * 100) / 100;
 }
 
 /**
- * Parsea fechas en español y formatos comunes a ISO YYYY-MM-DD
- * Ejemplos: "22 de agosto, 2026" -> "2026-08-22" | "22/08/2026" -> "2026-08-22" | "2026-08-22" -> "2026-08-22"
+ * 2. PARSEO DE REFERENCIA / Nº DE DOCUMENTO
+ * Extrae el identificador numérico o alfanumérico exacto y rechaza términos genéricos
  */
-export function normalizarFechaEspanol(rawFecha) {
-  if (!rawFecha || typeof rawFecha !== 'string') return null;
+export function parseReferenceFromOCR(rawText) {
+  if (!rawText) return null;
+  const lines = rawText.split('\n').map(l => l.trim()).filter(Boolean);
 
-  const str = rawFecha.trim().toLowerCase();
+  const regexEtiquetasRef = /(?:n[oº°]?\.?\s*(?:de\s*)?(?:referencia|ref|comprobante|transacci[oó]n|autorizaci[oó]n|aprobaci[oó]n|documento|doc|consecutivo|clave)|comprobante\s*#?|referencia\s*#?|ref\s*#?|aut\s*#?|clave\s*num[eé]rica)\s*[:#\-]?\s*([A-Za-z0-9\-_]{4,50})/i;
 
-  // 1. Formato ISO ya válido: YYYY-MM-DD
-  const matchIso = str.match(/\b(20\d{2})[-/](0[1-9]|1[0-2])[-/](0[1-9]|[12]\d|3[01])\b/);
-  if (matchIso) {
-    return `${matchIso[1]}-${matchIso[2]}-${matchIso[3]}`;
-  }
-
-  // 2. Formato natural en español: "22 de agosto, 2026" o "22 de agosto del 2026" o "22 de agosto de 2026"
-  const matchNatural = str.match(/\b(0?[1-9]|[12]\d|3[01])\s*(?:de|\/|-)?\s*([a-záéíóú]+)\s*(?:,|\.|de|del)?\s*(20\d{2})\b/i);
-  if (matchNatural) {
-    const dia = matchNatural[1].padStart(2, '0');
-    const mesTexto = matchNatural[2].normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-    const anio = matchNatural[3];
-    const mesNum = MAPA_MESES[mesTexto];
-    if (mesNum) {
-      return `${anio}-${mesNum}-${dia}`;
+  // A) Búsqueda en la misma línea
+  for (const linea of lines) {
+    const match = linea.match(regexEtiquetasRef);
+    if (match && match[1]) {
+      const candidato = match[1].replace(/^[:#\-\s.,;()]+|[:#\-\s.,;()]+$/g, '').trim();
+      const enMinuscula = candidato.toLowerCase();
+      if (!PALABRAS_PROHIBIDAS.has(enMinuscula) && (/\d/.test(candidato) || candidato.length >= 6)) {
+        return candidato;
+      }
     }
   }
 
-  // 3. Formato mes primero en español: "Agosto 22, 2026"
-  const matchMesPrimero = str.match(/\b([a-záéíóú]+)\s*(0?[1-9]|[12]\d|3[01])\s*(?:,|\.|de|del)?\s*(20\d{2})\b/i);
-  if (matchMesPrimero) {
-    const mesTexto = matchMesPrimero[1].normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-    const dia = matchMesPrimero[2].padStart(2, '0');
-    const anio = matchMesPrimero[3];
-    const mesNum = MAPA_MESES[mesTexto];
-    if (mesNum) {
-      return `${anio}-${mesNum}-${dia}`;
+  // B) Búsqueda en línea siguiente a la etiqueta
+  for (let i = 0; i < lines.length - 1; i++) {
+    const actual = lines[i];
+    if (/(?:n[oº°]?\.?\s*(?:de\s*)?(?:referencia|comprobante|transacci[oó]n|autorizaci[oó]n|documento)|referencia|comprobante)\s*[:#\-]?$/i.test(actual)) {
+      const candidato = lines[i + 1].replace(/^[:#\-\s.,;()]+|[:#\-\s.,;()]+$/g, '').trim();
+      const enMinuscula = candidato.toLowerCase();
+      if (!PALABRAS_PROHIBIDAS.has(enMinuscula) && (/\d/.test(candidato) || candidato.length >= 6)) {
+        return candidato;
+      }
     }
   }
 
-  // 4. Formato numérico latino: DD/MM/YYYY o DD-MM-YYYY
-  const matchLatino = str.match(/\b(0?[1-9]|[12]\d|3[01])[-/.](0?[1-9]|1[0-2])[-/.](20\d{2})\b/);
-  if (matchLatino) {
-    const dia = matchLatino[1].padStart(2, '0');
-    const mes = matchLatino[2].padStart(2, '0');
-    const anio = matchLatino[3];
-    return `${anio}-${mes}-${dia}`;
-  }
-
-  // 5. Formato corto: DD/MM/YY (ej: 22/08/26)
-  const matchCorto = str.match(/\b(0?[1-9]|[12]\d|3[01])[-/.](0?[1-9]|1[0-2])[-/.](2\d)\b/);
-  if (matchCorto) {
-    const dia = matchCorto[1].padStart(2, '0');
-    const mes = matchCorto[2].padStart(2, '0');
-    const anio = `20${matchCorto[3]}`;
-    return `${anio}-${mes}-${dia}`;
+  // C) Fallback: Códigos largos tipo "2026082215284002178009698" o "SINPE-94827103"
+  for (const linea of lines) {
+    const matchLargo = linea.match(/\b([0-9]{8,35})\b/) || linea.match(/\b([A-Z]{2,6}-[0-9]{4,15})\b/i);
+    if (matchLargo && matchLargo[1]) {
+      const candidato = matchLargo[1].trim();
+      if (!PALABRAS_PROHIBIDAS.has(candidato.toLowerCase())) {
+        return candidato;
+      }
+    }
   }
 
   return null;
 }
 
 /**
- * Intento de extracción con Gemini 1.5 Flash Vision AI si la API Key está configurada
+ * 3. PARSEO DE FECHA EN ESPAÑOL Y ENCABEZADOS
+ * Convierte fechas del comprobante a formato ISO YYYY-MM-DD
+ */
+export function parseDateFromOCR(rawText) {
+  if (!rawText) return null;
+  const lines = rawText.split('\n').map(l => l.trim()).filter(Boolean);
+
+  for (const line of lines) {
+    const str = line.toLowerCase();
+
+    // 1. Formato ISO: YYYY-MM-DD
+    const matchIso = str.match(/\b(20\d{2})[-/](0[1-9]|1[0-2])[-/](0[1-9]|[12]\d|3[01])\b/);
+    if (matchIso) {
+      return `${matchIso[1]}-${matchIso[2]}-${matchIso[3]}`;
+    }
+
+    // 2. Español natural: "22 de agosto, 2026" o "22 de agosto del 2026"
+    const matchNatural = str.match(/\b(0?[1-9]|[12]\d|3[01])\s*(?:de|\/|-)?\s*([a-záéíóú]+)\s*(?:,|\.|de|del)?\s*(20\d{2})\b/i);
+    if (matchNatural) {
+      const dia = matchNatural[1].padStart(2, '0');
+      const mesTexto = matchNatural[2].normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      const anio = matchNatural[3];
+      const mesNum = MAPA_MESES[mesTexto];
+      if (mesNum) {
+        return `${anio}-${mesNum}-${dia}`;
+      }
+    }
+
+    // 3. Mes primero: "Agosto 22, 2026"
+    const matchMesPrimero = str.match(/\b([a-záéíóú]+)\s*(0?[1-9]|[12]\d|3[01])\s*(?:,|\.|de|del)?\s*(20\d{2})\b/i);
+    if (matchMesPrimero) {
+      const mesTexto = matchMesPrimero[1].normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      const dia = matchMesPrimero[2].padStart(2, '0');
+      const anio = matchMesPrimero[3];
+      const mesNum = MAPA_MESES[mesTexto];
+      if (mesNum) {
+        return `${anio}-${mesNum}-${dia}`;
+      }
+    }
+
+    // 4. Formato latino: DD/MM/YYYY
+    const matchLatino = str.match(/\b(0?[1-9]|[12]\d|3[01])[-/.](0?[1-9]|1[0-2])[-/.](20\d{2})\b/);
+    if (matchLatino) {
+      const dia = matchLatino[1].padStart(2, '0');
+      const mes = matchLatino[2].padStart(2, '0');
+      const anio = matchLatino[3];
+      return `${anio}-${mes}-${dia}`;
+    }
+
+    // 5. Formato corto: DD/MM/YY (ej: 22/08/26)
+    const matchCorto = str.match(/\b(0?[1-9]|[12]\d|3[01])[-/.](0?[1-9]|1[0-2])[-/.](2\d)\b/);
+    if (matchCorto) {
+      const dia = matchCorto[1].padStart(2, '0');
+      const mes = matchCorto[2].padStart(2, '0');
+      const anio = `20${matchCorto[3]}`;
+      return `${anio}-${mes}-${dia}`;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Intento de extracción con Gemini 1.5 Flash Vision AI si la API Key está disponible
  */
 async function extraerConGeminiVision(fileOrDataUrl, apiKey) {
   if (!apiKey) return null;
@@ -283,19 +291,18 @@ async function extraerConGeminiVision(fileOrDataUrl, apiKey) {
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const promptText = `
-Actúa como un sistema OCR y Visión de datos financieros para comprobantes bancarios (SINPE Móvil, transferencias bancarias, recibos y facturas).
-Analiza cuidadosamente la imagen y extrae:
+Actúa como un extractor de alta precisión de comprobantes bancarios (SINPE Móvil, transferencias y facturas).
+Analiza la imagen y extrae:
 
-1. "referenceNumber": El código numérico o alfanumérico EXACTO del comprobante (ej: "2026082215284002178009698", "78009698", "SINPE-94827103", "AUT-582914", "FAC-001-00293").
-   - IMPORTANTE: NUNCA devuelvas palabras genéricas como "Transferencia", "SINPE", "Pago", "Comprobante", "Detalle", "Monto", etc.
-   - Si no hay un código numérico o alfanumérico específico, devuelve null.
-2. "amount": El valor del monto total transferido o pagado como un número decimal limpio sin símbolos de moneda ni letras (ej: "₡2.600,00" -> 2600.0, "₡12,287.38" -> 12287.38, "₡25.000" -> 25000.0).
-   - IMPORTANTE: NUNCA confundas el símbolo de colones ₡ con los dígitos 2 o 21. Si dice ₡2.600,00 el monto es 2600, NO 22600. Si dice ₡12,287.38 el monto es 12287.38, NO 212287.38.
-   - Si no se detecta el monto, devuelve null.
-3. "date": La fecha del comprobante en formato ISO estricto YYYY-MM-DD (ej: "22 de agosto, 2026" -> "2026-08-22", "31/08/2026" -> "2026-08-31").
-   - Si no se detecta la fecha, devuelve null.
+1. "referenceNumber": Código numérico/alfanumérico exacto del documento (ej: "2026082215284002178009698", "78009698", "SINPE-94827103", "AUT-582914").
+   - NUNCA devuelvas términos genéricos como "Transferencia", "SINPE", "Pago", "Comprobante".
+   - Si no hay código específico, devuelve null.
+2. "amount": Monto transferido o pagado como número flotante limpio (ej: "₡2.600,00" -> 2600.0, "₡12,287.38" -> 12287.38).
+   - NUNCA confundas ₡ con 2 o 21. Si dice ₡2.600,00 es 2600. Si dice ₡12,287.38 es 12287.38.
+   - Si no se detecta, devuelve null.
+3. "date": Fecha del documento en formato YYYY-MM-DD (ej: "22 de agosto, 2026" -> "2026-08-22"). Si no se detecta, devuelve null.
 
-Responde EXCLUSIVAMENTE con un JSON válido con esta estructura:
+Responde ÚNICAMENTE un JSON:
 {
   "referenceNumber": string | null,
   "amount": number | null,
@@ -336,124 +343,14 @@ Responde EXCLUSIVAMENTE con un JSON válido con esta estructura:
     const parsed = JSON.parse(candidateText);
 
     return {
-      referenceNumber: validarYLimpiarReferencia(parsed.referenceNumber),
-      amount: normalizarMonto(parsed.amount),
-      date: normalizarFechaEspanol(parsed.date)
+      referenceNumber: parsed.referenceNumber ? parseReferenceFromOCR(parsed.referenceNumber) || parsed.referenceNumber : null,
+      amount: parsed.amount !== null && parsed.amount !== undefined ? parseAmountFromOCR(String(parsed.amount)) : null,
+      date: parsed.date ? parseDateFromOCR(parsed.date) : null
     };
   } catch (err) {
-    console.warn('Fallo en extracción Gemini Vision (usando fallback OCR local):', err);
+    console.warn('Fallo en Gemini Vision (usando fallback OCR local):', err);
     return null;
   }
-}
-
-/**
- * Parser determinista y de alta precisión sobre texto extraído con Tesseract OCR
- */
-function parsearTextoOCR(rawText) {
-  if (!rawText) {
-    return { referenceNumber: null, amount: null, date: null };
-  }
-
-  const lineas = rawText.split('\n').map(l => l.trim()).filter(Boolean);
-  let referenceNumber = null;
-  let amount = null;
-  let date = null;
-
-  // 1. Patrones de etiquetas estrictas para Referencia
-  const regexEtiquetasRef = /(?:n[oº°]?\.?\s*(?:de\s*)?(?:referencia|ref|comprobante|transacci[oó]n|autorizaci[oó]n|aprobaci[oó]n|documento|doc|consecutivo|clave)|comprobante\s*#?|referencia\s*#?|ref\s*#?|aut\s*#?|clave\s*num[eé]rica)\s*[:#\-]?\s*([A-Za-z0-9\-_]{4,50})/i;
-
-  for (const linea of lineas) {
-    // A) Buscar en la misma línea
-    const match = linea.match(regexEtiquetasRef);
-    if (match && match[1]) {
-      const candidato = validarYLimpiarReferencia(match[1]);
-      if (candidato) {
-        referenceNumber = candidato;
-        break;
-      }
-    }
-  }
-
-  // Si no se encontró en la misma línea, buscar si la etiqueta está en una línea y el valor en la siguiente
-  if (!referenceNumber) {
-    for (let i = 0; i < lineas.length - 1; i++) {
-      const lineaActual = lineas[i];
-      if (/(?:n[oº°]?\.?\s*(?:de\s*)?(?:referencia|comprobante|transacci[oó]n|autorizaci[oó]n|documento)|referencia|comprobante)\s*[:#\-]?$/i.test(lineaActual)) {
-        const lineaSiguiente = lineas[i + 1];
-        const candidato = validarYLimpiarReferencia(lineaSiguiente);
-        if (candidato) {
-          referenceNumber = candidato;
-          break;
-        }
-      }
-    }
-  }
-
-  // Fallback: Buscar códigos SINPE / transaccionales largos tipo "2026082215284002178009698" o "SINPE-94827103"
-  if (!referenceNumber) {
-    for (const linea of lineas) {
-      const matchLargo = linea.match(/\b([0-9]{8,35})\b/) || linea.match(/\b([A-Z]{2,6}-[0-9]{4,15})\b/i);
-      if (matchLargo && matchLargo[1]) {
-        const candidato = validarYLimpiarReferencia(matchLargo[1]);
-        if (candidato) {
-          referenceNumber = candidato;
-          break;
-        }
-      }
-    }
-  }
-
-  // 2. Búsqueda de Monto (Campos prioritarios: "Monto total pagado", "Monto transferido", "Monto pagado", "Monto debitado", "Total")
-  const regexMontosPrioritarios = /(?:monto\s*(?:total\s*)?(?:transferido|pagado|debitado|enviado)?|total\s*(?:transferido|pagado|debitado)?|importe|valor\s*(?:total)?)\s*[:=]?\s*([^\n\r]+)/i;
-
-  for (let i = 0; i < lineas.length; i++) {
-    const linea = lineas[i];
-    const match = linea.match(regexMontosPrioritarios);
-    if (match && match[1]) {
-      const m = normalizarMonto(match[1]);
-      if (m) {
-        amount = m;
-        break;
-      }
-    }
-    // Si la etiqueta está sola en la línea, verificar la siguiente línea
-    if (/(?:monto\s*(?:total\s*)?(?:transferido|pagado|debitado)?|total)\s*[:=]?$/i.test(linea) && i < lineas.length - 1) {
-      const mSig = normalizarMonto(lineas[i + 1]);
-      if (mSig) {
-        amount = mSig;
-        break;
-      }
-    }
-  }
-
-  // Fallback de monto: buscar cualquier símbolo ₡ seguido de número
-  if (!amount) {
-    for (const linea of lineas) {
-      const matchSimbolo = linea.match(/(?:₡|¢|CRC|USD|\$)\s*([\d.,\s]+)/i);
-      if (matchSimbolo && matchSimbolo[1]) {
-        const m = normalizarMonto(matchSimbolo[1]);
-        if (m) {
-          amount = m;
-          break;
-        }
-      }
-    }
-  }
-
-  // 3. Búsqueda de Fecha en todo el texto (priorizando el encabezado)
-  for (let i = 0; i < lineas.length; i++) {
-    const f = normalizarFechaEspanol(lineas[i]);
-    if (f) {
-      date = f;
-      break;
-    }
-  }
-
-  return {
-    referenceNumber: referenceNumber || null,
-    amount: amount || null,
-    date: date || null
-  };
 }
 
 /**
@@ -502,7 +399,11 @@ export async function extraerDatosComprobante(fileOrDataUrl, onProgress = null) 
 
     if (onProgress) onProgress(95, 'Interpretando datos financieros...');
 
-    const resultadoOCR = parsearTextoOCR(text);
+    const resultadoOCR = {
+      referenceNumber: parseReferenceFromOCR(text),
+      amount: parseAmountFromOCR(text),
+      date: parseDateFromOCR(text)
+    };
 
     if (onProgress) onProgress(100, 'Análisis completado');
 
