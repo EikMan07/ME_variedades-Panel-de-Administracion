@@ -11,6 +11,7 @@ import { DashboardProvider } from './context/DashboardContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { ToastProvider } from './components/common/Toast';
 import { AppRoutes } from './routes';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
                         <DashboardProvider>
                           <NotificationProvider>
                             <AppRoutes />
+                            <SpeedInsights />
                           </NotificationProvider>
                         </DashboardProvider>
                       </FacturasProvider>
