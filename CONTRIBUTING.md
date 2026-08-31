@@ -1,6 +1,6 @@
 # Guía de Contribución — ME Variedades
 
-Gracias por tu interés en contribuir a la plataforma de administración de **ME Variedades (Proyecto María — Versión 4.0)**. Para garantizar la calidad, coherencia estética, robustez arquitectónica y estabilidad del código, todos los desarrolladores deben cumplir estrictamente con las siguientes directrices y estándares del proyecto.
+Gracias por tu interés en contribuir a la plataforma de administración de **ME Variedades (Proyecto María — Versión 4.2)**. Para garantizar la calidad, coherencia estética, robustez arquitectónica y estabilidad del código, todos los desarrolladores deben cumplir estrictamente con las siguientes directrices y estándares del proyecto.
 
 ---
 
@@ -8,7 +8,7 @@ Gracias por tu interés en contribuir a la plataforma de administración de **ME
 
 1. **Zero Mock Data Policy**:
    - Queda estrictamente prohibido introducir listas simuladas de clientes ficticios, productos de prueba estáticos o pedidos de ejemplo en el código base o almacenamiento por defecto.
-   - El sistema debe iniciar 100% limpio y renderizar *Empty States* atractivos cuando no existan registros en la base de datos de Supabase.
+   - El sistema debe iniciar 100% limpio (`[]`) y renderizar *Empty States* atractivos cuando no existan registros en la base de datos de Supabase.
 
 2. **Estética Dark Glassmorphism & High-Contrast**:
    - Respetar la paleta cromática oficial:
@@ -18,8 +18,8 @@ Gracias por tu interés en contribuir a la plataforma de administración de **ME
      - Analítica de Datos: Cyan Esmeralda (`#2dd4bf`) para Clientes, Rosa (`#f472b6`) para Stock y Dorado Cálido (`#fbbf24`) para Pedidos y Finanzas.
    - Ningún control nativo de formulario (`<input>`, `<select>`, `<option>`) debe mostrar fondos blancos por defecto del navegador.
 
-3. **Prohibición Estricta de Emojis**:
-   - **0% Emojis:** Queda totalmente prohibido el uso de caracteres emoji (ej. 📦, 🔔, 👤, 💰) en interfaces operativas, botones, badges, modales, tablas o documentos generados.
+3. **Prohibición Estricta de Emojis (0% Emojis Policy)**:
+   - Queda totalmente prohibido el uso de caracteres emoji en interfaces operativas, botones, badges, modales, tablas o documentos generados.
    - Utilizar **exclusivamente iconos vectoriales SVG limpios** con trazo uniforme (`stroke-width="2"`, `fill="none"`, `stroke="currentColor"`).
 
 4. **Flujo Estandarizado de Modales (CRUD)**:
@@ -29,10 +29,15 @@ Gracias por tu interés en contribuir a la plataforma de administración de **ME
      3. Limpieza completa del estado y variables del formulario.
      4. Cierre inmediato del modal invocando `onClose()`.
 
-5. **Modo 100% Silencioso**:
-   - No añadir reproductores de sonido, llamadas a `new Audio()`, sintetizadores `AudioContext` ni efectos de sonido en la pantalla de inicio de sesión ni durante la navegación en la plataforma.
+5. **Rendimiento, Code Splitting y Compresión de Archivos**:
+   - **Code Splitting:** Todas las rutas de páginas deben cargarse con `React.lazy` y envolverse en `<Suspense>`.
+   - **Librerías Pesadas Bajo Demanda:** Librerías como `jspdf`, `jspdf-autotable`, `tesseract.js` y `face-api.js` deben importarse dinámicamente mediante `import()` dentro de sus respectivas funciones.
+   - **Compresión Previa de Imágenes:** Toda fotografía subida o capturada debe comprimirse con `imageCompression.js` antes de su envío a Supabase Storage.
 
-6. **Validación Inmediata y Resiliente**:
+6. **Modo 100% Silencioso**:
+   - No añadir reproductores de sonido, llamadas a `new Audio()`, sintetizadores `AudioContext` ni efectos de sonido en la pantalla de inicio de sesión ni durante la navegación.
+
+7. **Validación Inmediata y Resiliente**:
    - Validar cada campo en tiempo real o en el envío con mensajes descriptivos en español natural.
    - Nombres: solo letras y espacios (sin números ni caracteres especiales).
    - Teléfonos: exactamente 8 dígitos numéricos.
@@ -46,10 +51,11 @@ Gracias por tu interés en contribuir a la plataforma de administración de **ME
 
 Crea ramas con nombres descriptivos según el tipo de cambio:
 
-- `feature/nombre-de-la-funcionalidad`: Nuevas funciones o módulos (ej. `feature/modulo-facturas-pdf`).
+- `feature/nombre-de-la-funcionalidad`: Nuevas funciones o módulos (ej. `feature/extraccion-ocr-facturas`).
 - `fix/descripcion-del-error`: Corrección de errores (ej. `fix/sincronizacion-clientes-grafica`).
-- `refactor/area-refactorizada`: Mejoras internas de código o rendimiento (ej. `refactor/modal-productos-820px`).
-- `docs/documentacion-actualizada`: Modificaciones en documentación (ej. `docs/actualizar-srs-v4`).
+- `perf/area-optimizada`: Mejoras de rendimiento o carga (ej. `perf/code-splitting-rutas`).
+- `refactor/area-refactorizada`: Mejoras internas de código o responsive (ej. `refactor/topbar-mobile-first`).
+- `docs/documentacion-actualizada`: Modificaciones en documentación (ej. `docs/actualizar-changelog`).
 
 ### 2. Mensajes de Commit (Conventional Commits)
 
@@ -62,22 +68,17 @@ Utiliza el formato estándar para mensajes de confirmación:
 **Tipos válidos:**
 - `feat:` Nueva característica funcional o componente para el usuario.
 - `fix:` Corrección de un error o bug de lógica/interfaz.
+- `perf:` Optimización de rendimiento, velocidad o consumo de memoria.
 - `docs:` Modificaciones en documentación (`README.md`, `Agent.md`, `CONTRIBUTING.md`, etc.).
 - `style:` Cambios visuales, espaciados o CSS que no alteran la lógica de negocio.
 - `refactor:` Reestructuración interna de código sin alterar su comportamiento funcional.
-- `test:` Inclusión o ajuste de pruebas de validación.
-- `chore:` Tareas de mantenimiento, dependencias o configuración del build de Vite.
-
-*Ejemplo:*
-```bash
-git commit -m "feat: integrar compilador de expedientes pdf en modulo de facturas"
-```
+- `chore:` Tareas de mantenimiento, dependencias o configuración de compilación.
 
 ---
 
 ## 💻 Estándares de Arquitectura y Código
 
-### 1. Estructura de Componentes React 18
+### 1. Estructura de Componentes React
 
 - Ubica cada componente en su carpeta modular dentro de `src/components/`:
   - `biometrics/`: Modales de login/enrolamiento facial y pantalla de verificación.
@@ -86,24 +87,26 @@ git commit -m "feat: integrar compilador de expedientes pdf en modulo de factura
   - `cobros/`: Registro de cobros, tabla y cálculo de días.
   - `common/`: Modales reutilizables, Toast flotante, selectores de fecha personalizados.
   - `dashboard/`: Analítica gráfica de alto contraste, tarjetas de KPIs y distribución de stock.
-  - `facturas/`: Bóveda documental, captura fotográfica y exportación PDF multipágina.
+  - `facturas/`: Bóveda documental, captura fotográfica, OCR en segundo plano y exportación PDF multipágina.
   - `layout/`: Barra lateral (`Sidebar`), barra superior (`Topbar`) y centro de notificaciones (`NotificationsCenter`).
   - `pagos/`: Cuentas por cobrar, modales de abono y semaforización.
   - `pedidos/`: Registro y edición de pedidos con descuento de existencias.
   - `prestamos/`: Préstamos a terceros, intereses y liquidación al 100%.
   - `productos/`: Catálogo visual, modal ampliado de 820px y cámara WebRTC.
-- Mantén el estado global en los Providers de `src/context/` y centraliza las llamadas a backend en `src/services/api.js`.
 
 ### 2. Glosario de Funciones y Nomenclatura Oficial
 
 | Función / Hook | Archivo | Propósito |
 |---|---|---|
 | `api.getDashboardMetrics()` | `src/services/api.js` | Recupera métricas y datos en vivo desde Supabase Cloud. |
+| `extraerDatosComprobante(...)` | `src/services/receiptOcrService.js` | Analiza imágenes con OCR y extrae números de referencia y montos. |
+| `comprimirImagen(file, options)` | `src/services/imageCompression.js` | Comprime fotos a <250 KB mediante Canvas API en cliente. |
+| `useDebounce(val, delay)` | `src/hooks/useDebounce.js` | Amortigua valores de búsqueda para evitar re-renderizados. |
 | `useClients()` | `src/context/ClientContext.jsx` | Provee el listado de clientes, alta, actualización y verificación RF-15. |
 | `useProducts()` | `src/context/ProductContext.jsx` | Gestiona el catálogo de productos, inventario y ajuste de stock. |
 | `useOrders()` | `src/context/OrderContext.jsx` | Administra la creación, edición (`updatePedido`) y cancelación de pedidos. |
 | `useNotifications()` | `src/context/NotificationContext.jsx` | Controla pestañas ("Pendientes" / "Historial") y eliminación de alertas. |
-| `exportarExpedienteClientePDF(...)` | `src/services/pdfExportService.js` | Compila comprobantes digitales en expedientes PDF multipágina con `jspdf`. |
+| `generarExpedientePDF(...)` | `src/services/pdfExportService.js` | Compila comprobantes digitales en expedientes PDF multipágina con `jspdf`. |
 | `showToast({ tipo, mensaje })` | `src/components/common/Toast.jsx` | Dispara notificaciones flotantes inferiores de éxito o error. |
 
 ---
@@ -122,18 +125,7 @@ Antes de solicitar una revisión o fusionar tu código a la rama principal, ejec
    ```
    *El comando debe finalizar con **Exit code: 0** y 0 errores de compilación.*
 3. **Verificación Visual y Funcional**:
-   - Comprueba que la aplicación responda con total fluidez en resoluciones móviles, tablets y monitores de escritorio.
+   - Comprueba que la aplicación responda con total fluidez en resoluciones móviles (`@media (max-width: 640px)`).
    - Verifica que los modales se abran centrados, con desenfoque de fondo y cierren inmediatamente tras guardar.
    - Confirma que la gráfica del Dashboard compute los clientes acumulados de forma reactiva.
-   - Asegura que no se emita ningún sonido de notificación al cargar o interactuar con el Login.
-
----
-
-## 📬 Proceso de Pull Request (PR)
-
-1. Crea un fork o clona el repositorio oficial.
-2. Crea tu rama de trabajo desde `main`.
-3. Realiza tus cambios y confirma tus commits siguiendo los estándares establecidos.
-4. Envía tu Pull Request describiendo claramente los cambios realizados, las pruebas de verificación y capturas si existen modificaciones visuales.
-
-¡Gracias por contribuir a la excelencia, seguridad y diseño de **ME Variedades**!
+   - Asegura que el OCR extraiga referencias sin bloquear la interfaz.

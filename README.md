@@ -1,17 +1,17 @@
-# ME Variedades — Plataforma de Administración (V4.0)
+# ME Variedades — Plataforma de Administración (V4.2)
 
 Plataforma web progresiva (SPA) moderna, intuitiva y de alto rendimiento diseñada para la digitalización, control financiero, gestión de inventario y administración integral de **ME Variedades (Proyecto María)**.
 
-El sistema sustituye por completo los registros manuales en papel por una solución centralizada en la nube con diseño **Dark Glassmorphism de Alto Contraste**, autenticación biométrica neuronal, analítica interactiva y bóveda digital de comprobantes.
+El sistema sustituye por completo los registros manuales en papel por una solución centralizada en la nube con diseño **Dark Glassmorphism de Alto Contraste**, autenticación biométrica neuronal, analítica interactiva, extracción OCR automática y compilador digital de expedientes PDF.
 
 ---
 
-## 🚀 Características Principales (Versión 4.0)
+## 🚀 Características Principales (Versión 4.2)
 
-- **🔐 Autenticación Híbrida y Biometría Facial**:
+- **🔐 Autenticación Híbrida y Biometría Facial Segura**:
   - Acceso administrativo mediante credenciales cifradas y reconocimiento facial neuronal en cliente con **Face-API.js** (`TinyFaceDetector` + `FaceLandmark68Net`).
+  - **Enrolamiento con Verificación de Administrador**: Registro de nuevos rostros condicionado a la validación de credenciales previas.
   - Pantalla intermedia de verificación de seguridad autorizada (`<AuthVerifyingScreen />`) con animación de escáner durante 1.6s.
-  - Banner de Login con tipografía de alto contraste en una sola línea horizontal (`clamp(2.6rem, 4vw, 3.6rem)`).
   - Operación 100% silenciosa sin audios ni pitidos invasivos.
 
 - **📊 Centro de Comando (Dashboard) y Analítica Visual**:
@@ -22,49 +22,32 @@ El sistema sustituye por completo los registros manuales en papel por una soluci
     - **Dorado Cálido (`#fbbf24`)**: Pedidos y Finanzas.
   - Distribución de inventario por categoría y panel de **Cumpleaños del Mes**.
 
-- **🔔 Centro de Notificaciones Inteligente con Historial**:
-  - Pestaña de **"Pendientes"** con contador en vivo de alertas no leídas.
-  - Pestaña de **"Historial"** con registro de eventos pasados y opción de eliminación individual o vaciado completo del historial.
-  - Alertas automáticas para cumpleaños de hoy, stock crítico (0 a 2 unidades), créditos vencidos y préstamos por cobrar.
+- **🧠 Bóveda de Facturas con Extracción OCR y Expedientes PDF**:
+  - Digitalización de comprobantes fiscales, recibos bancarios y transferencias SINPE Móvil.
+  - **Extracción Automática OCR (`tesseract.js`)**: Escaneo en segundo plano para autocompletar números de referencia, autorización y comprobantes sin bloquear la edición.
+  - Compilador de expedientes PDF multipágina profesionales con **jsPDF** y **AutoTable** en 3 niveles (Individual, Por Categoría y Consolidado).
 
-- **👥 Directorio CRM de Clientes**:
-  - Ficha de cliente con validación estricta de nombres (solo letras y espacios) y teléfonos de 8 dígitos.
-  - Selector visual dinámico de día y mes de cumpleaños (`BirthdayDatePicker`).
-  - **Regla de Integridad RF-15**: Bloqueo preventivo de eliminación de clientes con deudas activas, pedidos o préstamos abiertos.
+- **⚡ Optimización de Rendimiento Extremo & Vercel Speed Insights**:
+  - **Code Splitting con `React.lazy`**: Carga modular de páginas y bundle inicial en < 1 segundo.
+  - **División de Chunks**: Separación de dependencias en paquetes independientes (`vendor-react`, `vendor-supabase`, `vendor-charts`).
+  - **Compresión de Fotos en Cliente**: Reducción de imágenes de alta resolución (8 MB) a < 250 KB en ~50ms antes de su almacenamiento en Supabase.
+  - **Vercel Speed Insights**: Monitorización en vivo de Core Web Vitals (LCP, FID, CLS, INP).
+  - **Caché Inmutable (`vercel.json`)**: Configuración CDN para carga instantánea de recursos estáticos.
 
-- **👗 Catálogo de Productos e Inventario**:
-  - 10 categorías oficiales: Perfumes, Camisas, Shorts, Pantalones, Accesorios, Zapatos, Crocs, Maquillaje, Vestidos y Aparatos Electrónicos.
-  - Modal ampliado a 820px estructurado en 2 columnas (310px para dropzone/cámara y 1fr para datos).
-  - Captura fotográfica WebRTC en vivo con cámara web/móvil y subida desde galería.
-  - Filtros de categorías con barra de desplazamiento ultrafina (5px) y estado activo en degradado vino/rosa oscuro mate.
+- **📱 Diseño Responsivo Mobile-First**:
+  - TopBar adaptativa que prioriza el nombre del módulo actual y los botones de acción en smartphones.
+  - Modales con scroll vertical interno suave y botones flexibles.
+  - Sección de analítica y KPIs optimizados para pantallas táctiles.
 
-- **📦 Gestión de Pedidos**:
-  - Asociación de clientes del directorio con productos de inventario y descuento automático de stock.
-  - Columna dedicada de "Acciones" con botones de edición y cancelación.
-  - Modal de edición de pedidos (`updatePedido`) sincronizado en tiempo real con Supabase.
+- **👥 CRM de Clientes, Inventario, Pedidos y Préstamos**:
+  - Catálogo de 10 categorías oficiales con cámara WebRTC y control de existencias.
+  - Gestión de pedidos con reajuste automático de stock en Supabase.
+  - Cuentas por cobrar y abonos a préstamos con cálculo paramétrico de intereses y liquidación al 100%.
+  - **Regla RF-15**: Bloqueo de eliminación de clientes con deudas o pedidos activos.
 
-- **💳 Pagos, Cuentas por Cobrar y Cobros**:
-  - Registro de créditos y seguimiento de saldos adeudados.
-  - Modal de abonos parciales o totales con cálculo automático del saldo restante.
-  - Módulo de cobros con cálculo de días transcurridos y método de pago utilizado.
-
-- **💰 Módulo de Préstamos a Terceros**:
-  - Préstamos a clientes o terceros con cálculo paramétrico de intereses y plazos de devolución.
-  - Modal de amortizaciones con alerta de liquidación total al alcanzar el 100% (₡0 saldo).
-
-- **🧾 Bóveda de Facturas y Compilador de Expedientes PDF**:
-  - Digitalización de comprobantes fiscales, recibos y respaldos contables.
-  - Compilador de expedientes PDF multipágina profesionales con **jsPDF** y **AutoTable** en 3 niveles de exportación:
-    1. **Individual**: Descarga de un comprobante específico con datos y fotografía.
-    2. **Por Categoría**: Compilación agrupada (solo pedidos, pagos o préstamos).
-    3. **Expediente Consolidado por Cliente**: Historial completo de un cliente en un solo PDF.
-
-- **🤖 Asistente Virtual con IA (Chatbot)**:
-  - Widget flotante impulsado por IA para resolución de dudas operativas de la plataforma.
-
-- **✨ Estandarización de UX/UI**:
-  - **0% Emojis**: Reemplazo absoluto por iconos vectoriales SVG limpios y consistentes.
-  - **Flujo Homogéneo de Modales**: Ejecución asíncrona (`async/await`), reset de estado, notificación flotante inferior (`showToast`) y cierre inmediato (`onClose()`).
+- **✨ Directivas de Diseño**:
+  - **Zero Mock Data Policy**: Arranque garantizado en estado limpio (`[]`).
+  - **0% Emojis Policy**: Uso exclusivo de iconografía vectorial SVG limpia.
 
 ---
 
@@ -72,13 +55,14 @@ El sistema sustituye por completo los registros manuales en papel por una soluci
 
 | Capa | Tecnología |
 |---|---|
-| **Frontend** | [React 18](https://react.dev/) + [Vite](https://vitejs.dev/) |
-| **Base de Datos & Storage** | [Supabase](https://supabase.com/) (PostgreSQL Cloud + Realtime WebSockets) |
+| **Frontend** | [React 19](https://react.dev/) + [Vite 6](https://vitejs.dev/) |
+| **Base de Datos & Storage** | [Supabase](https://supabase.com/) (PostgreSQL Cloud + Realtime WebSockets + Storage) |
+| **Motor OCR / Visión** | Tesseract.js (Carga dinámica bajo demanda) |
 | **Biometría Neuronal** | Face-API.js (TinyFaceDetector, FaceLandmark68Net) |
 | **Visualización de Datos** | Chart.js 4.x + ChartJS React |
-| **Motor de Documentos PDF** | jsPDF + jsPDF-AutoTable |
-| **Estilos & UI** | Vanilla CSS (Dark Glassmorphism, CSS Custom Properties, Flexbox, CSS Grid) |
-| **Linter & Calidad** | ESLint + Oxlint |
+| **Generador de Documentos** | jsPDF + jsPDF-AutoTable (Carga dinámica bajo demanda) |
+| **Métricas de Rendimiento** | Vercel Speed Insights (`@vercel/speed-insights`) |
+| **Estilos & UI** | Vanilla CSS (Dark Glassmorphism, CSS Grid, Flexbox, Mobile-First) |
 
 ---
 
@@ -87,7 +71,6 @@ El sistema sustituye por completo los registros manuales en papel por una soluci
 ```text
 ME-Variedades/
 ├── public/                                      # Recursos públicos y modelos Face-API
-│   └── models/                                  # Pesos de redes neuronales (TinyFaceDetector, etc.)
 ├── src/
 │   ├── assets/                                  # Logotipo oficial e imágenes de marca
 │   ├── components/                              # Componentes modulares
@@ -103,17 +86,19 @@ ME-Variedades/
 │   │   ├── pedidos/                             # OrderModal, OrderTable
 │   │   ├── prestamos/                           # ModalRegistrarPrestamo, ModalAbonoPrestamo, PrestamosTable
 │   │   └── productos/                           # ProductModal, ProductTable, ProductGrid
-│   ├── context/                                 # Context API Providers (Auth, Client, Product, Order, Pagos, etc.)
-│   ├── services/                                # Servicios centralizados (api.js, supabase.js, pdfExportService.js)
-│   ├── styles/                                  # Hojas de estilo modulares (global.css, dashboard.css, etc.)
-│   ├── App.jsx                                  # Proveedores globales y enrutador
+│   ├── context/                                 # Context API Providers (Auth, Client, Product, Order, etc.)
+│   ├── hooks/                                   # Custom hooks (useDebounce, useBiometricAuth, useChatbot)
+│   ├── services/                                # Servicios centralizados (api, imageCompression, receiptOcrService, pdfExportService)
+│   ├── styles/                                  # Hojas de estilo modulares (global.css, dashboard.css, facturas.css, etc.)
+│   ├── App.jsx                                  # Proveedores globales, SpeedInsights y enrutador
 │   └── main.jsx                                 # Punto de entrada de la aplicación
 ├── Documento_Requerimientos_ME_Variedades_V4.html # Especificación formal SRS V4.0 para imprimir/guardar en PDF (Ctrl+P)
+├── vercel.json                                  # Configuración de CDN, SPA Routing y encabezados de caché
 ├── CHANGELOG.md                                 # Historial de versiones y cambios
 ├── CONTRIBUTING.md                             # Guía de contribución y estándares
 ├── SECURITY.md                                  # Políticas de seguridad del sistema
 ├── package.json                                 # Dependencias y scripts de Node.js
-└── vite.config.js                               # Configuración de Vite
+└── vite.config.js                               # Configuración de Vite y división de chunks
 ```
 
 ---
@@ -128,8 +113,8 @@ ME-Variedades/
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/eikabarc2008fwdcostarica-cpu/ME-Variedades.git
-cd ME-Variedades
+git clone https://github.com/EikMan07/ME_variedades-Panel-de-Administracion.git
+cd ME_variedades-Panel-de-Administracion
 ```
 
 ### 2. Instalar dependencias

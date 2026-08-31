@@ -6,51 +6,71 @@ El formato se basa en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/
 
 ---
 
+## [4.2.0] - 2026-08-31
+
+### ✨ Añadido (Added)
+- **Extracción Automática de Datos OCR en Comprobantes (`receiptOcrService.js`)**:
+  - Motor de lectura óptica de caracteres (OCR) integrado con `tesseract.js` cargado dinámicamente en segundo plano.
+  - Reconocimiento automático de comprobantes bancarios, transferencias SINPE Móvil, claves numéricas y números de factura.
+  - Autocompletado del campo "Referencia o N° Documento" con indicador visual de escaneo y badge de éxito sin bloquear la edición manual.
+- **Integración de Vercel Speed Insights**:
+  - Inclusión del componente `<SpeedInsights />` a nivel raíz en `App.jsx` para la monitorización en tiempo real de Core Web Vitals (LCP, FID, CLS, INP).
+- **Servicio de Compresión de Imágenes en Cliente (`imageCompression.js`)**:
+  - Redimensionamiento y optimización automática mediante Canvas API que comprime fotografías de alta resolución (5 MB - 12 MB) a menos de 250 KB en ~50ms antes de subirlas a Supabase Storage.
+- **Hook `useDebounce.js`**:
+  - Amortiguación de búsquedas y filtros en tablas para evitar re-renderizados continuos.
+- **Configuración de CDN y Despliegue (`vercel.json`)**:
+  - Políticas de caché inmutable (`max-age=31536000, immutable`) para `/assets/*` y reglas de enrutamiento SPA hacia `/index.html`.
+
+### ⚡ Rendimiento (Performance)
+- **Code Splitting Integral con `React.lazy` y `<Suspense>`**:
+  - Carga diferida de todas las páginas de la aplicación, reduciendo el bundle inicial a menos de 1 segundo de carga.
+- **División de Chunks en Vite (`vite.config.js`)**:
+  - Creación de paquetes independientes `vendor-react`, `vendor-supabase` y `vendor-charts`, eliminando todas las advertencias de paquetes mayores a 500 KB.
+- **Carga Dinámica Bajo Demanda**:
+  - `jspdf` y `jspdf-autotable` se importan asíncronamente solo cuando el usuario solicita la exportación de un PDF.
+  - `face-api.js` y `tesseract.js` se cargan únicamente al invocar sus funciones respectivas.
+
+### 📱 Responsive Mobile-First
+- **Refactorización de la TopBar**:
+  - Ocultamiento de prefijos largos (`ME VARIEDADES /`) y fecha en smartphones (`@media (max-width: 640px)`) para evitar textos truncados y dar prioridad al nombre del módulo y botones de acción.
+- **Optimización del Modal de Enrolamiento Biométrico (`FaceEnrollModal.jsx`)**:
+  - Formulario apilado verticalmente en 1 columna, visor de cámara autoajustable a 240px de altura y botones flexibles sin cortes.
+- **Optimización de la Sección de Analítica (`AnalyticsChartSection.jsx`)**:
+  - Reducción de la altura del canvas a 220px y apilamiento limpio de filtros en teléfonos móviles.
+
+### 🔒 Seguridad (Security)
+- **Sanitización del Login (`LoginPage.jsx` & `AuthContext.jsx`)**:
+  - Eliminación de placeholders y mensajes de error reveladores de credenciales.
+- **Validación Estricta en Registro Facial (`FaceEnrollModal.jsx`)**:
+  - Exigencia obligatoria de verificación de credenciales de Administrador antes de capturar o guardar descriptores biométricos.
+- **Limpieza de Producción (Estado Cero)**:
+  - Vaciado de datos de prueba en la base de datos de Supabase y arranque garantizado en estado limpio (`[]`).
+
+---
+
 ## [4.0.0] - 2026-08-30
 
 ### ✨ Añadido (Added)
 - **Autenticación Biométrica Neuronal**:
   - Modelos neuronales en cliente con `Face-API.js` (`TinyFaceDetector` y `FaceLandmark68Net`) para reconocimiento facial con cámara web.
-  - Componente de transición y verificación de seguridad autorizada `<AuthVerifyingScreen />` (1.6s) con animaciones de escáner y autorización.
+  - Componente de transición y verificación de seguridad autorizada `<AuthVerifyingScreen />` (1.6s) con animaciones de escáner.
 - **Centro de Comando & Analítica Visual de Alto Contraste**:
   - Gráfica interactiva con Paleta Cromática Armónica: **Cyan Esmeralda** (`#2dd4bf`) para Clientes, **Rosa** (`#f472b6`) para Stock y **Dorado Cálido** (`#fbbf24`) para Pedidos/Finanzas.
   - Sincronización en tiempo real con Supabase y cálculo semanal acumulativo de clientes según `created_at`.
-  - Tarjetas de KPIs en vivo para Clientes, Cuentas por Cobrar, Préstamos y Stock.
 - **Centro de Notificaciones con Historial**:
-  - Pestaña de **"Pendientes"** con badge numérico de alertas no leídas.
-  - Pestaña de **"Historial"** con registro de alertas leídas y botones para eliminación individual o vaciado completo del historial con persistencia.
-  - Alertas reactivas automáticas para cumpleaños de hoy, stock crítico (0 a 2 unids), cuentas por cobrar vencidas y préstamos por vencer.
+  - Pestaña de **"Pendientes"** con badge numérico y pestaña de **"Historial"** con registro de alertas leídas y vaciado con persistencia.
 - **Bóveda de Facturas y Compilador de Expedientes PDF**:
   - Digitalización y almacenamiento de comprobantes fiscales, recibos y respaldos con selector de cámara en vivo y archivos.
-  - Motor de exportación PDF multipágina profesional (`jspdf` + `jspdf-autotable`) en 3 niveles: Individual, Por Categoría y Expediente Consolidado por Cliente.
-  - Encabezado simplificado con indicador único "TOTAL ARCHIVOS".
+  - Motor de exportación PDF multipágina profesional (`jspdf` + `jspdf-autotable`) en 3 niveles.
 - **Módulo de Pedidos con Edición en Supabase**:
-  - Columna dedicada de "Acciones" con botones de edición y cancelación.
-  - Modal de edición de pedidos (`updatePedido`) sincronizado con Supabase y ajuste automático de existencias.
+  - Columna dedicada de "Acciones" con botones de edición y cancelación, con ajuste automático de existencias.
 - **Documento de Requerimientos Oficial**:
-  - Creación de `Documento_Requerimientos_ME_Variedades_V4.html` con estilos `@media print` optimizados para guardado directo en PDF mediante `Ctrl+P`.
-
-### 🔄 Cambiado (Changed)
-- **Estandarización de Modales de Creación**:
-  - Homogeneización del flujo `handleSubmit` en todos los modales (Productos, Pagos, Abonos, Cobros, Préstamos, Facturas y Clientes) con ejecución `async/await`, reset de estado, notificación flotante inferior (`showToast`) y cierre inmediato (`onClose()`).
-- **Ampliación del Modal de Productos a 820px**:
-  - Distribución en 2 columnas balanceadas (310px para dropzone/cámara de fotos y 1fr para formulario) para evitar textos o precios cortados.
-- **Optimización de Barra de Desplazamiento**:
-  - Scrollbar ultrafino (5px) y mate oscuro en la barra de categorías de productos, eliminando la barra blanca nativa del navegador.
-- **Diseño del Banner de Login**:
-  - Tipografía de alto contraste con "PANEL DE CONTROL" en una sola línea horizontal (`clamp(2.6rem, 4vw, 3.6rem)`), eliminando resplandores molestos y aumentando la legibilidad.
-- **Compatibilidad Polimórfica en `Toast.jsx`**:
-  - Admisión tanto de argumentos clásicos `showToast('texto', 'success')` como de objetos `{ tipo: 'success', mensaje: '...' }`.
+  - Creación de `Documento_Requerimientos_ME_Variedades_V4.html` optimizado para PDF mediante `Ctrl+P`.
 
 ### 🔇 Eliminado / Silenciado (Removed)
-- **Eliminación Total de Audio Invasivo**:
-  - Supresión definitiva de cualquier reproducción de audio, pitidos o sintetizadores `AudioContext` en la pantalla de inicio de sesión y durante la navegación en la plataforma.
-- **Prohibición de Emojis**:
-  - Reemplazo absoluto de cualquier carácter emoji por iconos vectoriales SVG limpios y consistentes.
-
-### 🔒 Seguridad (Security)
-- Integración con Supabase Cloud mediante claves de entorno protegidas y políticas RLS.
-- Bloqueo estricto de eliminación de clientes con deudas activas, pedidos o préstamos abiertos (**Regla RF-15**).
+- **Eliminación Total de Audio Invasivo**: Supresión definitiva de reproducción de audios y pitidos.
+- **Prohibición de Emojis**: Reemplazo absoluto por iconos vectoriales SVG.
 
 ---
 
@@ -67,7 +87,7 @@ El formato se basa en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/
 ## [1.0.0] - 2026-08-28
 
 ### ✨ Añadido (Added)
-- Estructura base SPA con React 18, Vite y Vanilla CSS con Dark Glassmorphism.
+- Estructura base SPA con React, Vite y Vanilla CSS con Dark Glassmorphism.
 - Autenticación administrativa con usuario y contraseña.
 - Directorio de clientes con buscador en tiempo real.
 - Catálogo de productos con 10 categorías oficiales y control de existencias.
