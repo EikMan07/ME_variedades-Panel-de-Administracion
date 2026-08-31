@@ -84,59 +84,79 @@ const MAPA_MESES = {
 };
 
 /**
- * 1. LIMPIEZA Y NORMALIZACIÓN QUIRÚRGICA DEL MONTO (Regex + Parser estricto)
- * Elimina el prefijo fantasma '2' o '21' que produce el glifo '₡' y normaliza separadores mixtos.
+ * 1. PARSEO ROBUSTO DEL MONTO (Sin cortar dígitos reales)
+ * Lee desde el final de la línea clave y detecta dinámicamente decimales y miles.
  */
-export function cleanAndParseAmount(rawText) {
-  if (!rawText) return null;
+export function extractCleanAmount(text) {
+  if (!text) return null;
+  const lines = text.split('\n');
 
-  const lines = rawText.split('\n').map(l => l.trim()).filter(Boolean);
-  const amountLine = lines.find(l => /monto\s*(transferido|pagado|total pagado|total|debitado)|total\s*(pagado|transferido|debitado)?|importe|valor/i.test(l)) || rawText;
+  // 1. Prioridad: buscar líneas clave de monto
+  const priorityPatterns = [
+    /monto total pagado/i,
+    /monto transferido/i,
+    /monto debitado/i,
+    /monto pagado/i,
+    /total pagado/i,
+    /total debitado/i,
+    /total/i,
+    /importe/i,
+    /valor/i
+  ];
 
-  // 1. Eliminar etiquetas de texto y palabras no numéricas
-  let str = amountLine
-    .replace(/monto\s+(transferido|pagado|total pagado|total|debitado)\s*:?/gi, '')
-    .replace(/total\s*:?/gi, '')
-    .replace(/[₡¢$€£¥]|CRC|USD|colones|dolares/gi, '')
-    .trim();
-
-  // 2. Corrección de error de OCR: Si quedó un '21' o '2' pegado al inicio de un monto con formato conocido (ej: '22.600,00' o '2112,287.38')
-  if (/^21\s*(\d{1,3}[.,]\d{3}(?:[.,]\d{2})?)$/.test(str)) {
-    str = str.replace(/^21\s*/, '');
-  } else if (/^2\s*(\d{1,3}[.,]\d{3}(?:[.,]\d{2})?)$/.test(str)) {
-    str = str.replace(/^2\s*/, '');
-  } else if (/^21\s+(\d+)/.test(str)) {
-    str = str.replace(/^21\s+/, '');
-  } else if (/^2\s+(\d+)/.test(str)) {
-    str = str.replace(/^2\s+/, '');
-  }
-
-  // 3. Normalizar separadores a formato float estándar
-  if (str.includes('.') && str.includes(',')) {
-    if (str.lastIndexOf(',') > str.lastIndexOf('.')) {
-      str = str.replace(/\./g, '').replace(',', '.'); // Formato latino: 2.600,00 -> 2600.00
-    } else {
-      str = str.replace(/,/g, ''); // Formato anglosajón: 12,287.38 -> 12287.38
-    }
-  } else if (str.includes(',')) {
-    const partes = str.split(',');
-    if (partes.length === 2 && partes[1].length === 3) {
-      str = str.replace(/,/g, '');
-    } else {
-      str = str.replace(',', '.');
-    }
-  } else if (str.includes('.')) {
-    const partes = str.split('.');
-    if (partes.length === 2 && partes[1].length === 3) {
-      str = str.replace(/\./g, '');
-    } else if (partes.length > 2) {
-      str = str.replace(/\./g, '');
+  let targetLine = '';
+  for (const pattern of priorityPatterns) {
+    const found = lines.find(l => pattern.test(l));
+    if (found) {
+      targetLine = found;
+      break;
     }
   }
 
-  const result = parseFloat(str.replace(/[^0-9.]/g, ''));
+  if (!targetLine) targetLine = text;
+
+  // 2. Extraer todos los bloques numéricos con formato monetario de la línea
+  // Coincide con: "12,287.38", "2.600,00", "2.600", "12287.38", etc.
+  const numberMatches = targetLine.match(/\d+(?:[.,]\d+)*/g);
+  if (!numberMatches || numberMatches.length === 0) return null;
+
+  // El monto real siempre es el último número de esa línea
+  let raw = numberMatches[numberMatches.length - 1];
+
+  // 3. Normalización inteligente de miles y decimales
+  if (raw.includes('.') && raw.includes(',')) {
+    // Si la coma está después del punto (ej. 2.600,00) -> punto es mil, coma es decimal
+    if (raw.lastIndexOf(',') > raw.lastIndexOf('.')) {
+      raw = raw.replace(/\./g, '').replace(',', '.');
+    } else {
+      // Si el punto está después de la coma (ej. 12,287.38) -> coma es mil, punto es decimal
+      raw = raw.replace(/,/g, '');
+    }
+  } else if (raw.includes(',')) {
+    // Si tiene coma y 2 decimales (ej. 2600,00 o 2,600)
+    const parts = raw.split(',');
+    if (parts[1] && parts[1].length === 2) {
+      raw = parts[0].replace(/\./g, '') + '.' + parts[1]; // decimal
+    } else {
+      raw = raw.replace(/,/g, ''); // separador de miles
+    }
+  } else if (raw.includes('.')) {
+    // Si tiene punto y 3 dígitos después (ej. 2.600) es separador de miles
+    const parts = raw.split('.');
+    if (parts[1] && parts[1].length === 3) {
+      raw = raw.replace(/\./g, '');
+    } else if (parts.length > 2) {
+      raw = raw.replace(/\./g, '');
+    }
+  }
+
+  const result = parseFloat(raw);
   return isNaN(result) ? null : Math.round(result * 100) / 100;
 }
+
+// Alias de compatibilidad
+export const cleanAndParseAmount = extractCleanAmount;
+export const parseAmountFromOCR = extractCleanAmount;
 
 /**
  * 2. EXTRACCIÓN ESTRICTA DE REFERENCIA / Nº DE DOCUMENTO
@@ -203,7 +223,7 @@ export function parseDateFromOCR(rawText) {
       return `${matchIso[1]}-${matchIso[2]}-${matchIso[3]}`;
     }
 
-    // 2. Español natural: "22 de agosto, 2026" o "22 de agosto del 2026"
+    // 2. Español natural: "22 de agosto, 2026" o "22 de agosto del 2026" o "22 de agosto de 2026"
     const matchNatural = str.match(/\b(0?[1-9]|[12]\d|3[01])\s*(?:de|\/|-)?\s*([a-záéíóú]+)\s*(?:,|\.|de|del)?\s*(20\d{2})\b/i);
     if (matchNatural) {
       const dia = matchNatural[1].padStart(2, '0');
@@ -321,7 +341,7 @@ Devuelve ÚNICAMENTE un JSON válido:
 
     return {
       referenceNumber: parsed.referenceNumber ? parseReferenceFromOCR(parsed.referenceNumber) || parsed.referenceNumber : null,
-      amount: parsed.amount !== null && parsed.amount !== undefined ? cleanAndParseAmount(String(parsed.amount)) : null,
+      amount: parsed.amount !== null && parsed.amount !== undefined ? extractCleanAmount(String(parsed.amount)) : null,
       date: parsed.date ? parseDateFromOCR(parsed.date) : null
     };
   } catch (err) {
@@ -378,7 +398,7 @@ export async function extraerDatosComprobante(fileOrDataUrl, onProgress = null) 
 
     const resultadoOCR = {
       referenceNumber: parseReferenceFromOCR(text),
-      amount: cleanAndParseAmount(text),
+      amount: extractCleanAmount(text),
       date: parseDateFromOCR(text)
     };
 
