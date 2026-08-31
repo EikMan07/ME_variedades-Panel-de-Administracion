@@ -1,6 +1,3 @@
-import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
-
 /**
  * SERVICIO PROFESIONAL DE GENERACIÓN DE EXPEDIENTES PDF
  * ME VARIEDADES — PLATAFORMA DE ADMINISTRACIÓN
@@ -48,6 +45,7 @@ function formatColon(monto) {
 
 /**
  * Genera el expediente en PDF (Nivel 1: Individual, Nivel 2: Por Categoría, Nivel 3: Consolidado Completo)
+ * Carga dinámica de jsPDF y autoTable bajo demanda.
  * @param {Object} cliente - Datos del cliente ({ nombre_completo, telefono, id, ... })
  * @param {Array} facturas - Lista de comprobantes a incluir
  * @param {String} tituloReporte - Nombre descriptivo del reporte
@@ -57,6 +55,13 @@ export async function generarExpedientePDF(cliente, facturas = [], tituloReporte
     alert('No hay comprobantes disponibles para exportar.');
     return;
   }
+
+  // Carga asíncrona bajo demanda para mantener el bundle ligero
+  const [{ jsPDF }, autoTableModule] = await Promise.all([
+    import('jspdf'),
+    import('jspdf-autotable')
+  ]);
+  const autoTable = autoTableModule.default || autoTableModule;
 
   const doc = new jsPDF({
     orientation: 'portrait',

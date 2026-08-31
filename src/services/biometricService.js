@@ -15,19 +15,44 @@ export class BiometricAuthService {
   }
 
   /**
+   * Carga dinámica del bundle face-api.js bajo demanda sin bloquear el inicio de la app
+   */
+  async cargarScriptFaceApi() {
+    if (typeof window !== 'undefined' && window.faceapi) return true;
+    return new Promise((resolve, reject) => {
+      const existing = document.querySelector('script[src*="face-api"]');
+      if (existing) {
+        if (window.faceapi) return resolve(true);
+        existing.addEventListener('load', () => resolve(true));
+        existing.addEventListener('error', () => reject(new Error('Error al cargar face-api.js')));
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js';
+      script.async = true;
+      script.onload = () => resolve(true);
+      script.onerror = (err) => reject(new Error('No se pudo cargar la librería biométrica facial.', { cause: err }));
+      document.head.appendChild(script);
+    });
+  }
+
+  /**
    * Carga los pesos de las redes neuronales necesarias en memoria GPU / WebGL
    */
   async cargarModelos(onProgress = null) {
     if (this.modelsLoaded) return true;
 
+    if (onProgress) onProgress('Iniciando motor biométrico...');
+    await this.cargarScriptFaceApi();
+
     if (typeof window === 'undefined' || typeof window.faceapi === 'undefined') {
-      throw new Error('La librería face-api no se encuentra cargada en el navegador.');
+      throw new Error('La librería face-api no se encuentra disponible.');
     }
 
     const faceapi = window.faceapi;
 
     try {
-      if (onProgress) onProgress('Descargando modelos biométricos neuronales...');
+      if (onProgress) onProgress('Descargando modelos neuronales optimizados...');
 
       await Promise.all([
         faceapi.nets.ssdMobilenetv1.loadFromUri(this.MODEL_URL),

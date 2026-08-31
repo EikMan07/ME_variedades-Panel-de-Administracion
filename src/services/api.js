@@ -1,4 +1,5 @@
 import { supabase, SUPABASE_URL, SUPABASE_KEY } from './supabase';
+import { comprimirImagen } from './imageCompression';
 
 /**
  * SERVICIO CENTRALIZADO DE API (SUPABASE CLIENT & CRUD)
@@ -384,19 +385,20 @@ export async function deleteProducto(id) {
 }
 
 /**
- * Subir imagen de producto a Supabase Storage (Bucket: imagenes-productos).
+ * Subir imagen de producto a Supabase Storage con compresión previa en el cliente.
  */
 export async function uploadProductoImagen(file) {
   if (!file) return null;
 
-  const fileExt = file.name ? file.name.split('.').pop() : 'jpg';
-  const fileName = `prod_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+  // Compresión en el cliente: reduce fotos pesadas a < 250 KB
+  const fileOptimizado = await comprimirImagen(file, { maxWidth: 1200, maxHeight: 1200, quality: 0.82 });
+  const fileName = `prod_${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
   const filePath = `${fileName}`;
 
   const { error: uploadError } = await supabase.storage
     .from('imagenes-productos')
-    .upload(filePath, file, {
-      cacheControl: '3600',
+    .upload(filePath, fileOptimizado, {
+      cacheControl: '31536000, immutable',
       upsert: true
     });
 
@@ -1069,6 +1071,10 @@ export async function uploadFactura(fileOrBlob, metadata) {
       fileToUpload = new Blob([uInt8Array], { type: contentType });
     }
 
+    if (fileToUpload instanceof Blob || (typeof fileToUpload === 'object' && fileToUpload?.type?.startsWith('image/'))) {
+      fileToUpload = await comprimirImagen(fileToUpload, { maxWidth: 1400, maxHeight: 1400, quality: 0.84 });
+    }
+
     const fileExt = metadata.archivo_nombre ? metadata.archivo_nombre.split('.').pop() : 'jpg';
     const fileName = `factura_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
     const filePath = `${fileName}`;
@@ -1076,7 +1082,7 @@ export async function uploadFactura(fileOrBlob, metadata) {
     const { error: uploadError } = await supabase.storage
       .from('comprobantes-facturas')
       .upload(filePath, fileToUpload, {
-        cacheControl: '3600',
+        cacheControl: '31536000, immutable',
         upsert: true
       });
 
