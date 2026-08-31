@@ -1,0 +1,543 @@
+/* ========================================================
+   ESTILOS DEL MÓDULO DE PRÉSTAMOS
+   ME VARIEDADES — Requerimientos RF-39 al RF-44 & HU-07
+   ======================================================== */
+
+/* Grid de KPIs Superiores */
+.prestamos-kpis-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+.prestamo-kpi-card {
+  background: var(--color-superficie-oscura);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  border: 1px solid var(--color-borde-vidrio);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.prestamo-kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--prestamo-accent, var(--color-rosa-empolvado));
+  opacity: 0.7;
+}
+
+.prestamo-kpi-card:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+  transform: translateY(-2px);
+}
+
+.prestamo-kpi-rose { --prestamo-accent: var(--rose-soft); }
+.prestamo-kpi-gold { --prestamo-accent: var(--color-dorado); border-color: rgba(212, 175, 55, 0.25); }
+.prestamo-kpi-coral { --prestamo-accent: var(--color-error); border-color: rgba(178, 58, 72, 0.25); }
+.prestamo-kpi-cyan { --prestamo-accent: var(--rose-soft); border-color: rgba(244, 180, 200, 0.25); }
+
+.prestamo-kpi-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.prestamo-kpi-icon-rose {
+  background: var(--rose-pill-bg);
+  color: var(--rose-soft);
+  border: 1px solid rgba(244, 180, 200, 0.25);
+}
+
+.prestamo-kpi-icon-gold {
+  background: var(--color-advertencia-bg);
+  color: var(--color-dorado);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.prestamo-kpi-icon-coral {
+  background: var(--color-error-bg);
+  color: #e06070;
+  border: 1px solid rgba(178, 58, 72, 0.3);
+}
+
+.prestamo-kpi-icon-cyan {
+  background: var(--rose-pill-bg);
+  color: var(--rose-soft);
+  border: 1px solid rgba(244, 180, 200, 0.3);
+}
+
+.prestamo-kpi-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.prestamo-kpi-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-texto-secundario);
+}
+
+.prestamo-kpi-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-texto-principal);
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.prestamo-kpi-sublabel {
+  font-size: 0.75rem;
+  color: var(--color-texto-apagado);
+  margin-top: 0.15rem;
+}
+
+.prestamo-alert-pulse {
+  animation: prestamoAlertGlow 2.4s ease-in-out infinite;
+}
+
+@keyframes prestamoAlertGlow {
+  0%, 100% {
+    box-shadow: var(--shadow-card);
+  }
+  50% {
+    box-shadow: var(--shadow-card), 0 0 22px rgba(178, 58, 72, 0.3);
+  }
+}
+
+/* Barra de Filtros de Préstamos */
+.prestamos-filters-bar {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.prestamos-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+  min-width: 170px;
+}
+
+.prestamos-filter-group label {
+  font-size: 0.75rem;
+  color: var(--color-texto-secundario);
+  font-weight: 500;
+}
+
+/* Badges de Estado del Préstamo (RF-42) */
+.badge-prestamo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.28rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge-prestamo::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Al Día */
+.badge-prestamo-aldia {
+  background: var(--color-exito-bg);
+  color: #88c985;
+  border: 1px solid rgba(110, 143, 107, 0.35);
+}
+.badge-prestamo-aldia::before {
+  background: #88c985;
+  box-shadow: 0 0 6px rgba(136, 201, 133, 0.7);
+}
+
+/* Próximo a Vencer */
+.badge-prestamo-proximo {
+  background: rgba(201, 162, 75, 0.2);
+  color: #e8b84b;
+  border: 1px solid rgba(232, 184, 75, 0.4);
+}
+.badge-prestamo-proximo::before {
+  background: #e8b84b;
+  box-shadow: 0 0 6px rgba(232, 184, 75, 0.6);
+  animation: prestamoAlertGlow 1.8s ease-in-out infinite;
+}
+
+/* Atrasado / Vencido */
+.badge-prestamo-atrasado {
+  background: var(--color-error-bg);
+  color: #e06070;
+  border: 1px solid rgba(178, 58, 72, 0.35);
+}
+.badge-prestamo-atrasado::before {
+  background: #e06070;
+  box-shadow: 0 0 6px rgba(224, 96, 112, 0.7);
+  animation: prestamoAlertGlow 1.4s ease-in-out infinite;
+}
+
+.badge-prestamo-liquidado {
+  background: var(--rose-pill-bg);
+  color: var(--rose-soft);
+  border: 1px solid rgba(244, 180, 200, 0.35);
+}
+.badge-prestamo-liquidado::before {
+  background: var(--rose-soft);
+  box-shadow: 0 0 6px rgba(244, 180, 200, 0.6);
+}
+
+/* Tags de Beneficiario */
+.badge-beneficiario-tag {
+  font-size: 0.65rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  display: inline-block;
+  margin-top: 0.15rem;
+  width: fit-content;
+}
+
+.tag-cliente {
+  background: rgba(154, 110, 121, 0.18);
+  color: var(--color-rosa-suave);
+  border: 1px solid rgba(154, 110, 121, 0.35);
+}
+
+.tag-tercero {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-texto-secundario);
+  border: 1px solid var(--color-borde-vidrio);
+}
+
+/* Celdas de la Tabla */
+.prestamo-beneficiario-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.prestamo-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-rosa-empolvado), var(--color-dorado));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.prestamo-avatar-tercero {
+  background: linear-gradient(135deg, var(--color-info), var(--color-carbon-claro));
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.prestamo-beneficiario-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.prestamo-nombre {
+  font-weight: 600;
+  color: var(--color-texto-principal);
+  font-size: 0.88rem;
+}
+
+.prestamo-tel {
+  font-size: 0.72rem;
+  color: var(--color-texto-apagado);
+}
+
+.prestamo-capital-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.prestamo-monto-principal {
+  font-weight: 700;
+  color: var(--color-texto-principal);
+  font-size: 0.92rem;
+}
+
+.prestamo-tasa-badge {
+  font-size: 0.7rem;
+  color: var(--color-dorado);
+  font-weight: 600;
+}
+
+.prestamo-total-devolver {
+  font-weight: 700;
+  color: var(--color-texto-principal);
+  font-size: 0.95rem;
+}
+
+.prestamo-ganancia-tag {
+  font-size: 0.68rem;
+  color: #88c985;
+}
+
+.prestamo-saldo-amount {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.saldo-liquidado { color: var(--rose-soft); }
+.saldo-activo { color: #e06070; }
+
+.progress-liquidado {
+  background: linear-gradient(90deg, #8A4E58, var(--rose-soft));
+}
+
+/* Caja de Cálculo en Tiempo Real en Modal (RF-41) */
+.calculator-preview-box {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem;
+  margin: 1.25rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.calculator-preview-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-dorado);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.calculator-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.calculator-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.calculator-item-label {
+  font-size: 0.68rem;
+  color: var(--color-texto-apagado);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.calculator-item-val {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-texto-principal);
+}
+
+.calculator-item-val.val-green { color: #88c985; }
+.calculator-item-val.val-gold { color: var(--color-dorado); }
+
+/* Switch / Pestañas de Tipo de Beneficiario */
+.beneficiario-type-tabs {
+  display: flex;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-borde-vidrio);
+  margin-bottom: 1rem;
+}
+
+.btn-tab-beneficiario {
+  flex: 1;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--color-texto-secundario);
+  border-radius: 6px;
+  transition: all var(--transition-fast);
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.btn-tab-beneficiario.active {
+  background: var(--color-rosa-vino);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(138, 78, 88, 0.4);
+}
+
+/* Modal de Amortización / Historial */
+.amortizacion-header {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--color-borde-vidrio);
+  border-radius: var(--radius-sm);
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.amortizacion-stats {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.amortizacion-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.amortizacion-stat-label {
+  font-size: 0.68rem;
+  color: var(--color-texto-apagado);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.amortizacion-stat-val {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.abono-destino-tag {
+  font-size: 0.65rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-left: 0.35rem;
+}
+
+.destino-capital {
+  background: rgba(110, 143, 107, 0.18);
+  color: #88c985;
+  border: 1px solid rgba(110, 143, 107, 0.35);
+}
+
+.destino-interes {
+  background: rgba(212, 175, 55, 0.18);
+  color: var(--color-dorado);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+}
+
+.destino-general {
+  background: rgba(154, 110, 121, 0.18);
+  color: var(--color-rosa-suave);
+  border: 1px solid rgba(154, 110, 121, 0.35);
+}
+
+/* Empty State de Préstamos */
+.prestamos-empty-state {
+  padding: 4.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.25rem;
+}
+
+.prestamos-empty-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(154, 110, 121, 0.08);
+  border: 1px solid rgba(154, 110, 121, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-rosa-empolvado);
+}
+
+.prestamos-empty-state h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  color: var(--color-texto-principal);
+}
+
+.prestamos-empty-state p {
+  font-size: 0.85rem;
+  color: var(--color-texto-secundario);
+  max-width: 440px;
+  line-height: 1.6;
+}
+
+/* Responsividad */
+@media (max-width: 900px) {
+  .prestamos-kpis-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .calculator-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .prestamos-kpis-grid {
+    grid-template-columns: 1fr;
+  }
+  .prestamos-filters-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .amortizacion-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .amortizacion-stats {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .amortizacion-stat-item {
+    align-items: flex-start;
+  }
+}

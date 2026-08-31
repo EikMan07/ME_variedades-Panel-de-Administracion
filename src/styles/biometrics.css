@@ -1,0 +1,295 @@
+/* ========================================================
+   ESTILOS DE BIOMETRÍA FACIAL Y RECONOCIMIENTO
+   ME VARIEDADES
+   ======================================================== */
+
+.modal-face-card {
+  max-width: 520px;
+}
+
+.modal-icon-face {
+  background: rgba(183, 110, 121, 0.15);
+  color: var(--oro-rosa-claro);
+  border: 1px solid rgba(183, 110, 121, 0.3);
+}
+
+.face-scanner-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.camera-scanner-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  height: 330px;
+  background: #000;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 2px solid rgba(183, 110, 121, 0.4);
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(183, 110, 121, 0.2);
+}
+
+.video-feed {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1); /* Modo espejo */
+}
+
+.overlay-detection-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.face-oval-guide {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 250px;
+  border: 2px dashed rgba(216, 159, 166, 0.5);
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.35);
+  transition: border-color var(--transition-normal);
+}
+
+.face-oval-guide.guide-warning {
+  border-color: rgba(255, 77, 77, 0.7);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45), inset 0 0 20px rgba(255, 77, 77, 0.2);
+}
+
+.scanner-laser-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent 0%, var(--oro-rosa-claro) 50%, transparent 100%);
+  box-shadow: 0 0 15px var(--oro-rosa-claro);
+  animation: scanLaser 2.2s infinite ease-in-out;
+  pointer-events: none;
+}
+
+@keyframes scanLaser {
+  0% { top: 15%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 85%; opacity: 0; }
+}
+
+.scanner-feedback-box {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-borde-vidrio);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  color: var(--color-texto-principal);
+}
+
+.scanner-feedback-box.success {
+  background: rgba(110, 143, 107, 0.15);
+  border-color: rgba(110, 143, 107, 0.4);
+  color: #a3e69f;
+}
+
+.scanner-feedback-box.error {
+  background: rgba(178, 58, 72, 0.15);
+  border-color: rgba(178, 58, 72, 0.4);
+  color: #ff9999;
+}
+
+.scanner-feedback-box.loading {
+  background: rgba(183, 110, 121, 0.1);
+  border-color: rgba(183, 110, 121, 0.3);
+  color: var(--oro-rosa-claro);
+}
+
+.spinner-biometrico {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(216, 159, 166, 0.2);
+  border-top-color: var(--oro-rosa-claro);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.feedback-icon-svg {
+  flex-shrink: 0;
+}
+
+.feedback-icon-success {
+  color: var(--color-exito);
+}
+
+.feedback-icon-error {
+  color: var(--color-error);
+}
+
+.feedback-icon-info {
+  color: var(--color-info);
+}
+
+/* ========================================================
+   PANTALLA DE TRANSICIÓN Y VERIFICACIÓN DE SEGURIDAD
+   ======================================================== */
+
+.auth-verifying-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(10, 8, 9, 0.94);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: authFadeIn 0.3s ease-out forwards;
+}
+
+@keyframes authFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.auth-verifying-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 420px;
+  width: 100%;
+  animation: authScaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes authScaleUp {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.auth-security-badge {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1.5px solid rgba(244, 180, 200, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.75rem;
+  transition: all 0.4s ease;
+}
+
+.auth-security-badge.escaneando {
+  border-color: rgba(244, 180, 200, 0.4);
+  box-shadow: 0 0 35px rgba(244, 180, 200, 0.2);
+}
+
+.auth-security-badge.aprobado {
+  border-color: rgba(16, 185, 129, 0.6);
+  background: rgba(16, 185, 129, 0.08);
+  box-shadow: 0 0 40px rgba(16, 185, 129, 0.3);
+}
+
+.auth-glow-ring {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 1px dashed rgba(244, 180, 200, 0.2);
+  animation: authGlowRotate 8s linear infinite;
+  pointer-events: none;
+}
+
+.auth-security-badge.aprobado .auth-glow-ring {
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+@keyframes authGlowRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.auth-circular-spinner {
+  width: 50px;
+  height: 50px;
+  animation: authSpinnerRotate 1.2s linear infinite;
+}
+
+@keyframes authSpinnerRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.auth-spinner-track {
+  stroke: rgba(255, 255, 255, 0.08);
+}
+
+.auth-spinner-head {
+  stroke: #f4b4c8;
+  stroke-linecap: round;
+  stroke-dasharray: 80, 200;
+  stroke-dashoffset: 0;
+  animation: authSpinnerDash 1.4s ease-in-out infinite;
+}
+
+@keyframes authSpinnerDash {
+  0% {
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 90, 200;
+    stroke-dashoffset: -35px;
+  }
+  100% {
+    stroke-dasharray: 90, 200;
+    stroke-dashoffset: -125px;
+  }
+}
+
+.auth-success-check {
+  width: 44px;
+  height: 44px;
+  animation: authCheckPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes authCheckPop {
+  0% {
+    transform: scale(0) rotate(-45deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.auth-verifying-labels h3 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.01em;
+}
+
+.auth-verifying-labels p {
+  font-size: 0.92rem;
+  color: #b8a7ad;
+  margin: 0;
+  line-height: 1.5;
+}

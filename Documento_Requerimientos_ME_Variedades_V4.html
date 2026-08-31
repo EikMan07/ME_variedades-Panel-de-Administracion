@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documento de Requerimientos de Software (SRS V4.0) — ME Variedades</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ==========================================================================
+       SISTEMA DE ESTILOS TIPOGRÁFICOS Y DE IMPRESIÓN — SRS V4.0 ME VARIEDADES
+       ========================================================================== */
+    :root {
+      --font-title: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --color-primario: #8d4f62;
+      --color-primario-oscuro: #5e2634;
+      --color-rosa-pastel: #f9dbe4;
+      --color-rosa-acento: #e598ad;
+      --color-cyan: #0d9488;
+      --color-cyan-bg: #f0fdfa;
+      --color-dorado: #b45309;
+      --color-dorado-bg: #fffbeb;
+
+      --color-texto: #1e1b1c;
+      --color-texto-suave: #4a4446;
+      --color-texto-muted: #736b6e;
+      --color-fondo: #ffffff;
+      --color-fondo-alt: #fdfafb;
+      --color-borde: #ebd8df;
+      --color-borde-subtle: #f3e9ed;
+
+      --sombra-card: 0 4px 16px rgba(141, 79, 98, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      font-size: 10.5pt;
+      line-height: 1.55;
+      color: var(--color-texto);
+      background-color: #ede8ea;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Contenedor tipo Hoja para vista en Pantalla */
+    .document-wrapper {
+      max-width: 900px;
+      margin: 30px auto;
+      background: var(--color-fondo);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+      border-radius: 8px;
+    }
+
+    .page {
+      padding: 48px 56px;
+      background: #ffffff;
+      position: relative;
+    }
+
+    .page:not(:last-child) {
+      border-bottom: 1px solid var(--color-borde-subtle);
+    }
+
+    /* ==========================================================================
+       PORTADA PROFESIONAL (PÁGINA 1)
+       ========================================================================== */
+    .cover-page {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 1060px;
+      padding: 80px 60px 60px;
+      text-align: center;
+      background: linear-gradient(180deg, #ffffff 0%, #fffbfc 50%, #faf3f5 100%);
+    }
+
+    .cover-header-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 18px;
+      background: var(--color-rosa-pastel);
+      color: var(--color-primario-oscuro);
+      border-radius: 999px;
+      font-size: 8.5pt;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin: 0 auto 24px;
+    }
+
+    .cover-title-main {
+      font-family: var(--font-title);
+      font-size: 32pt;
+      font-weight: 800;
+      color: var(--color-primario);
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .cover-subtitle {
+      font-size: 14pt;
+      font-weight: 500;
+      color: var(--color-texto-suave);
+      margin-bottom: 40px;
+    }
+
+    .cover-brand-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 40px auto;
+      padding: 24px 36px;
+      background: #ffffff;
+      border: 1px solid var(--color-borde);
+      border-radius: 16px;
+      box-shadow: var(--sombra-card);
+      max-width: 440px;
+    }
+
+    .brand-logo-text {
+      font-family: var(--font-title);
+      font-size: 20pt;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+    }
+
+    .brand-logo-text .m-char { color: #1e1b1c; }
+    .brand-logo-text .e-char { color: var(--color-primario); }
+    .brand-logo-text .sub-text { font-size: 14pt; font-weight: 600; color: #4a4446; margin-left: 4px; }
+
+    .brand-tagline {
+      font-size: 9pt;
+      color: var(--color-texto-muted);
+      margin-top: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .cover-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      max-width: 580px;
+      margin: 0 auto;
+      text-align: left;
+      background: #ffffff;
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid var(--color-borde);
+    }
+
+    .meta-item-label {
+      font-size: 8pt;
+      font-weight: 700;
+      color: var(--color-primario);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 2px;
+    }
+
+    .meta-item-value {
+      font-size: 10pt;
+      font-weight: 600;
+      color: var(--color-texto);
+    }
+
+    .cover-footer {
+      font-size: 8.5pt;
+      color: var(--color-texto-muted);
+      border-top: 1px solid var(--color-borde);
+      padding-top: 20px;
+    }
+
+    /* ==========================================================================
+       ENCABEZADOS Y ESTRUCTURA DE SECCIONES
+       ========================================================================== */
+    .section-title {
+      font-family: var(--font-title);
+      font-size: 16pt;
+      font-weight: 700;
+      color: var(--color-primario);
+      letter-spacing: -0.01em;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--color-rosa-pastel);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .section-title:first-child {
+      margin-top: 0;
+    }
+
+    .subsection-title {
+      font-family: var(--font-title);
+      font-size: 12pt;
+      font-weight: 700;
+      color: var(--color-primario-oscuro);
+      margin-top: 18px;
+      margin-bottom: 8px;
+    }
+
+    p {
+      margin-bottom: 10px;
+      color: var(--color-texto-suave);
+      text-align: justify;
+    }
+
+    /* ==========================================================================
+       TABLAS FORMATEADAS PARA SRS
+       ========================================================================== */
+    .table-container {
+      width: 100%;
+      margin: 14px 0 20px;
+      overflow: hidden;
+      border: 1px solid var(--color-borde);
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9pt;
+      text-align: left;
+    }
+
+    thead th {
+      background: var(--color-primario);
+      color: #ffffff;
+      font-family: var(--font-title);
+      font-weight: 600;
+      padding: 8px 12px;
+      text-transform: uppercase;
+      font-size: 8pt;
+      letter-spacing: 0.05em;
+      border: none;
+    }
+
+    tbody td {
+      padding: 7px 12px;
+      border-top: 1px solid var(--color-borde-subtle);
+      color: var(--color-texto-suave);
+      vertical-align: top;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: var(--color-fondo-alt);
+    }
+
+    .col-id {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--color-primario-oscuro);
+      white-space: nowrap;
+      width: 65px;
+    }
+
+    .col-priority {
+      text-align: center;
+      width: 85px;
+    }
+
+    /* Badges de Prioridad MoSCoW */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-must {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    .badge-should {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+
+    .badge-could {
+      background: #e0e7ff;
+      color: #3730a3;
+      border: 1px solid #c7d2fe;
+    }
+
+    .badge-feature {
+      background: var(--color-rosa-pastel);
+      color: var(--color-primario-oscuro);
+      border: 1px solid var(--color-rosa-acento);
+      font-weight: 600;
+    }
+
+    /* ==========================================================================
+       TARJETAS DE HISTORIAS DE USUARIO (HU)
+       ========================================================================== */
+    .user-story-card {
+      margin: 12px 0 16px;
+      padding: 14px 18px;
+      background: #ffffff;
+      border: 1px solid var(--color-borde);
+      border-left: 4px solid var(--color-primario);
+      border-radius: 6px;
+      box-shadow: var(--sombra-card);
+      page-break-inside: avoid;
+    }
+
+    .user-story-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .user-story-title {
+      font-family: var(--font-title);
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: var(--color-primario-oscuro);
+    }
+
+    .user-story-body {
+      font-size: 9pt;
+      margin-bottom: 8px;
+      color: var(--color-texto-suave);
+    }
+
+    .user-story-criteria-title {
+      font-size: 8.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--color-primario);
+      margin-top: 6px;
+      margin-bottom: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    ul.criteria-list {
+      list-style-type: none;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    ul.criteria-list li {
+      position: relative;
+      padding-left: 16px;
+      font-size: 8.8pt;
+      color: var(--color-texto-suave);
+      margin-bottom: 3px;
+    }
+
+    ul.criteria-list li::before {
+      content: "•";
+      position: absolute;
+      left: 4px;
+      color: var(--color-primario);
+      font-weight: bold;
+    }
+
+    /* Cajas Informativas Destacadas */
+    .info-callout {
+      padding: 12px 16px;
+      background: #fff5f7;
+      border: 1px solid #f2cfd9;
+      border-radius: 6px;
+      margin: 12px 0;
+      font-size: 9pt;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .info-callout.cyan {
+      background: var(--color-cyan-bg);
+      border-color: #99f6e4;
+      color: #115e59;
+    }
+
+    .info-callout-icon {
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .info-callout-content {
+      flex: 1;
+    }
+
+    .info-callout-title {
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    /* Lista Estándar */
+    ul.doc-list {
+      padding-left: 20px;
+      margin-bottom: 12px;
+    }
+
+    ul.doc-list li {
+      font-size: 9.5pt;
+      color: var(--color-texto-suave);
+      margin-bottom: 4px;
+    }
+
+    /* Pie de página de documento */
+    .page-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 32px;
+      padding-top: 10px;
+      border-top: 1px solid var(--color-borde-subtle);
+      font-size: 8pt;
+      color: var(--color-texto-muted);
+    }
+
+    /* ==========================================================================
+       REGLAS ESTRICTAS DE IMPRESIÓN (@media print)
+       ========================================================================== */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 16mm 14mm 16mm 14mm;
+      }
+
+      body {
+        background-color: #ffffff !important;
+        font-size: 9.5pt !important;
+        color: #000000 !important;
+      }
+
+      .document-wrapper {
+        max-width: 100% !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+      }
+
+      .page {
+        padding: 0 !important;
+        border: none !important;
+        page-break-after: always !important;
+        break-after: page !important;
+      }
+
+      .page:last-child {
+        page-break-after: auto !important;
+        break-after: auto !important;
+      }
+
+      .cover-page {
+        min-height: 98vh !important;
+        padding: 40px 20px 20px !important;
+      }
+
+      .page-break {
+        page-break-before: always !important;
+        break-before: page !important;
+      }
+
+      .no-break {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      thead th {
+        background-color: #8d4f62 !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .badge-must,
+      .badge-should,
+      .badge-could,
+      .badge-feature,
+      .info-callout,
+      .cover-header-tag {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .btn-print-floating {
+        display: none !important;
+      }
+    }
+
+    /* Botón flotante para imprimir en pantalla */
+    .btn-print-floating {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--color-primario);
+      color: #ffffff;
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-family: var(--font-title);
+      font-weight: 700;
+      font-size: 11pt;
+      box-shadow: 0 8px 24px rgba(141, 79, 98, 0.35);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 9999;
+      transition: all 0.2s ease;
+    }
+
+    .btn-print-floating:hover {
+      background: var(--color-primario-oscuro);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(94, 38, 52, 0.45);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Botón de Acción Rápida para Guardar en PDF -->
+  <button class="btn-print-floating" onclick="window.print()" title="Imprimir o Guardar en PDF (Ctrl + P)">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="6 9 6 2 18 2 18 9"></polyline>
+      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+      <rect x="6" y="14" width="12" height="8"></rect>
+    </svg>
+    <span>Imprimir / Guardar PDF (Ctrl+P)</span>
+  </button>
+
+  <div class="document-wrapper">
+
+    <!-- ======================================================================
+         PÁGINA 1: PORTADA OFICIAL SRS V4.0
+         ====================================================================== -->
+    <div class="page cover-page">
+      <div>
+        <div class="cover-header-tag">Especificación de Requerimientos de Software (SRS)</div>
+        <h1 class="cover-title-main">ESPECIFICACIÓN DE SOFTWARE</h1>
+        <div class="cover-subtitle">Sistema Integral de Administración, Finanzas y Almacén Digital</div>
+      </div>
+
+      <div class="cover-brand-badge">
+        <div class="brand-logo-text">
+          <span class="m-char">M</span><span class="e-char">E</span><span class="sub-text">VARIEDADES</span>
+        </div>
+        <div class="brand-tagline">Plataforma Administrativa y Operativa</div>
+      </div>
+
+      <div>
+        <div class="cover-meta-grid">
+          <div>
+            <div class="meta-item-label">Proyecto</div>
+            <div class="meta-item-value">Proyecto María — Web App</div>
+          </div>
+          <div>
+            <div class="meta-item-label">Cliente / Negocio</div>
+            <div class="meta-item-value">ME Variedades</div>
+          </div>
+          <div>
+            <div class="meta-item-label">Administradora</div>
+            <div class="meta-item-value">María</div>
+          </div>
+          <div>
+            <div class="meta-item-label">Versión de Documento</div>
+            <div class="meta-item-value">Versión 4.0 (Full Cloud & Biometrics)</div>
+          </div>
+          <div>
+            <div class="meta-item-label">Arquitectura</div>
+            <div class="meta-item-value">React 18 + Supabase Cloud + AI</div>
+          </div>
+          <div>
+            <div class="meta-item-label">Fecha de Actualización</div>
+            <div class="meta-item-value">Agosto 2026</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cover-footer">
+        Documento técnico confidencial elaborado para la administración exclusiva de ME Variedades.
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 2: INTRODUCCIÓN, OBJETIVOS Y MÉTRICAS
+         ====================================================================== -->
+    <div class="page">
+      <h2 class="section-title">1. Introducción y Contexto del Negocio</h2>
+      
+      <p>
+        <strong>ME Variedades</strong> es una empresa comercial en constante crecimiento dedicada a la comercialización multirubro de mercancía — incluyendo perfumería fina, prendas de vestir (camisas, pantalones, shorts, vestidos), calzado y crocs, cosméticos/maquillaje y artículos electrónicos — complementada con una línea financiera de otorgamiento de préstamos de dinero y crédito a terceros.
+      </p>
+      
+      <p>
+        Históricamente, la operativa diaria, los pedidos, la emisión de recibos y el control de amortizaciones se gestionaban mediante cuadernos y hojas de papel, lo que generaba riesgos de extravío de información, inconsistencias en el saldo adeudado de clientes y retrasos en la toma de decisiones.
+      </p>
+
+      <div class="info-callout">
+        <div class="info-callout-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+          </svg>
+        </div>
+        <div class="info-callout-content">
+          <strong>Propósito de la Versión 4.0:</strong> Consolidar una plataforma web progresiva (PWA) de nivel empresarial con autenticación biométrica neuronal (Face-API), analítica interactiva de alto contraste, centro reactivo de notificaciones con historial, bóveda documental de facturas con compilador de expedientes PDF y sincronización en tiempo real con Supabase.
+        </div>
+      </div>
+
+      <h3 class="subsection-title">1.1 Objetivo General del Sistema</h3>
+      <p>
+        Proveer a la administradora (María) de una herramienta integral, accesible desde computadoras de escritorio, tablets y dispositivos móviles inteligentes, con diseño moderno de alto contraste mate ("Dark Aesthetic"), tiempos de respuesta instantáneos y un motor asistido por Inteligencia Artificial para consultas operativas.
+      </p>
+
+      <h3 class="subsection-title">1.2 Métricas de Éxito Cuantificables</h3>
+      <ul class="doc-list">
+        <li><strong>0% de Extravío de Datos:</strong> Centralización de todos los clientes, compras, comprobantes y saldos en la nube.</li>
+        <li><strong>Búsqueda Menor a 3 Segundos:</strong> Localización inmediata de cualquier ficha de cliente, factura o artículo de inventario.</li>
+        <li><strong>100% de Detección de Cumpleaños:</strong> Automatización de alertas para fidelización y gratificación de clientes.</li>
+        <li><strong>Acceso Biométrico Rápido (&lt;1.6s):</strong> Autenticación facial segura sin necesidad de digitar contraseñas manuales.</li>
+        <li><strong>Expedientes PDF en 1 Clic:</strong> Compilación consolidada de comprobantes digitales por cliente y categoría.</li>
+      </ul>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 2 de 16</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 3: ACTORES, ROLES Y ALCANCE V4.0
+         ====================================================================== -->
+    <div class="page">
+      <h2 class="section-title">2. Actores y Usuarios del Sistema</h2>
+      
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 150px;">Rol / Actor</th>
+              <th>Descripción y Nivel de Privilegios</th>
+              <th style="width: 110px;">Autenticación</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Administradora<br>(María)</strong></td>
+              <td>Acceso total y sin restricciones a todos los módulos: creación, edición, liquidación y eliminación controlada de registros. Visualización de analítica financiera, exportación de expedientes PDF y gestión biométrica.</td>
+              <td><span class="badge badge-feature">Credenciales + Facial</span></td>
+            </tr>
+            <tr>
+              <td><strong>Colaborador / Asistente</strong></td>
+              <td>Acceso a operaciones diarias de registro (ventas de mostrador, altas de pedidos, recepción de abonos) sin permisos de eliminación de registros maestros ni modificación de configuraciones del sistema.</td>
+              <td><span class="badge badge-must">Credenciales</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="section-title">3. Alcance del Sistema (Versión 4.0)</h2>
+
+      <h3 class="subsection-title">3.1 Módulos Incluidos en la Versión 4.0</h3>
+      <ul class="doc-list">
+        <li><strong>Autenticación Híbrida:</strong> Login mediante credenciales seguras y reconocimiento facial neuronal (Face-API) con pantalla intermedia de verificación de seguridad autorizada.</li>
+        <li><strong>Centro de Comando (Dashboard):</strong> Tarjetas de KPIs vivos, distribución de inventario y gráfica interactiva con paleta de alto contraste (Cyan #2dd4bf / Rosa #f472b6 / Dorado #fbbf24).</li>
+        <li><strong>Centro de Notificaciones:</strong> Pestañas diferenciadas ("Pendientes" con badge de conteo e "Historial"), eliminación individual/total de leídas y alertas reactivas de negocio.</li>
+        <li><strong>Directorio de Clientes CRM:</strong> Ficha de cliente, buscador instantáneo, selector de cumpleaños y bloqueo preventivo de eliminación (RF-15).</li>
+        <li><strong>Catálogo de Productos:</strong> Modal ampliado de 820px en 2 columnas, captura WebRTC en vivo con cámara y selector de galería, control de stock y filtros por tipo con scrollbar ultrafino.</li>
+        <li><strong>Gestión de Pedidos:</strong> Vinculación cliente-producto, descuento automático de existencias, columna de acciones en tabla y modal de edición sincronizado con Supabase.</li>
+        <li><strong>Cuentas por Cobrar y Cobros:</strong> Registro de créditos, seguimiento de saldos adeudados, cálculo de días transcurridos y registro de abonos.</li>
+        <li><strong>Préstamos a Terceros:</strong> Cálculo paramétrico de intereses, frecuencias de pago y registro de amortizaciones hasta liquidación al 100%.</li>
+        <li><strong>Bóveda de Facturas y Comprobantes:</strong> Carga de archivos/imágenes y compilación de expedientes PDF multipágina estructurados en 3 niveles de extracción.</li>
+        <li><strong>Asistente Virtual con IA:</strong> Botón flotante interactivo con respuestas contextuales del negocio.</li>
+      </ul>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 3 de 16</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 4: REQUERIMIENTOS FUNCIONALES (AUTENTICACIÓN Y DASHBOARD)
+         ====================================================================== -->
+    <div class="page">
+      <h2 class="section-title">4. Requerimientos Funcionales (RF)</h2>
+      
+      <h3 class="subsection-title">4.1 Autenticación y Biometría Facial</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RF-01</td>
+              <td>El sistema debe permitir el inicio de sesión de María mediante usuario y contraseña cifrada.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-02</td>
+              <td>El banner de bienvenida debe presentar tipografía de alto contraste en una sola línea horizontal ("PANEL DE CONTROL") con escala tipográfica destacada y rol administrativo.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-03</td>
+              <td>El sistema debe ofrecer autenticación biométrica facial mediante modelos neuronales (Face-API) capturados por la cámara web del dispositivo.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-04</td>
+              <td>Al validar credenciales o biometría, el sistema debe desplegar a pantalla completa la animación de transición de seguridad (&lt;AuthVerifyingScreen /&gt;) durante 1.6 segundos antes de conceder acceso al Dashboard.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-05</td>
+              <td>La página de login y la navegación pública deben operar en modo 100% silencioso, sin emitir sonidos de notificación ni pitidos de audio.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="subsection-title">4.2 Centro de Comando (Dashboard) y Analítica</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RF-06</td>
+              <td>El dashboard debe mostrar 4 tarjetas KPI principales: Total Clientes, Cuentas por Cobrar (₡), Préstamos Activos (₡) y Stock de Inventario en Unidades.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-07</td>
+              <td>La gráfica interactiva debe utilizar una paleta cromática de alto contraste: Cyan Esmeralda (#2dd4bf) para Clientes, Rosa (#f472b6) para Stock y Dorado (#fbbf24) para Pedidos/Finanzas.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-08</td>
+              <td>El cálculo de clientes en la gráfica debe ser acumulativo según la fecha de registro (created_at) a lo largo de las 4 semanas del mes en curso.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-09</td>
+              <td>La topbar debe mantener una alineación limpia donde el último elemento a la derecha sea el botón interactivo de campana de notificaciones.</td>
+              <td class="col-priority"><span class="badge badge-should">Should</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 4 de 16</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 5: REQUERIMIENTOS FUNCIONALES (NOTIFICACIONES Y CLIENTES)
+         ====================================================================== -->
+    <div class="page">
+      <h3 class="subsection-title">4.3 Centro de Notificaciones Inteligentes</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RF-10</td>
+              <td>El centro de notificaciones debe disponer de dos pestañas: "Pendientes" (alertas no leídas con badge de conteo) e "Historial" (alertas marcadas como leídas).</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-11</td>
+              <td>En la pestaña "Historial", el sistema debe permitir eliminar notificaciones individualmente o vaciar todo el historial en un solo clic mediante persistencia en localStorage/Supabase.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-12</td>
+              <td>El sistema debe generar alertas automáticas para: cumpleaños del día, stock agotado (0 unids), stock bajo (≤2 unids), cuentas por cobrar vencidas y préstamos por vencer.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="subsection-title">4.4 Directorio de Clientes (CRM)</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RF-13</td>
+              <td>El formulario de clientes debe validar obligatoriamente: nombre completo (solo letras y espacios), teléfono (8 dígitos numéricos) y fecha de cumpleaños (día y mes sin año).</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-14</td>
+              <td>El módulo debe incluir buscador en tiempo real por nombre y número de teléfono.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-15</td>
+              <td><strong>Regla de Integridad RF-15:</strong> El sistema debe bloquear estrictamente la eliminación de clientes que mantengan pedidos activos, cuentas por cobrar con saldo pendiente o préstamos abiertos.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-16</td>
+              <td>Toda acción de eliminación debe solicitar confirmación modal explícita para evitar pérdidas accidentales.</td>
+              <td class="col-priority"><span class="badge badge-should">Should</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 5 de 16</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 6: REQUERIMIENTOS FUNCIONALES (PRODUCTOS Y PEDIDOS)
+         ====================================================================== -->
+    <div class="page">
+      <h3 class="subsection-title">4.5 Catálogo de Productos e Inventario</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RF-17</td>
+              <td>El modal "Registrar Nuevo Producto" / "Editar Producto" debe contar con una anchura de 820px distribuida en 2 columnas: 310px para dropzone/cámara de foto y 1fr para campos del formulario.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-18</td>
+              <td>El modal de productos debe integrar captura fotográfica en vivo con cámara WebRTC y selector para subir archivos desde la galería del dispositivo.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-19</td>
+              <td>El tipo de producto debe seleccionarse entre las 10 categorías oficiales. Si el tipo no es "maquillaje", debe requerirse obligatoriamente el género (Mujer, Hombre, Unisex).</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-20</td>
+              <td>La barra de filtros de categorías debe contar con una barra de desplazamiento horizontal personalizada, ultrafina (5px) y en tono mate oscuro que preserve la estética de la plataforma.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-21</td>
+              <td>Los botones de filtro de tipo deben presentar un estado activo estilizado con fondo degradado vino/rosa oscuro mate y texto blanco nítido de alto contraste.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="subsection-title">4.6 Módulo de Pedidos</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RF-22</td>
+              <td>El sistema debe permitir registrar pedidos seleccionando un cliente del directorio y un artículo en inventario, descontando automáticamente las unidades del stock.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-23</td>
+              <td>La tabla de pedidos debe incluir una columna dedicada de "Acciones" con botones de edición y cancelación de pedidos.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-24</td>
+              <td>El modal de edición de pedidos debe permitir modificar cliente, producto, cantidad y estado (Pendiente, Entregado, Cancelado) sincronizándose en tiempo real con Supabase (updatePedido).</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 6 de 16</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 7: REQUERIMIENTOS FUNCIONALES (PAGOS, COBROS Y PRÉSTAMOS)
+         ====================================================================== -->
+    <div class="page">
+      <h3 class="subsection-title">4.7 Pagos, Cuentas por Cobrar y Cobros</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RF-25</td>
+              <td>El sistema debe registrar cuentas por cobrar por cliente, calculando el saldo pendiente tras cada abono registrado (RF-19).</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-26</td>
+              <td>El modal de abono debe validar que el monto abonado no supere el saldo pendiente de la cuenta.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-27</td>
+              <td>El módulo de cobros debe calcular automáticamente los días transcurridos desde la fecha del cobro y registrar el método de pago utilizado.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="subsection-title">4.8 Módulo de Préstamos a Terceros</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RF-28</td>
+              <td>El sistema debe permitir registrar préstamos a clientes del directorio o a terceros, calculando el monto total a devolver según el capital y la tasa de interés pactada.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-29</td>
+              <td>El módulo debe permitir registrar abonos al préstamo, actualizando el saldo en vivo y marcándolo como "Liquidado al 100%" al completar el saldo total.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="subsection-title">4.9 Bóveda de Facturas y Expedientes PDF</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RF-30</td>
+              <td>En el encabezado del módulo de Facturas se debe mostrar únicamente el indicador principal "TOTAL ARCHIVOS", habiendo eliminado la insignia secundaria.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-31</td>
+              <td>El sistema debe contar con un motor de compilación de expedientes PDF multipágina profesionales con 3 niveles de exportación: Individual, Por Categoría y Expediente Consolidado por Cliente.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 7 de 16</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 8: ESTANDARIZACIÓN DE MODALES Y CHATBOT CON IA
+         ====================================================================== -->
+    <div class="page">
+      <h3 class="subsection-title">4.10 Estandarización de UX/UI y Flujo de Modales</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RF-32</td>
+              <td><strong>Flujo Homogéneo de Guardado:</strong> Todos los modales de creación (Productos, Pagos, Abonos, Cobros, Préstamos, Facturas y Clientes) deben ejecutarse de forma asíncrona (async/await), cerrar el modal de inmediato, limpiar el formulario y disparar la notificación flotante inferior (Toast).</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-33</td>
+              <td><strong>Prohibición Estricta de Emojis:</strong> En toda la interfaz de la plataforma y en los documentos generados queda estrictamente prohibido el uso de emojis; se deben utilizar exclusivamente iconos vectoriales SVG limpios.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="subsection-title">4.11 Asistente Virtual (Chatbot con IA)</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RF-34</td>
+              <td>El asistente virtual debe estar disponible mediante un botón flotante en todas las pantallas de la plataforma para resolver dudas de uso del sistema en español.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-35</td>
+              <td>La clave de API del servicio de Inteligencia Artificial debe protegerse en variables de entorno seguras de backend y nunca exponerse en texto plano en el cliente.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 8 de 16</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 9: REQUERIMIENTOS NO FUNCIONALES (RNF)
+         ====================================================================== -->
+    <div class="page">
+      <h2 class="section-title">5. Requerimientos No Funcionales (RNF)</h2>
+      
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              <th style="width: 140px;">Categoría</th>
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RNF-01</td>
+              <td><strong>Rendimiento</strong></td>
+              <td>El tiempo de carga inicial de cualquier vista o renderizado de tablas de datos no debe exceder los 1.5 segundos bajo conexión de banda ancha estándar.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RNF-02</td>
+              <td><strong>Seguridad</strong></td>
+              <td>Contraseñas almacenadas con hashing seguro, rutas de la aplicación protegidas por AuthProvider y canales WebSocket cifrados con TLS 1.3 en Supabase.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RNF-03</td>
+              <td><strong>Usabilidad UI</strong></td>
+              <td>Diseño glassmorphism oscuro mate de alto contraste con tarjetas con desenfoque de fondo (backdrop-filter) y tipografías Outfit y Plus Jakarta Sans.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RNF-04</td>
+              <td><strong>Multiplataforma</strong></td>
+              <td>Interfaz 100% responsiva optimizada para smartphones (iOS/Android), tablets, laptops y pantallas 4K.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RNF-05</td>
+              <td><strong>Persistencia</strong></td>
+              <td>Persistencia en la nube de Supabase PostgreSQL con fallback resiliente en localStorage en situaciones de pérdida transitoria de conectividad.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RNF-06</td>
+              <td><strong>Operación Silenciosa</strong></td>
+              <td>La plataforma no debe reproducir ningún sonido invasivo en la pantalla de inicio de sesión ni durante la interacción cotidiana de los módulos.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 9 de 16</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINAS 10 A 13: HISTORIAS DE USUARIO Y CRITERIOS DE ACEPTACIÓN
+         ====================================================================== -->
+    <div class="page">
+      <h2 class="section-title">6. Historias de Usuario (HU) y Criterios de Aceptación</h2>
+
+      <!-- HU-01 -->
+      <div class="user-story-card">
+        <div class="user-story-header">
+          <span class="user-story-title">HU-01: Acceso Seguro con Biometría Facial</span>
+          <span class="badge badge-must">Must</span>
+        </div>
+        <div class="user-story-body">
+          <strong>Como:</strong> María, administradora de ME Variedades.<br>
+          <strong>Quiero:</strong> Ingresar al sistema mediante el reconocimiento de mi rostro con la cámara.<br>
+          <strong>Para:</strong> Acceder de forma rápida, moderna y segura sin tener que digitar claves en cada sesión.
+        </div>
+        <div class="user-story-criteria-title">Criterios de Aceptación:</div>
+        <ul class="criteria-list">
+          <li>El modal activa la cámara web y carga los modelos neuronales de detección.</li>
+          <li>Al identificar el rostro registrado, muestra indicador de coincidencia y detiene el flujo de video.</li>
+          <li>Despliega la pantalla &lt;AuthVerifyingScreen /&gt; durante 1.6s y redirige fluidamente al Dashboard.</li>
+        </ul>
+      </div>
+
+      <!-- HU-02 -->
+      <div class="user-story-card">
+        <div class="user-story-header">
+          <span class="user-story-title">HU-02: Consulta de Analítica en Paleta Cromática de Alto Contraste</span>
+          <span class="badge badge-must">Must</span>
+        </div>
+        <div class="user-story-body">
+          <strong>Como:</strong> María, administradora.<br>
+          <strong>Quiero:</strong> Visualizar las métricas de clientes, stock y pedidos en líneas de color bien diferenciadas.<br>
+          <strong>Para:</strong> Interpretar la evolución semanal del negocio de un vistazo sin confusiones de color ni duplicidad de leyendas.
+        </div>
+        <div class="user-story-criteria-title">Criterios de Aceptación:</div>
+        <ul class="criteria-list">
+          <li>Línea de clientes en color Cyan Esmeralda (#2dd4bf), stock en Rosa (#f472b6) y pedidos en Dorado (#fbbf24).</li>
+          <li>Los clientes registrados se distribuyen de forma acumulada según su fecha de registro en las semanas del mes.</li>
+          <li>La leyenda HTML es única y reactiva a la pestaña seleccionada (General, Finanzas, Clientes, Stock).</li>
+        </ul>
+      </div>
+
+      <!-- HU-03 -->
+      <div class="user-story-card">
+        <div class="user-story-header">
+          <span class="user-story-title">HU-03: Gestión de Notificaciones con Pestañas e Historial</span>
+          <span class="badge badge-must">Must</span>
+        </div>
+        <div class="user-story-body">
+          <strong>Como:</strong> María, administradora.<br>
+          <strong>Quiero:</strong> Consultar alertas pendientes y revisar o purgar el historial de notificaciones leídas.<br>
+          <strong>Para:</strong> Mantener limpia mi bandeja de alertas operativas sin perder el registro de eventos pasados.
+        </div>
+        <div class="user-story-criteria-title">Criterios de Aceptación:</div>
+        <ul class="criteria-list">
+          <li>Dispone de pestañas "Pendientes" (con badge numérico de alertas activas) e "Historial".</li>
+          <li>Permite eliminar alertas leídas individualmente o vaciar todo el historial con un solo botón.</li>
+        </ul>
+      </div>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 10 de 16</span>
+      </div>
+    </div>
+
+    <!-- PÁGINA 11 -->
+    <div class="page">
+      <!-- HU-04 -->
+      <div class="user-story-card">
+        <div class="user-story-header">
+          <span class="user-story-title">HU-04: Registro y Edición de Producto con Modal Ampliado</span>
+          <span class="badge badge-must">Must</span>
+        </div>
+        <div class="user-story-body">
+          <strong>Como:</strong> María, administradora.<br>
+          <strong>Quiero:</strong> Crear o modificar productos en un formulario holgado con dropzone de foto y cámara.<br>
+          <strong>Para:</strong> Ver todos los campos, precios y placeholders completos sin recortes visuales.
+        </div>
+        <div class="user-story-criteria-title">Criterios de Aceptación:</div>
+        <ul class="criteria-list">
+          <li>El modal tiene un ancho de 820px estructurado en 2 columnas balanceadas (310px foto y 1fr formulario).</li>
+          <li>Permite tomar foto con WebRTC o subir archivo desde galería; valida precio &gt; 0 y género según tipo.</li>
+          <li>Al guardar, cierra el modal de inmediato, resetea campos y dispara el toast flotante inferior.</li>
+        </ul>
+      </div>
+
+      <!-- HU-05 -->
+      <div class="user-story-card">
+        <div class="user-story-header">
+          <span class="user-story-title">HU-05: Edición y Actualización de Pedidos en Supabase</span>
+          <span class="badge badge-must">Must</span>
+        </div>
+        <div class="user-story-body">
+          <strong>Como:</strong> María, administradora.<br>
+          <strong>Quiero:</strong> Editar pedidos registrados para modificar cliente, artículo, cantidad o estado.<br>
+          <strong>Para:</strong> Reflejar cambios en entregas o cancelaciones y mantener sincronizado el stock y Supabase.
+        </div>
+        <div class="user-story-criteria-title">Criterios de Aceptación:</div>
+        <ul class="criteria-list">
+          <li>Tabla de pedidos muestra columna "Acciones" con botón de editar en cada fila.</li>
+          <li>Modal de edición carga datos del pedido, actualiza la base de datos y refresca la tabla inmediatamente.</li>
+        </ul>
+      </div>
+
+      <!-- HU-06 -->
+      <div class="user-story-card">
+        <div class="user-story-header">
+          <span class="user-story-title">HU-06: Compilación de Expedientes de Facturas en PDF</span>
+          <span class="badge badge-must">Must</span>
+        </div>
+        <div class="user-story-body">
+          <strong>Como:</strong> María, administradora.<br>
+          <strong>Quiero:</strong> Descargar comprobantes individuales o compilar expedientes completos en documentos PDF.<br>
+          <strong>Para:</strong> Respaldar transacciones contables y compartirlas formalmente con clientes.
+        </div>
+        <div class="user-story-criteria-title">Criterios de Aceptación:</div>
+        <ul class="criteria-list">
+          <li>Genera PDF multipágina con encabezado oficial, metadatos, tabla resumen e imagen incrustada de alta resolución.</li>
+          <li>Permite exportación individual, por categoría de comprobante o expediente consolidado del cliente.</li>
+        </ul>
+      </div>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 11 de 16</span>
+      </div>
+    </div>
+
+    <!-- PÁGINA 12 -->
+    <div class="page">
+      <!-- HU-07 -->
+      <div class="user-story-card">
+        <div class="user-story-header">
+          <span class="user-story-title">HU-07: Bloqueo de Eliminación de Cliente con Dependencias (RF-15)</span>
+          <span class="badge badge-must">Must</span>
+        </div>
+        <div class="user-story-body">
+          <strong>Como:</strong> María, administradora.<br>
+          <strong>Quiero:</strong> Que el sistema me impida borrar clientes con deudas, pedidos o préstamos abiertos.<br>
+          <strong>Para:</strong> Evitar la pérdida involuntaria de cuentas por cobrar o compromisos comerciales vigentes.
+        </div>
+        <div class="user-story-criteria-title">Criterios de Aceptación:</div>
+        <ul class="criteria-list">
+          <li>Al intentar eliminar, el sistema verifica saldos y muestra un modal explicativo con los motivos de bloqueo.</li>
+          <li>Clientes sin deudas ni transacciones abiertas pueden eliminarse previa confirmación.</li>
+        </ul>
+      </div>
+
+      <!-- HU-08 -->
+      <div class="user-story-card">
+        <div class="user-story-header">
+          <span class="user-story-title">HU-08: Gestión de Préstamos con Amortización e Intereses</span>
+          <span class="badge badge-must">Must</span>
+        </div>
+        <div class="user-story-body">
+          <strong>Como:</strong> María, administradora.<br>
+          <strong>Quiero:</strong> Registrar préstamos a terceros, calcular intereses y abonar periódicamente.<br>
+          <strong>Para:</strong> Llevar un control transparente de las ganancias financieras y fechas límites de pago.
+        </div>
+        <div class="user-story-criteria-title">Criterios de Aceptación:</div>
+        <ul class="criteria-list">
+          <li>Calcula automáticamente monto total = capital + (capital * tasa/100).</li>
+          <li>Modal de abono descuenta el saldo pendiente y emite alerta de liquidación total cuando el saldo llega a ₡0.</li>
+        </ul>
+      </div>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 12 de 16</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 13: MATRIZ DE PRIORIZACIÓN MOSCOW
+         ====================================================================== -->
+    <div class="page">
+      <h2 class="section-title">7. Matriz de Priorización MoSCoW (V4.0)</h2>
+      
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 140px;">Categoría</th>
+              <th>Requerimientos y Módulos Incluidos en la Versión 4.0</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-must">Must Have<br>(Obligatorios)</span></td>
+              <td>
+                <strong>RF-01 a RF-05:</strong> Autenticación con contraseña, Biometría Facial neuronal, Pantalla de Verificación y Modo Silencioso.<br>
+                <strong>RF-06 a RF-08:</strong> Dashboard con KPIs vivos y Gráfica interactiva de alto contraste Cyan/Rosa/Dorado con distribución semanal acumulada.<br>
+                <strong>RF-10 a RF-12:</strong> Centro de Notificaciones con pestañas "Pendientes" e "Historial" y eliminación de leídas.<br>
+                <strong>RF-13 a RF-16:</strong> Directorio CRM de clientes, selector de cumpleaños y regla de protección RF-15.<br>
+                <strong>RF-17 a RF-21:</strong> Modal de producto ampliado a 820px, cámara WebRTC, scrollbar ultrafino y filtros de alto contraste.<br>
+                <strong>RF-22 a RF-24:</strong> Gestión y edición de pedidos con actualización en Supabase.<br>
+                <strong>RF-25 a RF-29:</strong> Pagos, abonos, cobros y préstamos con cálculo de intereses.<br>
+                <strong>RF-30 a RF-31:</strong> Bóveda de facturas y compilador de expedientes PDF multipágina en 3 niveles.<br>
+                <strong>RF-32 a RF-33:</strong> Estandarización de guardado/cierre en modales con toast flotante y prohibición de emojis.<br>
+                <strong>RNF-01 a RNF-06:</strong> Rendimiento, seguridad cifrada, glassmorphism oscuro y persistencia Supabase.
+              </td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-should">Should Have<br>(Importantes)</span></td>
+              <td>
+                <strong>RF-09:</strong> Topbar minimalista con campana de notificaciones al extremo derecho.<br>
+                <strong>RF-34 a RF-35:</strong> Asistente Virtual (Chatbot con IA) para soporte operativo de María.<br>
+                <strong>RF-16:</strong> Modales de confirmación con diseño suave antes de eliminar datos.
+              </td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-could">Could Have<br>(Deseables)</span></td>
+              <td>
+                Sincronización directa de comprobantes con Google Drive.<br>
+                Generación automática de recordatorios vía API de WhatsApp Web.
+              </td>
+            </tr>
+            <tr>
+              <td><span class="badge" style="background:#fee2e2; color:#991b1b; border:1px solid #fecaca;">Won't Have<br>(Fuera de V4)</span></td>
+              <td>
+                Facturación electrónica formal ante el Ministerio de Hacienda de Costa Rica.<br>
+                Pasarela de pagos en línea con cobro directo de tarjetas de crédito.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 13 de 16</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 14: ARQUITECTURA TÉCNICA E IMPLEMENTACIÓN
+         ====================================================================== -->
+    <div class="page">
+      <h2 class="section-title">8. Especificación Técnica y Arquitectura de Software</h2>
+      
+      <h3 class="subsection-title">8.1 Stack Tecnológico Implementado</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 140px;">Capa / Componente</th>
+              <th>Tecnología Seleccionada</th>
+              <th>Justificación y Funcionalidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Frontend Framework</strong></td>
+              <td>React 18 + Vite (SPA)</td>
+              <td>Renderizado reactivo ultrarrápido, estructura modular y cero recargas de página.</td>
+            </tr>
+            <tr>
+              <td><strong>Backend & Base de Datos</strong></td>
+              <td>Supabase (PostgreSQL Cloud)</td>
+              <td>Almacenamiento relacional seguro, WebSockets en tiempo real y Storage para comprobantes.</td>
+            </tr>
+            <tr>
+              <td><strong>Biometría Facial</strong></td>
+              <td>Face-API.js + Canvas HTML5</td>
+              <td>Modelos neuronales TinyFaceDetector y FaceLandmark68Net ejecutados localmente en el navegador.</td>
+            </tr>
+            <tr>
+              <td><strong>Gráficas y Analítica</strong></td>
+              <td>Chart.js 4.x + ChartJS React</td>
+              <td>Visualización de datos con gradientes, curvas de Bézier dinámicas y tooltips interactivos.</td>
+            </tr>
+            <tr>
+              <td><strong>Exportación PDF</strong></td>
+              <td>jsPDF + jsPDF-AutoTable</td>
+              <td>Generación programática de expedientes de comprobantes en alta resolución.</td>
+            </tr>
+            <tr>
+              <td><strong>Iconografía & Estilos</strong></td>
+              <td>SVG Vectorial + Vanilla CSS</td>
+              <td>Diseño aesthetic libre de emojis, variables CSS, glassmorphism y micro-animaciones fluidas.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="subsection-title">8.2 Arquitectura Modular de Archivos</h3>
+      <p style="font-family: var(--font-mono); font-size: 8pt; background: var(--color-fondo-alt); padding: 12px; border-radius: 6px; border: 1px solid var(--color-borde); line-height: 1.4;">
+        /src<br>
+        ├── assets/ (Logo oficial, recursos gráficos)<br>
+        ├── components/<br>
+        │   ├── biometrics/ (FaceLoginModal, FaceEnrollModal, AuthVerifyingScreen)<br>
+        │   ├── chatbot/ (ChatbotFlotante, AsistenteVirtual)<br>
+        │   ├── clientes/ (ClientModal, ClientTable, ClientBlockedModal)<br>
+        │   ├── cobros/ (ModalRegistrarCobro, CobrosTable, CobrosKPIs)<br>
+        │   ├── common/ (Modal, Toast, BirthdayDatePicker, CustomDatePicker)<br>
+        │   ├── dashboard/ (AnalyticsChartSection, KPICards, StockDistributionCard)<br>
+        │   ├── facturas/ (FacturasGrid, ModalNuevaFactura, ModalPreviewFactura)<br>
+        │   ├── layout/ (Sidebar, Topbar, NotificationsCenter)<br>
+        │   ├── pagos/ (ModalRegistrarPago, ModalAbono, PagosTable)<br>
+        │   ├── pedidos/ (OrderModal, OrderTable)<br>
+        │   ├── prestamos/ (ModalRegistrarPrestamo, ModalAbonoPrestamo, PrestamosTable)<br>
+        │   └── productos/ (ProductModal, ProductTable, ProductGrid)<br>
+        ├── context/ (Auth, Client, Product, Order, Pagos, Cobros, Prestamos, Facturas, Notification, Dashboard)<br>
+        ├── services/ (api.js, supabase.js, biometricService.js, pdfExportService.js, notificationService.js)<br>
+        └── styles/ (global.css, login.css, dashboard.css, productos.css, facturas.css, biometrics.css)
+      </p>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 14 de 16</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 15: ESPECIFICACIÓN DE MÓDULOS TÉCNICOS
+         ====================================================================== -->
+    <div class="page">
+      <h3 class="subsection-title">8.3 Mecanismos Técnicos Clave Implementados</h3>
+      
+      <p><strong>1. Motor de Persistencia Centralizado (<code>api.js</code>):</strong></p>
+      <p>
+        Unifica todas las operaciones CRUD contra las tablas de Supabase (<code>clientes</code>, <code>productos</code>, <code>pedidos</code>, <code>pagos</code>, <code>cobros</code>, <code>prestamos</code>, <code>facturas</code>), implementando bloqueos de integridad y fallback automático a almacenamiento local ante contingencias.
+      </p>
+
+      <p><strong>2. Canal en Tiempo Real (<code>DashboardContext.jsx</code>):</strong></p>
+      <p>
+        Escucha eventos de tipo <code>postgres_changes</code> en todas las tablas operativas para recalcular indicadores de inventario, cuentas por cobrar y préstamos sin requerir recargar la página.
+      </p>
+
+      <p><strong>3. Sistema de Notificaciones sin Ruido:</strong></p>
+      <p>
+        El generador de notificaciones (<code>notificationService.js</code>) evalúa fechas de cumpleaños, niveles de stock y vencimientos de crédito para alertar de forma visual en la barra superior con contador reactivo, garantizando una operación 100% libre de sonidos invasivos.
+      </p>
+
+      <p><strong>4. Compilación PDF con jsPDF (<code>pdfExportService.js</code>):</strong></p>
+      <p>
+        Convierte imágenes base64 y registros tabulares en documentos multipágina con paginación automática, paleta corporativa y tipografía nítida para entrega formal a clientes.
+      </p>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 15 de 16</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 16: SUPUESTOS, RESTRICCIONES Y APROBACIÓN
+         ====================================================================== -->
+    <div class="page no-break">
+      <h2 class="section-title">9. Supuestos, Restricciones y Firmas de Aprobación</h2>
+      
+      <h3 class="subsection-title">9.1 Supuestos de Operación</h3>
+      <ul class="doc-list">
+        <li>La administradora (María) cuenta con conexión a internet y dispositivos compatibles con navegadores modernos (Google Chrome, Safari, Edge, Mozilla Firefox).</li>
+        <li>Para el reconocimiento facial, el dispositivo debe contar con cámara frontal o webcam funcional con permisos concedidos al navegador.</li>
+        <li>El almacenamiento de comprobantes en Supabase Storage se rige por las cuotas de almacenamiento asignadas a la cuenta del negocio.</li>
+      </ul>
+
+      <h3 class="subsection-title">9.2 Restricciones Técnicas</h3>
+      <ul class="doc-list">
+        <li>El sistema es de uso administrativo interno y no expone registro público ni pasarelas de pago de terceros.</li>
+        <li>Las imágenes adjuntas para productos y comprobantes tienen un límite de tamaño de 5 MB por archivo para optimizar el ancho de banda.</li>
+      </ul>
+
+      <h3 class="subsection-title" style="margin-top: 32px;">9.3 Conformidad y Aprobación Formal del SRS V4.0</h3>
+      <p>
+        El presente documento constituye la especificación formal y definitiva de la plataforma <strong>ME Variedades (Versión 4.0)</strong>, validando la entrega de todos los módulos, componentes biométricos, interfaces gráficas y servicios en la nube solicitados.
+      </p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 50px; text-align: center;">
+        <div>
+          <div style="border-top: 1.5px solid #1e1b1c; padding-top: 8px; font-weight: 700; font-family: var(--font-title);">
+            María
+          </div>
+          <div style="font-size: 8.5pt; color: var(--color-texto-muted);">
+            Administradora y Propietaria<br>ME Variedades
+          </div>
+        </div>
+
+        <div>
+          <div style="border-top: 1.5px solid #1e1b1c; padding-top: 8px; font-weight: 700; font-family: var(--font-title);">
+            Equipo de Desarrollo e Ingeniería
+          </div>
+          <div style="font-size: 8.5pt; color: var(--color-texto-muted);">
+            Antigravity IDE & Fullstack Team<br>Agosto 2026
+          </div>
+        </div>
+      </div>
+
+      <div class="page-footer" style="margin-top: 50px;">
+        <span>ME Variedades — SRS V4.0 Final</span>
+        <span>Página 16 de 16</span>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

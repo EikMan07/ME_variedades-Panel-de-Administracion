@@ -1,0 +1,971 @@
+/* ========================================================
+   ESTILOS DEL MÓDULO DE PRODUCTOS E INVENTARIO
+   ME VARIEDADES
+   ======================================================== */
+
+/* Píldoras de Categoría */
+.category-pills-section {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ===================================================
+   SCROLLBAR OSCURO Y ULTRAFINO PARA CATEGORÍAS
+   =================================================== */
+
+/* Contenedor de las píldoras de categorías */
+.category-filter-bar,
+.product-types-nav,
+.pills-container,
+.pills-scroll-container,
+.types-bar-scroll {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.55rem !important;
+  overflow-x: auto !important;
+  padding-bottom: 6px !important;
+  
+  /* Soporte estándar para Firefox */
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(244, 180, 200, 0.25) rgba(255, 255, 255, 0.02) !important;
+}
+
+/* 1. Dimensiones de la barra (Chrome, Safari, Edge) */
+.category-filter-bar::-webkit-scrollbar,
+.product-types-nav::-webkit-scrollbar,
+.pills-container::-webkit-scrollbar,
+.pills-scroll-container::-webkit-scrollbar,
+.types-bar-scroll::-webkit-scrollbar {
+  height: 5px !important; /* Altura ultrafina y discreta */
+}
+
+/* 2. Pista de fondo (Track) */
+.category-filter-bar::-webkit-scrollbar-track,
+.product-types-nav::-webkit-scrollbar-track,
+.pills-container::-webkit-scrollbar-track,
+.pills-scroll-container::-webkit-scrollbar-track,
+.types-bar-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border-radius: 10px !important;
+}
+
+/* 3. Indicador de arrastre (Thumb) */
+.category-filter-bar::-webkit-scrollbar-thumb,
+.product-types-nav::-webkit-scrollbar-thumb,
+.pills-container::-webkit-scrollbar-thumb,
+.pills-scroll-container::-webkit-scrollbar-thumb,
+.types-bar-scroll::-webkit-scrollbar-thumb {
+  background: rgba(244, 180, 200, 0.22) !important; /* Tono rosa suave translúcido */
+  border-radius: 10px !important;
+  transition: background 0.2s ease !important;
+}
+
+.category-filter-bar::-webkit-scrollbar-thumb:hover,
+.product-types-nav::-webkit-scrollbar-thumb:hover,
+.pills-container::-webkit-scrollbar-thumb:hover,
+.pills-scroll-container::-webkit-scrollbar-thumb:hover,
+.types-bar-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(244, 180, 200, 0.45) !important;
+}
+
+/* 4. Ocultar botones de flechas laterales blancas */
+.category-filter-bar::-webkit-scrollbar-button,
+.product-types-nav::-webkit-scrollbar-button,
+.pills-container::-webkit-scrollbar-button,
+.pills-scroll-container::-webkit-scrollbar-button,
+.types-bar-scroll::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Estado normal de la píldora */
+.category-pill,
+.type-filter-btn,
+.pill-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 38px;
+  padding: 0 1rem;
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 10px;
+  color: #c4b5b9 !important;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+/* Hover suave */
+.category-pill:hover,
+.type-filter-btn:hover {
+  background-color: rgba(244, 180, 200, 0.08) !important;
+  border-color: rgba(244, 180, 200, 0.25) !important;
+  color: #ffffff !important;
+}
+
+/* Estado Activo / Seleccionado (Elegante tono vino / rosa oscuro matte) */
+.category-pill.active,
+.type-filter-btn.active,
+.pill-button.active {
+  background: linear-gradient(135deg, #5e2634, #3a1620) !important;
+  border: 1px solid rgba(244, 180, 200, 0.45) !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Badge numérico de conteo dentro de la píldora */
+.category-pill .pill-count,
+.type-filter-btn .badge-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.06);
+  color: #d1c5c7;
+  transition: all 0.2s ease;
+}
+
+/* Badge numérico cuando la píldora está activa */
+.category-pill.active .pill-count,
+.type-filter-btn.active .badge-count {
+  background: rgba(244, 180, 200, 0.2) !important;
+  color: #f4b4c8 !important;
+  border: 1px solid rgba(244, 180, 200, 0.3) !important;
+}
+
+/* Barra de Filtros Secundaria */
+.filters-bar-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--color-borde-vidrio);
+}
+
+.filter-search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-borde-vidrio);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.85rem;
+  flex: 1;
+  max-width: 400px;
+}
+
+.input-search-inline {
+  background: none;
+  border: none;
+  color: var(--color-texto-principal);
+  font-size: 0.85rem;
+  width: 100%;
+}
+
+.stock-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.filter-label-inline {
+  font-size: 0.8rem;
+  color: var(--color-texto-secundario);
+}
+
+.select-compact {
+  padding: 0.45rem 0.85rem;
+  font-size: 0.8rem;
+}
+
+.view-toggle-group {
+  display: flex;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-borde-vidrio);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.btn-view-toggle {
+  padding: 0.45rem 0.75rem;
+  color: var(--color-texto-secundario);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.btn-view-toggle.active {
+  background: var(--color-rosa-empolvado);
+  color: #ffffff;
+}
+
+/* VISTA EN CUADRÍCULA (PRODUCT GRID) */
+.products-grid-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.product-card {
+  background: var(--color-superficie-oscura);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  border: 1px solid var(--color-borde-vidrio);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-normal);
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+}
+
+.product-image-box {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.product-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.product-card:hover .product-img {
+  transform: scale(1.05);
+}
+
+.product-img-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--color-texto-apagado);
+  font-size: 0.8rem;
+}
+
+.product-stock-badge-overlay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+}
+
+.badge-stock-normal {
+  background: rgba(110, 143, 107, 0.85);
+  color: #ffffff;
+}
+
+.badge-stock-low {
+  background: rgba(201, 162, 75, 0.85);
+  color: #ffffff;
+}
+
+.badge-stock-out {
+  background: rgba(178, 58, 72, 0.85);
+  color: #ffffff;
+}
+
+.product-card-body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.product-tags-row {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.tag-category {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(154, 110, 121, 0.15);
+  color: var(--color-rosa-suave);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.tag-gender {
+  font-size: 0.7rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-texto-secundario);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.product-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-texto-principal);
+  line-height: 1.3;
+}
+
+.product-price-box {
+  margin-top: auto;
+}
+
+.product-price {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-dorado);
+}
+
+/* Control rápido de Stock (+ / -) */
+.stock-control-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--color-borde-vidrio);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+}
+
+.stock-info-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.stock-label {
+  font-size: 0.68rem;
+  color: var(--color-texto-apagado);
+  text-transform: uppercase;
+}
+
+.stock-number {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-texto-principal);
+}
+
+.stock-quick-btns {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.btn-stock-adjust {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--color-borde-vidrio);
+  color: var(--color-texto-principal);
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.btn-stock-adjust:hover {
+  background: var(--color-rosa-empolvado);
+  color: #fff;
+}
+
+.product-card-footer {
+  padding: 0.85rem 1.25rem;
+  border-top: 1px solid var(--color-borde-vidrio);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+/* MODAL DE PRODUCTO (FOTO + CAMPOS) */
+/* ===================================================
+   MODAL DE PRODUCTOS: AMPLIACIÓN Y ESPACIADO CÓMODO
+   =================================================== */
+
+/* 1. Ancho del contenedor del Modal */
+.modal-product-dialog,
+.modal-dialog.modal-product,
+.product-modal-container,
+.modal-card-large {
+  max-width: 820px !important; /* Ampliado para dar holgura total a ambas columnas */
+  width: 95% !important;
+  margin: 1.5rem auto !important;
+}
+
+/* 2. Cuerpo del Modal: 2 Columnas Balanceadas */
+.product-modal-body,
+.modal-product-grid,
+.modal-form-grid {
+  display: grid !important;
+  grid-template-columns: 310px 1fr !important; /* 310px para foto y el resto para formulario */
+  gap: 2rem !important;
+  padding: 1.5rem 2rem !important;
+  align-items: start;
+}
+
+/* 3. Columna Izquierda: Zona de Foto y Botones */
+.photo-upload-container,
+.product-photo-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.image-preview-box,
+.product-photo-dropzone {
+  width: 100%;
+  height: 240px !important; /* Altura cómoda para la miniatura */
+  background: rgba(255, 255, 255, 0.02);
+  border: 2px dashed rgba(244, 180, 200, 0.2);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.image-preview-box.camera-active-mode {
+  border: 1px solid var(--color-rosa-empolvado);
+  box-shadow: 0 0 20px rgba(154, 110, 121, 0.3);
+  background: #000000;
+}
+
+.preview-product-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.image-preview-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.image-placeholder-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--color-texto-apagado);
+  font-size: 0.78rem;
+  text-align: center;
+  padding: 1rem;
+}
+
+/* Transmisión de Video en Vivo de la Cámara */
+.camera-live-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000000;
+}
+
+.camera-video-stream {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.camera-live-indicator {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #ff5252;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid rgba(255, 82, 82, 0.4);
+  letter-spacing: 0.05em;
+  z-index: 2;
+}
+
+.camera-live-dot {
+  width: 7px;
+  height: 7px;
+  background-color: #ff5252;
+  border-radius: 50%;
+  animation: pulse-recording 1.2s infinite ease-in-out;
+}
+
+@keyframes pulse-recording {
+  0% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.7); }
+  70% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 0 6px rgba(255, 82, 82, 0); }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+.camera-status-text {
+  font-size: 0.78rem;
+  color: var(--color-texto-secundario);
+}
+
+/* Alerta de Error de Cámara */
+.camera-error-banner {
+  background: var(--color-error-bg);
+  border: 1px solid rgba(178, 58, 72, 0.4);
+  color: #ff8e99;
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+}
+
+.camera-error-banner svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Controles de Cámara Activa */
+.camera-active-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.btn-camera-snap {
+  width: 100%;
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, var(--color-rosa-empolvado), var(--color-rosa-vino));
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(154, 110, 121, 0.4);
+  transition: all var(--transition-fast);
+}
+
+.btn-camera-snap:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(154, 110, 121, 0.6);
+  background: linear-gradient(135deg, var(--color-rosa-empolvado-hover), #753f48);
+}
+
+.camera-sub-controls {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.btn-camera-tool {
+  flex: 1;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--color-borde-vidrio);
+  border-radius: var(--radius-sm);
+  color: var(--color-texto-principal);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-camera-tool:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.btn-camera-cancel {
+  color: var(--color-texto-secundario);
+}
+
+.btn-camera-cancel:hover {
+  color: var(--color-error);
+  background: var(--color-error-bg);
+  border-color: rgba(178, 58, 72, 0.3);
+}
+
+/* Fila de Acciones de Foto Normal */
+.photo-actions-row,
+.product-photo-actions {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 0.75rem !important;
+  align-items: center;
+}
+
+.btn-photo-action,
+.btn-upload-action {
+  height: 40px !important;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-photo-action:hover,
+.btn-upload-action:hover {
+  background: rgba(244, 180, 200, 0.12);
+  border-color: rgba(244, 180, 200, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-camera-trigger {
+  background: rgba(154, 110, 121, 0.12);
+  border-color: rgba(154, 110, 121, 0.3);
+  color: var(--color-rosa-suave);
+}
+
+.btn-camera-trigger:hover {
+  background: rgba(154, 110, 121, 0.25);
+  border-color: var(--color-rosa-empolvado);
+  color: #ffffff;
+}
+
+.btn-photo-remove {
+  grid-column: span 2;
+  height: 38px !important;
+  min-height: 38px;
+  color: var(--color-error);
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-photo-remove:hover {
+  background: var(--color-error-bg);
+  border-color: rgba(178, 58, 72, 0.4);
+}
+
+/* Columna de Campos y Feedback de Validación */
+.fields-column,
+.product-form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  min-width: 0;
+}
+
+.fields-column .form-group,
+.form-group-modal {
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.fields-column .form-label,
+.form-group-modal label,
+.form-group-modal .form-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #f1e6e8;
+  white-space: nowrap !important; /* Evita que las etiquetas se quiebren */
+}
+
+.input-feedback-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.input-warning-msg {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--color-dorado);
+  font-size: 0.76rem;
+  font-weight: 500;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.65rem;
+  animation: fadeInDown 0.25s ease-out;
+}
+
+.input-error-msg {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #ff7685;
+  font-size: 0.76rem;
+  font-weight: 500;
+  background: var(--color-error-bg);
+  border: 1px solid rgba(178, 58, 72, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.65rem;
+  animation: fadeInDown 0.25s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.product-form-fields input,
+.product-form-fields select,
+.fields-column .input-form,
+.fields-column .select-form {
+  width: 100%;
+  height: 44px !important;
+  padding: 0 1rem !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(244, 180, 200, 0.2) !important;
+  border-radius: 10px !important;
+  color: #ffffff !important;
+  font-size: 0.9rem !important;
+  box-sizing: border-box;
+}
+
+.product-form-fields input::placeholder,
+.fields-column .input-form::placeholder {
+  color: #7d6e73;
+  font-size: 0.88rem;
+}
+
+.form-row-2,
+.product-pricing-row {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 1.25rem !important;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  align-items: start;
+}
+
+.form-row-2 .form-group,
+.product-pricing-row .form-group-modal {
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  box-sizing: border-box;
+}
+
+.product-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.25rem 2rem;
+  margin-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.product-modal-footer button {
+  height: 44px;
+  padding: 0 1.5rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* ========================================================
+   DISEÑO 100% RESPONSIVO MULTI-DISPOSITIVO
+   (Móviles, Tablets, Computadoras, Smart TVs)
+   ======================================================== */
+
+/* 1. MÓVILES (Pantallas pequeñas <= 640px) */
+@media (max-width: 640px) {
+  .modal-card-large {
+    width: 95vw;
+    max-height: 94vh;
+    border-radius: var(--radius-md);
+  }
+
+  .modal-form-grid {
+    grid-template-columns: 1fr;
+    gap: 1.15rem;
+  }
+
+  .photo-upload-container {
+    width: 100%;
+  }
+
+  .image-preview-box {
+    height: 180px;
+  }
+
+  .form-row-2 {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .product-modal-footer {
+    flex-direction: column-reverse;
+    gap: 0.65rem;
+  }
+
+  .product-modal-footer .btn-primary-action,
+  .product-modal-footer .btn-secondary-action {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+  }
+
+  .filters-bar-secondary {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-search-box {
+    max-width: 100%;
+  }
+
+  .stock-filter-group {
+    justify-content: space-between;
+  }
+}
+
+/* 2. TABLETS (641px a 1023px) */
+@media (min-width: 641px) and (max-width: 1023px) {
+  .modal-card-large {
+    max-width: 700px;
+    width: 92vw;
+  }
+
+  .modal-form-grid {
+    grid-template-columns: 220px 1fr;
+    gap: 1.25rem;
+  }
+
+  .image-preview-box {
+    height: 175px;
+  }
+}
+
+/* 3. COMPUTADORAS DE ESCRITORIO (1024px a 1599px) */
+@media (min-width: 1024px) and (max-width: 1599px) {
+  .modal-card-large {
+    max-width: 860px;
+  }
+
+  .modal-form-grid {
+    grid-template-columns: 250px 1fr;
+    gap: 1.5rem;
+  }
+
+  .image-preview-box {
+    height: 200px;
+  }
+}
+
+/* 4. TELEVISORES / SMART TVs / PANTALLAS ULTRA-ANCHAS (>= 1600px) */
+@media (min-width: 1600px) {
+  .modal-card-large {
+    max-width: 960px;
+    box-shadow: 0 35px 80px rgba(0, 0, 0, 0.85), 0 0 40px rgba(154, 110, 121, 0.15);
+  }
+
+  .modal-form-grid {
+    grid-template-columns: 280px 1fr;
+    gap: 1.85rem;
+  }
+
+  .image-preview-box {
+    height: 230px;
+  }
+
+  .fields-column .form-label {
+    font-size: 0.88rem;
+  }
+
+  .fields-column .input-form,
+  .fields-column .select-form {
+    font-size: 0.98rem;
+    min-height: 46px;
+  }
+
+  .btn-camera-snap {
+    min-height: 48px;
+    font-size: 0.95rem;
+  }
+
+  .btn-photo-action {
+    min-height: 46px;
+    font-size: 0.9rem;
+  }
+}
+
+/* 5. ORIENTACIÓN HORIZONTAL EN PANTALLAS COMPACTAS (Landscape en teléfonos y tablets) */
+@media (max-height: 580px) {
+  .modal-card-large {
+    max-height: 96vh;
+  }
+
+  .image-preview-box {
+    height: 135px;
+  }
+
+  .fields-column {
+    gap: 0.5rem;
+  }
+}

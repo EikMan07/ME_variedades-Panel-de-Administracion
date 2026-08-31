@@ -1,0 +1,779 @@
+/* ========================================================
+   ESTILOS GLOBALES Y RESET
+   ME VARIEDADES
+   ======================================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  width: 100%;
+  min-height: 100%;
+  font-family: 'Poppins', 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--color-fondo-oscuro);
+  color: var(--color-texto-principal);
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+
+body.dashboard-body {
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(154, 110, 121, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(212, 175, 55, 0.03) 0%, transparent 40%);
+  background-attachment: fixed;
+}
+
+/* Scrollbar estilizado */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-fondo-oscuro);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-rosa-empolvado);
+}
+
+/* Enlaces y botones base */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  outline: none;
+}
+
+input, select, textarea {
+  font-family: inherit;
+  outline: none;
+}
+
+/* ========================================================
+   ESTANDARIZACIÓN UNIVERSAL DE INPUTS Y AUTOFILL DARK
+   ======================================================== */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text-primary, #ffffff) !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--bg-input, #1c1719) inset !important;
+  box-shadow: 0 0 0 1000px var(--bg-input, #1c1719) inset !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+  caret-color: #ffffff !important;
+  border-color: var(--border-card, rgba(244, 180, 200, 0.15)) !important;
+}
+
+/* ===================================================
+   CORRECCIÓN DE SELECTORES Y FILTROS
+   =================================================== */
+
+/* Contenedor individual de cada filtro */
+.filter-group,
+.pagos-filter-group,
+.cobros-filter-group,
+.prestamos-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 180px;
+}
+
+/* Etiqueta superior del filtro */
+.filter-label,
+.pagos-filter-group label,
+.cobros-filter-group label,
+.prestamos-filter-group label {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #e5dada;
+  letter-spacing: 0.01em;
+  margin-bottom: 2px;
+}
+
+/* Estilo exacto para todos los <select> de filtros */
+select,
+.filter-select,
+select.form-control,
+.filter-group select,
+.pagos-filter-group select,
+.cobros-filter-group select,
+.prestamos-filter-group select,
+.select-glass,
+.form-select,
+.select-compact,
+.select-form,
+.modal-select {
+  width: 100%;
+  height: 42px !important;
+  min-height: 42px !important;
+  line-height: 42px;
+  
+  /* Espaciado interno generoso para que el texto no toque ningún borde */
+  padding: 0 2.25rem 0 1rem !important; /* 16px a la izquierda para evitar cortes */
+  
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(244, 180, 200, 0.2) !important;
+  border-radius: 12px !important;
+  
+  color: #ffffff !important;
+  font-size: 0.88rem !important;
+  font-family: inherit;
+  
+  /* Icono de flecha SVG centrado y espaciado a la derecha */
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23d1a8b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 14px center !important;
+  background-size: 14px !important;
+
+  box-sizing: border-box !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+select:hover,
+.filter-select:hover,
+.filter-group select:hover,
+.pagos-filter-group select:hover,
+.cobros-filter-group select:hover,
+.prestamos-filter-group select:hover,
+.select-glass:hover,
+.form-select:hover {
+  border-color: rgba(244, 180, 200, 0.35) !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+select:focus,
+.filter-select:focus,
+.filter-group select:focus,
+.pagos-filter-group select:focus,
+.cobros-filter-group select:focus,
+.prestamos-filter-group select:focus,
+.select-glass:focus,
+.form-select:focus {
+  outline: none !important;
+  border-color: #e0a6b5 !important;
+  box-shadow: 0 0 0 3px rgba(224, 166, 181, 0.15) !important;
+}
+
+/* Opciones desplegables dentro del select */
+select option,
+select optgroup,
+.filter-select option,
+.filter-group select option,
+.pagos-filter-group select option,
+.cobros-filter-group select option,
+.prestamos-filter-group select option,
+.select-glass option,
+.form-select option {
+  background-color: #1e191b !important;
+  color: #ffffff !important;
+  padding: 10px !important;
+}
+
+/* Inputs y Textareas Universales */
+input[type="text"],
+input[type="number"],
+input[type="password"],
+input[type="email"],
+input[type="tel"],
+input[type="date"],
+textarea,
+.form-input,
+.input-glass,
+.modal-input {
+  background-color: var(--bg-input);
+  border: var(--border-input);
+  border-radius: var(--radius-input);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.88rem;
+  transition: all var(--transition-fast);
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="date"]:focus,
+textarea:focus,
+.form-input:focus,
+.input-glass:focus,
+.modal-input:focus {
+  border-color: var(--border-input-focus, #e0a6b5);
+  background-color: var(--bg-input-hover);
+  box-shadow: 0 0 15px var(--rose-glow);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* ========================================================
+   SUPERFICIE UNIFICADA DE TARJETAS (GLASSMORPHISM DARK)
+   ======================================================== */
+.card-glass,
+.filters-card,
+.table-container-card,
+.empty-state-card,
+.modal-card {
+  background: var(--bg-card);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  border: var(--border-card);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  transition: all var(--transition-normal);
+}
+
+.card-glass:hover {
+  background: var(--bg-card-hover);
+  border: var(--border-card-hover);
+  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.55), 0 0 15px var(--rose-glow);
+}
+
+/* Botones de acción principales */
+.btn-primary-action,
+.btn-new-item,
+.header-actions .btn-primary,
+.topbar-actions button:first-child {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  
+  height: 42px !important;
+  padding: 0 1.25rem !important;
+  margin: 0 !important; /* Evita márgenes negativos que peguen el botón al techo */
+  
+  border-radius: 12px !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+  
+  background: linear-gradient(135deg, #7a3c4d, #4e2632) !important;
+  border: 1px solid rgba(244, 180, 200, 0.25) !important;
+  color: #ffffff !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary-action:hover,
+.btn-new-item:hover,
+.header-actions .btn-primary:hover {
+  background: linear-gradient(135deg, #8f465a, #5c2d3b) !important;
+  border-color: rgba(244, 180, 200, 0.45) !important;
+  transform: translateY(-1px);
+}
+
+.btn-secondary-action {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  height: 42px !important;
+  padding: 0 1.25rem !important;
+  margin: 0 !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #d1c5c7 !important;
+  font-weight: 500;
+  font-size: 0.88rem !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary-action:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(244, 180, 200, 0.3) !important;
+  color: var(--rose-soft) !important;
+}
+
+.btn-danger-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #b23a48 0%, #801f2b 100%);
+  color: #ffffff;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all var(--transition-fast);
+}
+
+.btn-danger-action:hover {
+  background: linear-gradient(135deg, #c74352 0%, #942533 100%);
+  transform: translateY(-1px);
+}
+
+/* Badges e Icon Badges */
+.icon-circle-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.rose-badge {
+  background: var(--rose-pill-bg);
+  color: var(--rose-soft);
+  border: 1px solid rgba(244, 180, 200, 0.3);
+}
+
+.gold-badge {
+  background: rgba(212, 175, 55, 0.15);
+  color: var(--color-dorado);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.warning-badge {
+  background: var(--color-advertencia-bg);
+  color: var(--color-advertencia);
+  border: 1px solid rgba(201, 162, 75, 0.3);
+}
+
+.slate-badge {
+  background: var(--rose-pill-bg);
+  color: var(--rose-soft);
+  border: 1px solid rgba(244, 180, 200, 0.3);
+}
+
+.coral-badge {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+  border: 1px solid rgba(178, 58, 72, 0.3);
+}
+
+/* Animaciones y utilidades */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: var(--color-rosa-empolvado);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.dot-online {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-exito);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--color-exito);
+}
+
+/* ========================================================
+   BUSCADOR UNIVERSAL Y ESTANDARIZADO EN BARRAS DE FILTROS
+   ======================================================== */
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.filter-group.search-filter-group {
+  flex: 1.5;
+  min-width: 260px;
+  max-width: 420px;
+}
+
+.filter-label {
+  font-size: 0.78rem;
+  color: var(--color-texto-secundario, #a1a1aa);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.search-input-wrapper .search-icon-svg,
+.search-input-wrapper .search-icon {
+  position: absolute;
+  left: 0.95rem;
+  color: #a1a1aa;
+  pointer-events: none;
+  flex-shrink: 0;
+  z-index: 1;
+  transition: color 0.2s ease;
+}
+
+.filter-input.search-client-input,
+.search-client-input,
+.form-input.filter-input {
+  width: 100%;
+  height: 44px;
+  background: var(--bg-input, rgba(28, 23, 25, 0.7)) !important;
+  border: 1px solid var(--border-card, rgba(244, 180, 200, 0.15)) !important;
+  color: var(--color-texto-principal, #ffffff) !important;
+  padding: 0.65rem 2.4rem 0.65rem 2.65rem !important;
+  border-radius: var(--radius-sm, 10px) !important;
+  font-size: 0.85rem !important;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.filter-input.search-client-input:focus,
+.search-client-input:focus,
+.form-input.filter-input:focus {
+  border-color: var(--color-rosa-empolvado, #f4b4c8) !important;
+  background: var(--bg-input-focus, rgba(35, 28, 31, 0.9)) !important;
+  box-shadow: 0 0 12px rgba(154, 110, 121, 0.25) !important;
+}
+
+.search-input-wrapper:focus-within .search-icon-svg,
+.search-input-wrapper:focus-within .search-icon {
+  color: var(--color-rosa-empolvado, #f4b4c8);
+}
+
+.filter-input.search-client-input::placeholder,
+.search-client-input::placeholder,
+.form-input.filter-input::placeholder {
+  color: var(--color-texto-apagado, rgba(255, 255, 255, 0.4));
+  font-size: 0.82rem;
+}
+
+.btn-clear-input {
+  position: absolute;
+  right: 0.75rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: #a1a1aa;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  cursor: pointer;
+  z-index: 2;
+  transition: all 0.2s ease;
+}
+
+.btn-clear-input:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+.btn-clear-input.hidden {
+  display: none;
+}
+
+/* ===================================================
+   SCROLLBAR OSCURO Y ULTRAFINO PARA CATEGORÍAS
+   =================================================== */
+
+/* Contenedor de las píldoras de categorías */
+.category-filter-bar,
+.product-types-nav,
+.pills-container,
+.pills-scroll-container,
+.types-bar-scroll {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.55rem !important;
+  overflow-x: auto !important;
+  padding-bottom: 6px !important;
+  
+  /* Soporte estándar para Firefox */
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(244, 180, 200, 0.25) rgba(255, 255, 255, 0.02) !important;
+}
+
+/* 1. Dimensiones de la barra (Chrome, Safari, Edge) */
+.category-filter-bar::-webkit-scrollbar,
+.product-types-nav::-webkit-scrollbar,
+.pills-container::-webkit-scrollbar,
+.pills-scroll-container::-webkit-scrollbar,
+.types-bar-scroll::-webkit-scrollbar {
+  height: 5px !important; /* Altura ultrafina y discreta */
+}
+
+/* 2. Pista de fondo (Track) */
+.category-filter-bar::-webkit-scrollbar-track,
+.product-types-nav::-webkit-scrollbar-track,
+.pills-container::-webkit-scrollbar-track,
+.pills-scroll-container::-webkit-scrollbar-track,
+.types-bar-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border-radius: 10px !important;
+}
+
+/* 3. Indicador de arrastre (Thumb) */
+.category-filter-bar::-webkit-scrollbar-thumb,
+.product-types-nav::-webkit-scrollbar-thumb,
+.pills-container::-webkit-scrollbar-thumb,
+.pills-scroll-container::-webkit-scrollbar-thumb,
+.types-bar-scroll::-webkit-scrollbar-thumb {
+  background: rgba(244, 180, 200, 0.22) !important; /* Tono rosa suave translúcido */
+  border-radius: 10px !important;
+  transition: background 0.2s ease !important;
+}
+
+.category-filter-bar::-webkit-scrollbar-thumb:hover,
+.product-types-nav::-webkit-scrollbar-thumb:hover,
+.pills-container::-webkit-scrollbar-thumb:hover,
+.pills-scroll-container::-webkit-scrollbar-thumb:hover,
+.types-bar-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(244, 180, 200, 0.45) !important;
+}
+
+/* 4. Ocultar botones de flechas laterales blancas */
+.category-filter-bar::-webkit-scrollbar-button,
+.product-types-nav::-webkit-scrollbar-button,
+.pills-container::-webkit-scrollbar-button,
+.pills-scroll-container::-webkit-scrollbar-button,
+.types-bar-scroll::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Estado normal de la píldora */
+.category-pill,
+.type-filter-btn,
+.pill-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 38px;
+  padding: 0 1rem;
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 10px;
+  color: #c4b5b9 !important;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+/* Hover suave */
+.category-pill:hover,
+.type-filter-btn:hover {
+  background-color: rgba(244, 180, 200, 0.08) !important;
+  border-color: rgba(244, 180, 200, 0.25) !important;
+  color: #ffffff !important;
+}
+
+/* Estado Activo / Seleccionado (Elegante tono vino / rosa oscuro matte) */
+.category-pill.active,
+.type-filter-btn.active,
+.pill-button.active {
+  background: linear-gradient(135deg, #5e2634, #3a1620) !important;
+  border: 1px solid rgba(244, 180, 200, 0.45) !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Badge numérico de conteo dentro de la píldora */
+.category-pill .pill-count,
+.type-filter-btn .badge-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.06);
+  color: #d1c5c7;
+  transition: all 0.2s ease;
+}
+
+/* Badge numérico cuando la píldora está activa */
+.category-pill.active .pill-count,
+.type-filter-btn.active .badge-count {
+  background: rgba(244, 180, 200, 0.2) !important;
+  color: #f4b4c8 !important;
+  border: 1px solid rgba(244, 180, 200, 0.3) !important;
+}
+
+/* ===================================================
+   MODAL DE PRODUCTOS: AMPLIACIÓN Y ESPACIADO CÓMODO
+   =================================================== */
+
+/* 1. Ancho del contenedor del Modal */
+.modal-product-dialog,
+.modal-dialog.modal-product,
+.product-modal-container {
+  max-width: 820px !important;
+  width: 95% !important;
+  margin: 1.5rem auto !important;
+}
+
+/* 2. Cuerpo del Modal: 2 Columnas Balanceadas */
+.product-modal-body,
+.modal-product-grid {
+  display: grid !important;
+  grid-template-columns: 310px 1fr !important;
+  gap: 2rem !important;
+  padding: 1.5rem 2rem !important;
+  align-items: start;
+}
+
+/* 3. Columna Izquierda: Zona de Foto y Botones */
+.product-photo-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.product-photo-dropzone {
+  width: 100%;
+  height: 240px !important;
+  background: rgba(255, 255, 255, 0.02);
+  border: 2px dashed rgba(244, 180, 200, 0.2);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem;
+  transition: all 0.2s ease;
+}
+
+.product-photo-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.btn-upload-action {
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-upload-action:hover {
+  background: rgba(244, 180, 200, 0.12);
+  border-color: rgba(244, 180, 200, 0.35);
+}
+
+/* 4. Columna Derecha: Formulario y Campos */
+.product-form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.form-group-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group-modal label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #f1e6e8;
+  white-space: nowrap !important;
+}
+
+/* 5. Fila Dual: Costo / Precio y Stock Inicial */
+.product-pricing-row {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 1.25rem !important;
+  width: 100%;
+}
+
+.product-pricing-row .form-group-modal {
+  min-width: 0;
+}
+
+/* 6. Inputs y Selects del Modal */
+.product-form-fields input,
+.product-form-fields select {
+  width: 100%;
+  height: 44px !important;
+  padding: 0 1rem !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(244, 180, 200, 0.2) !important;
+  border-radius: 10px !important;
+  color: #ffffff !important;
+  font-size: 0.9rem !important;
+  box-sizing: border-box;
+}
+
+.product-form-fields input::placeholder {
+  color: #7d6e73;
+  font-size: 0.88rem;
+}
+
+/* 7. Footer del Modal */
+.product-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.25rem 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.product-modal-footer button {
+  height: 44px;
+  padding: 0 1.5rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+
+

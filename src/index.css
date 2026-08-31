@@ -1,0 +1,16 @@
+/* ========================================================
+   HUB CENTRAL DE ESTILOS — ME VARIEDADES
+   ======================================================== */
+
+@import './styles/variables.css';
+@import './styles/global.css';
+@import './styles/layout.css';
+@import './styles/login.css';
+@import './styles/dashboard.css';
+@import './styles/clientes.css';
+@import './styles/productos.css';
+@import './styles/pedidos.css';
+@import './styles/chatbot.css';
+@import './styles/biometrics.css';
+@import './components/common/Modal.css';
+@import './components/common/Toast.css';
