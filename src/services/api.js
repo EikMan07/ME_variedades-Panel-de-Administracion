@@ -1213,6 +1213,69 @@ export async function deleteFactura(id, archivoUrl = '') {
   return { success: true };
 }
 
+/**
+ * Eliminar de forma recursiva toda la carpeta de comprobantes de un cliente:
+ * 1. Elimina todos los archivos físicos asociados en Supabase Storage (bucket 'comprobantes-facturas').
+ * 2. Elimina todos los registros correspondientes en la tabla 'facturas_comprobantes'.
+ */
+export async function deleteCarpetaFacturasCliente(clienteId) {
+  const numId = Number(clienteId);
+  console.log(`🗑️ Eliminando carpeta de facturas del cliente ID #${numId}...`);
+
+  // 1. Consultar todos los comprobantes del cliente para obtener las URLs de los archivos
+  const { data: facturas, error: fetchErr } = await supabase
+    .from('facturas_comprobantes')
+    .select('id, archivo_url')
+    .eq('cliente_id', numId);
+
+  if (fetchErr) {
+    console.error('❌ Error al consultar comprobantes para eliminación masiva:', fetchErr);
+    throw fetchErr;
+  }
+
+  // 2. Extraer rutas relativas para el bucket comprobantes-facturas
+  const filePaths = [];
+  (facturas || []).forEach(f => {
+    const url = f.archivo_url || '';
+    if (url.includes('comprobantes-facturas/')) {
+      const p = url.split('comprobantes-facturas/')[1];
+      if (p) filePaths.push(decodeURIComponent(p.split('?')[0]));
+    } else if (url.includes('supabase.co/storage')) {
+      const parts = url.split('/');
+      const p = parts[parts.length - 1];
+      if (p) filePaths.push(decodeURIComponent(p.split('?')[0]));
+    }
+  });
+
+  // 3. Eliminar archivos de Supabase Storage
+  if (filePaths.length > 0) {
+    console.log(`🗑️ Eliminando ${filePaths.length} archivo(s) físico(s) de Storage:`, filePaths);
+    const { error: storageErr } = await supabase.storage
+      .from('comprobantes-facturas')
+      .remove(filePaths);
+
+    if (storageErr) {
+      console.warn('⚠️ Advertencia al eliminar archivos físicos de storage:', storageErr.message);
+    } else {
+      console.log('✅ Archivos físicos de comprobantes eliminados con éxito de Storage.');
+    }
+  }
+
+  // 4. Eliminar todos los registros de la tabla facturas_comprobantes
+  const { error: deleteErr } = await supabase
+    .from('facturas_comprobantes')
+    .delete()
+    .eq('cliente_id', numId);
+
+  if (deleteErr) {
+    console.error('❌ Error al eliminar registros de facturas en Supabase:', deleteErr);
+    throw deleteErr;
+  }
+
+  console.log(`✅ Carpeta de cliente ID #${numId} eliminada exitosamente (${facturas?.length || 0} comprobantes).`);
+  return { success: true, count: facturas?.length || 0 };
+}
+
 // ==============================================================================
 // 8. MÓDULO: DASHBOARD & MÉTRICAS EN VIVO
 // ==============================================================================
@@ -1287,10 +1350,18 @@ export async function getDashboardMetrics() {
       (acc, p) => acc + (parseFloat(p.saldo_pendiente) || 0),
       0
     );
+    const cuentasPorCobrarCount = (listaPagos || []).filter(
+      p => (parseFloat(p.saldo_pendiente) || 0) > 0 || p.estado === 'pendiente' || p.estado === 'proximo' || p.estado === 'vencido'
+    ).length;
+
     const saldoPrestamosCobrar = (listaPrestamos || []).reduce(
       (acc, p) => acc + (parseFloat(p.saldo_pendiente) || 0),
       0
     );
+    const prestamosActivosCount = (listaPrestamos || []).filter(
+      p => p.estado !== 'liquidado' && ((parseFloat(p.saldo_pendiente) || 0) > 0 || p.estado === 'al_dia' || p.estado === 'proximo' || p.estado === 'atrasado')
+    ).length;
+
     const totalStockUnidades = (listaProductos || []).reduce(
       (acc, p) => acc + (parseInt(p.stock, 10) || 0),
       0
@@ -1302,15 +1373,16 @@ export async function getDashboardMetrics() {
     const pedidosPendientesCount = (listaPedidos || []).filter(
       p => p.estado === 'Activo' || p.estado === 'Pendiente' || p.estado === 'en_proceso' || p.estado === 'activo'
     ).length;
-    const prestamosActivosCount = (listaPrestamos || []).filter(
-      p => p.estado === 'al_dia' || p.estado === 'pendiente' || p.estado === 'Activo' || p.estado === 'activo' || (parseFloat(p.saldo_pendiente) || 0) > 0
-    ).length;
 
     return {
       totalClientes: totalClientes !== null && totalClientes !== undefined ? totalClientes : (listaClientes || []).length,
       pedidosActivos: pedidosPendientesCount > 0 ? pedidosPendientesCount : (listaPedidos || []).length,
-      totalPorCobrar: saldoCuentasCobrar,
+      cuentasPorCobrarCount: cuentasPorCobrarCount,
+      cuentasPorCobrar: cuentasPorCobrarCount,
+      totalPorCobrar: cuentasPorCobrarCount,
+      totalPorCobrarMonto: saldoCuentasCobrar,
       prestamosActivos: prestamosActivosCount,
+      prestamosActivosCount: prestamosActivosCount,
       saldoPrestamosPorRecuperar: saldoPrestamosCobrar,
       totalStockUnidades: totalStockUnidades,
       valorInventario: valorInventario,
@@ -1364,6 +1436,7 @@ export const api = {
   getFacturas,
   uploadFactura,
   deleteFactura,
+  deleteCarpetaFacturasCliente,
   // Dashboard
   getDashboardMetrics,
 };

@@ -36,12 +36,12 @@ export function AuthProvider({ children }) {
   const login = (usuario, contrasena) => {
     const usuarioLower = (usuario || '').trim().toLowerCase();
     const esAdminValido = (
-      (usuarioLower === 'maria_admin' || usuarioLower === 'maria' || usuarioLower === 'admin' || usuarioLower === 'eiker') &&
-      (contrasena === 'admin123' || contrasena === 'admin' || contrasena === 'maria123' || contrasena === '123456')
+      (usuarioLower === 'maria' || usuarioLower === 'maria@mevariedades.com' || usuarioLower === 'maria_admin' || usuarioLower === 'admin' || usuarioLower === 'eiker') &&
+      (contrasena === 'DSE777' || contrasena === 'admin123' || contrasena === 'admin')
     );
 
     if (esAdminValido) {
-      const nombreFormateado = (usuarioLower === 'maria_admin' || usuarioLower === 'maria') ? 'María' : (usuario.charAt(0).toUpperCase() + usuario.slice(1));
+      const nombreFormateado = (usuarioLower === 'maria' || usuarioLower === 'maria@mevariedades.com' || usuarioLower === 'maria_admin') ? 'María' : (usuario.charAt(0).toUpperCase() + usuario.slice(1));
       setUser(nombreFormateado);
       return { success: true };
     } else {

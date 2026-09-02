@@ -193,19 +193,3 @@ FOR UPDATE TO public USING (bucket_id IN ('imagenes-productos', 'comprobantes-fa
 DROP POLICY IF EXISTS "Eliminacion publica de storage" ON storage.objects;
 CREATE POLICY "Eliminacion publica de storage" ON storage.objects
 FOR DELETE TO public USING (bucket_id IN ('imagenes-productos', 'comprobantes-facturas'));
-
--- ==============================================================================
--- 7. DATOS DE SEMILLA INICIALES (OPCIONAL / DEMOSTRATIVO)
--- ==============================================================================
-INSERT INTO public.clientes (nombre_completo, telefono, dia_cumpleanos, mes_cumpleanos, estado_cuenta)
-VALUES 
-    ('María Elena Morales', '8888-1111', 15, 8, 'al_dia'),
-    ('Sofía Delgado Vega', '7777-2222', 24, 8, 'al_dia')
-ON CONFLICT DO NOTHING;
-
-INSERT INTO public.productos (nombre, tipo, genero, costo, stock)
-VALUES 
-    ('Perfume Bella Rosa 100ml', 'perfume', 'Dama', 24500, 15),
-    ('Blusa Elegante Soft Rose', 'camisa', 'Dama', 18000, 8),
-    ('Reloj Quartz Minimalist Gold', 'accesorio', 'Unisex', 32000, 5)
-ON CONFLICT DO NOTHING;

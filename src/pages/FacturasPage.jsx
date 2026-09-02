@@ -15,7 +15,7 @@ import '../styles/facturas.css';
  * Gestión digital de facturas de pedidos, comprobantes de cobros/pagos y préstamos.
  */
 export default function FacturasPage() {
-  const { facturas, eliminarFactura, filtrarFacturas, calcularKPIsFacturas } = useFacturas();
+  const { facturas, eliminarFactura, eliminarCarpetaCliente, filtrarFacturas, calcularKPIsFacturas } = useFacturas();
   const { showToast } = useToast();
 
   const [busqueda, setBusqueda] = useState('');
@@ -27,7 +27,9 @@ export default function FacturasPage() {
   const [clientePreseleccionado, setClientePreseleccionado] = useState(null);
   const [facturaPreview, setFacturaPreview] = useState(null);
   const [facturaToDelete, setFacturaToDelete] = useState(null);
+  const [carpetaToDelete, setCarpetaToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeletingCarpeta, setIsDeletingCarpeta] = useState(false);
 
   const kpis = calcularKPIsFacturas();
 
@@ -55,16 +57,40 @@ export default function FacturasPage() {
       );
 
       if (res.success) {
-        showToast('Comprobante y archivo eliminados permanentemente de Supabase.', 'success');
+        showToast({ tipo: 'success', mensaje: 'Comprobante y archivo eliminados permanentemente de Supabase.' });
         setFacturaToDelete(null);
       } else {
-        showToast(res.error || 'No se pudo eliminar el comprobante de Supabase.', 'error');
+        showToast({ tipo: 'error', mensaje: res.error || 'No se pudo eliminar el comprobante de Supabase.' });
       }
     } catch (err) {
       console.error('Error al confirmar eliminación:', err);
-      showToast('Error inesperado al eliminar el comprobante.', 'error');
+      showToast({ tipo: 'error', mensaje: 'Error inesperado al eliminar el comprobante.' });
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleConfirmDeleteCarpeta = async () => {
+    if (!carpetaToDelete || isDeletingCarpeta) return;
+
+    try {
+      setIsDeletingCarpeta(true);
+      const res = await eliminarCarpetaCliente(carpetaToDelete.id);
+
+      if (res.success) {
+        showToast({
+          tipo: 'success',
+          mensaje: `Carpeta de ${carpetaToDelete.nombre_completo} y sus archivos en Storage fueron eliminados correctamente.`
+        });
+        setCarpetaToDelete(null);
+      } else {
+        showToast({ tipo: 'error', mensaje: res.error || 'No se pudo eliminar la carpeta en Supabase.' });
+      }
+    } catch (err) {
+      console.error('Error al eliminar carpeta de cliente:', err);
+      showToast({ tipo: 'error', mensaje: 'Error inesperado al eliminar la carpeta del cliente.' });
+    } finally {
+      setIsDeletingCarpeta(false);
     }
   };
 
@@ -99,19 +125,25 @@ export default function FacturasPage() {
         <section className="page-title-section">
           <div>
             <span className="breadcrumb-text">
-              Dashboard / Finanzas / <strong>Facturas y Comprobantes</strong>
+              Dashboard / Contabilidad / <strong>Bóveda de Facturas</strong>
             </span>
-            <h1 className="page-main-heading">Archivo de Facturas y Comprobantes</h1>
+            <h1 className="page-main-heading">Bóveda Digital de Facturas y Comprobantes</h1>
             <p className="page-sub-heading">
-              Digitalización, previsualización y almacenamiento centralizado de documentos, facturas y recibos.
+              Gestión centralizada de facturas por cliente, escaneo inteligente OCR y exportación en PDF.
             </p>
           </div>
 
-          <div className="client-summary-chips header-stat-badges">
-            <div className="summary-chip stat-badge-item">
-              <span className="chip-label stat-badge-label">TOTAL ARCHIVOS</span>
-              <span className="chip-val stat-badge-value" id="chip-total-facturas">
+          <div className="client-summary-chips">
+            <div className="summary-chip">
+              <span className="chip-label">Total Documentos</span>
+              <span className="chip-val" id="chip-total-facturas">
                 {facturas.length}
+              </span>
+            </div>
+            <div className="summary-chip chip-rosa">
+              <span className="chip-label">Carpetas Activas</span>
+              <span className="chip-val" id="chip-carpetas-activas">
+                {new Set(facturas.map(f => f.cliente_id || 'sin_cliente')).size}
               </span>
             </div>
           </div>
@@ -120,12 +152,12 @@ export default function FacturasPage() {
         {/* Tarjetas KPIs Superiores */}
         <FacturasKPIs />
 
-        {/* Pestañas y Filtros */}
+        {/* Pestañas de Categorías y Filtro Rápido */}
         <FacturasTabs
-          busqueda={busqueda}
-          setBusqueda={setBusqueda}
           filtroCategoria={filtroCategoria}
           setFiltroCategoria={setFiltroCategoria}
+          busqueda={busqueda}
+          setBusqueda={setBusqueda}
           filtroFecha={filtroFecha}
           setFiltroFecha={setFiltroFecha}
           onReset={handleResetFilters}
@@ -136,6 +168,7 @@ export default function FacturasPage() {
           facturas={facturasFiltradas}
           onVerPreview={(f) => setFacturaPreview(f)}
           onEliminar={(f) => setFacturaToDelete(f)}
+          onEliminarCarpeta={(grupo) => setCarpetaToDelete(grupo)}
           onCrear={() => handleOpenCreate(null)}
           onCrearParaCliente={(cliente) => handleOpenCreate(cliente)}
         />
@@ -158,7 +191,7 @@ export default function FacturasPage() {
         factura={facturaPreview}
       />
 
-      {/* Modal: Confirmación de Eliminación */}
+      {/* Modal: Confirmación de Eliminación Individual */}
       <Modal
         isOpen={!!facturaToDelete}
         onClose={() => setFacturaToDelete(null)}
@@ -209,7 +242,62 @@ export default function FacturasPage() {
           ¿Estás segura de que deseas eliminar el comprobante &quot;{facturaToDelete?.archivo_nombre}&quot; asociado a &quot;{facturaToDelete?.cliente_nombre}&quot;?
         </p>
         <p style={{ fontSize: '0.82rem', color: 'var(--color-texto-secundario)' }}>
-          El archivo adjunto se borrará permanentemente de la plataforma.
+          El archivo adjunto se borrará permanentemente de Supabase Storage.
+        </p>
+      </Modal>
+
+      {/* Modal: Confirmación de Eliminación de Carpeta Completa */}
+      <Modal
+        isOpen={!!carpetaToDelete}
+        onClose={() => setCarpetaToDelete(null)}
+        title="¿Eliminar Carpeta Completa de Comprobantes?"
+        subtitle="Borrado masivo y purga física en Storage"
+        cardClassName="modal-card-danger"
+        icon={
+          <div className="icon-circle-badge coral-badge">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </div>
+        }
+        footer={
+          <>
+            <button
+              type="button"
+              className="btn-secondary-action"
+              onClick={() => setCarpetaToDelete(null)}
+              disabled={isDeletingCarpeta}
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              className="btn-danger-action"
+              onClick={handleConfirmDeleteCarpeta}
+              disabled={isDeletingCarpeta}
+              id="btn-confirmar-eliminar-carpeta"
+            >
+              {isDeletingCarpeta ? (
+                <span>Purgando Storage y DB...</span>
+              ) : (
+                <>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                  <span>Sí, Eliminar Toda la Carpeta</span>
+                </>
+              )}
+            </button>
+          </>
+        }
+      >
+        <p className="confirm-message">
+          ¿Estás segura de que deseas eliminar la carpeta completa de <strong>&quot;{carpetaToDelete?.nombre_completo}&quot;</strong> con todos sus <strong>{carpetaToDelete?.documentos?.length || 0} comprobantes</strong>?
+        </p>
+        <p style={{ fontSize: '0.82rem', color: '#e06070', marginTop: '0.5rem', fontWeight: 500 }}>
+          Advertencia Crítica: Se purgarán de inmediato todos los archivos físicos almacenados en el bucket de Supabase Storage y se borrarán todos los registros de la base de datos. Esta acción es irreversible.
         </p>
       </Modal>
     </>

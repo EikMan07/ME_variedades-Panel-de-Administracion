@@ -5,8 +5,8 @@ export default function KPICards() {
 
   const totalStock = metrics?.totalStockUnidades ?? 0;
   const totalPedidos = metrics?.pedidosActivos ?? 0;
-  const cuentasPorCobrar = metrics?.totalPorCobrar ?? 0;
-  const prestamosActivos = metrics?.saldoPrestamosPorRecuperar ?? 0;
+  const cuentasPorCobrar = metrics?.cuentasPorCobrarCount ?? metrics?.cuentasPorCobrar ?? metrics?.totalPorCobrar ?? 0;
+  const prestamosActivos = metrics?.prestamosActivosCount ?? metrics?.prestamosActivos ?? 0;
 
   return (
     <section className="kpi-grid-4" aria-label="Indicadores clave de operaciones">
@@ -31,7 +31,7 @@ export default function KPICards() {
         </div>
       </article>
 
-      {/* KPI 2: Cuentas por Cobrar */}
+      {/* KPI 2: Cuentas por Cobrar (Conteo de Cuentas Pendientes) */}
       <article className="kpi-command-card" id="kpi-pagos">
         <div className="kpi-card-top">
           <div className="kpi-icon-box icon-emerald">
@@ -46,14 +46,14 @@ export default function KPICards() {
         </div>
         <div className="kpi-card-body">
           <span className="kpi-label-text">Cuentas por Cobrar</span>
-          <h3 className="kpi-number-value">₡{cuentasPorCobrar.toLocaleString('es-CR')}</h3>
+          <h3 className="kpi-number-value">{cuentasPorCobrar}</h3>
           <span className="kpi-status-subtext">
-            {cuentasPorCobrar > 0 ? 'Cobros pendientes' : 'Al día'}
+            {cuentasPorCobrar > 0 ? `${cuentasPorCobrar} cuentas pendientes` : 'Al día'}
           </span>
         </div>
       </article>
 
-      {/* KPI 3: Préstamos Activos */}
+      {/* KPI 3: Préstamos Activos (Conteo de Préstamos en Curso) */}
       <article className="kpi-command-card" id="kpi-prestamos">
         <div className="kpi-card-top">
           <div className="kpi-icon-box icon-amber">
@@ -68,9 +68,9 @@ export default function KPICards() {
         </div>
         <div className="kpi-card-body">
           <span className="kpi-label-text">Préstamos Activos</span>
-          <h3 className="kpi-number-value">₡{prestamosActivos.toLocaleString('es-CR')}</h3>
+          <h3 className="kpi-number-value">{prestamosActivos}</h3>
           <span className="kpi-status-subtext">
-            {prestamosActivos > 0 ? 'Préstamos en curso' : 'Sin préstamos abiertos'}
+            {prestamosActivos > 0 ? `${prestamosActivos} préstamos en curso` : 'Sin préstamos abiertos'}
           </span>
         </div>
       </article>

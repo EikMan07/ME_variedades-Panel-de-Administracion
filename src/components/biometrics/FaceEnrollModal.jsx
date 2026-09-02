@@ -70,8 +70,8 @@ export default function FaceEnrollModal({ isOpen, onClose, onEnrolled }) {
 
     // Validación estricta de credenciales de Administrador
     const esAdminValido = (
-      (u === 'maria_admin' || u === 'maria' || u === 'admin' || u === 'eiker') &&
-      (p === 'admin123' || p === 'admin' || p === 'maria123' || p === '123456')
+      (u === 'maria' || u === 'maria@mevariedades.com' || u === 'maria_admin' || u === 'admin' || u === 'eiker') &&
+      (p === 'DSE777' || p === 'admin123' || p === 'admin')
     );
 
     if (!esAdminValido) {
@@ -79,7 +79,7 @@ export default function FaceEnrollModal({ isOpen, onClose, onEnrolled }) {
       return;
     }
 
-    const nombreCuenta = (u === 'maria_admin' || u === 'maria') ? 'María' : (u.charAt(0).toUpperCase() + u.slice(1));
+    const nombreCuenta = (u === 'maria' || u === 'maria@mevariedades.com' || u === 'maria_admin') ? 'María' : (u.charAt(0).toUpperCase() + u.slice(1));
 
     setCapturing(true);
     try {

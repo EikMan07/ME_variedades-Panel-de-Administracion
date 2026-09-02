@@ -1085,6 +1085,29 @@
   color: var(--rose-soft);
 }
 
+.btn-delete-vault-folder {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-sm);
+  background: rgba(224, 96, 112, 0.12);
+  border: 1px solid rgba(224, 96, 112, 0.3);
+  color: #ff7b89;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-rapida);
+}
+
+.btn-delete-vault-folder:hover {
+  background: rgba(224, 96, 112, 0.25);
+  border-color: #ff7b89;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(224, 96, 112, 0.3);
+}
+
 .btn-table-action.btn-action-pdf {
   color: var(--color-dorado);
   border-color: rgba(212, 175, 55, 0.3);

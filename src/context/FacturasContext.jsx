@@ -111,6 +111,20 @@ export function FacturasProvider({ children }) {
   }, [facturas]);
 
   /**
+   * Eliminar recursivamente toda la carpeta de comprobantes de un cliente.
+   */
+  const eliminarCarpetaCliente = useCallback(async (clienteId) => {
+    try {
+      const res = await api.deleteCarpetaFacturasCliente(clienteId);
+      setFacturas(prev => prev.filter(f => Number(f.cliente_id) !== Number(clienteId)));
+      return res;
+    } catch (err) {
+      console.error('❌ Error al eliminar carpeta de facturas del cliente:', err);
+      return { success: false, error: err.message || 'Error al eliminar la carpeta del cliente en Supabase.' };
+    }
+  }, []);
+
+  /**
    * KPIs generales de facturas y comprobantes.
    */
   const calcularKPIsFacturas = useCallback(() => {
@@ -191,6 +205,7 @@ export function FacturasProvider({ children }) {
         facturas,
         agregarFactura,
         eliminarFactura,
+        eliminarCarpetaCliente,
         calcularKPIsFacturas,
         filtrarFacturas,
       }}
