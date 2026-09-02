@@ -51,11 +51,13 @@ export default function PrestamosPage() {
     setIsModalPrestamoOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (!prestamoToDelete) return;
-    const res = eliminarPrestamo(prestamoToDelete.id);
+    const res = await eliminarPrestamo(prestamoToDelete.id);
     if (res.success) {
-      showToast('Registro de préstamo eliminado correctamente.', 'success');
+      showToast({ tipo: 'success', mensaje: 'Registro de préstamo eliminado correctamente de Supabase.' });
+    } else {
+      showToast({ tipo: 'error', mensaje: res.error || 'Error al eliminar el préstamo en Supabase.' });
     }
     setPrestamoToDelete(null);
   };

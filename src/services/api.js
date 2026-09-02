@@ -987,6 +987,25 @@ export async function registrarAbonoPrestamo(prestamoId, montoAbono, nota = '') 
   return normalizarPrestamo(data && data.length > 0 ? data[0] : null);
 }
 
+/**
+ * Eliminar un préstamo en Supabase.
+ */
+export async function deletePrestamo(id) {
+  const numId = Number(id);
+  console.log(`🗑️ Eliminando préstamo #${numId} en Supabase...`);
+  const { error } = await supabase
+    .from('prestamos')
+    .delete()
+    .eq('id', numId);
+
+  if (error) {
+    console.error(`❌ Error al eliminar préstamo #${numId} en Supabase:`, error.message, error.details || error);
+    throw error;
+  }
+  console.log(`✅ Préstamo #${numId} eliminado exitosamente de Supabase`);
+  return { success: true };
+}
+
 // ==============================================================================
 // 7. MÓDULO: FACTURAS & COMPROBANTES (STORAGE + DB)
 // ==============================================================================
@@ -1340,6 +1359,7 @@ export const api = {
   getPrestamos,
   createPrestamo,
   registrarAbonoPrestamo,
+  deletePrestamo,
   // Facturas
   getFacturas,
   uploadFactura,

@@ -37,10 +37,10 @@ function getImageDimensions(base64) {
   });
 }
 
-// Formateador de moneda para el reporte
+// Formateador de moneda seguro para el reporte PDF (evita glifos rotos y espaciado defectuoso)
 function formatColon(monto) {
   const num = parseFloat(monto) || 0;
-  return `₡${num.toLocaleString('es-CR', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+  return `CRC ${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 /**
@@ -125,7 +125,7 @@ export async function generarExpedientePDF(cliente, facturas = [], tituloReporte
     const tipo = f.tipo_categoria ? f.tipo_categoria.toUpperCase() : (f.tipo_comprobante || 'GENERAL').toUpperCase();
     const ref = f.referencia_id || f.identificador_ref || `DOC-${String(f.id).padStart(4, '0')}`;
     const fecha = f.fecha_emision || 'Sin fecha';
-    const montoStr = f.monto ? formatColon(f.monto) : '₡0';
+    const montoStr = f.monto ? formatColon(f.monto) : 'CRC 0.00';
     return [`#${index + 1}`, tipo, ref, fecha, montoStr];
   });
 
@@ -180,7 +180,7 @@ export async function generarExpedientePDF(cliente, facturas = [], tituloReporte
 
     const catLabel = item.tipo_categoria ? item.tipo_categoria.toUpperCase() : 'COMPROBANTE';
     const refLabel = item.referencia_id || item.identificador_ref || `#${item.id}`;
-    const montoLabel = item.monto ? formatColon(item.monto) : '₡0';
+    const montoLabel = item.monto ? formatColon(item.monto) : 'CRC 0.00';
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10.5);

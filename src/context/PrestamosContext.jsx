@@ -254,19 +254,32 @@ export function PrestamosProvider({ children }) {
 
   /**
    * RF-44: Eliminar registro de préstamo.
+   * Elimina la actualización optimista prematura: solo actualiza el estado local tras confirmación exitosa de Supabase.
    */
-  const eliminarPrestamo = useCallback((id) => {
+  const eliminarPrestamo = useCallback(async (id) => {
     const prestamo = prestamos.find(p => p.id === id);
     if (!prestamo) return { success: false, error: 'Préstamo no encontrado.' };
 
-    setPrestamos(prev => prev.filter(p => p.id !== id));
+    try {
+      await api.deletePrestamo(id);
 
-    // Si estaba activo con saldo > 0 y pertenecía a un cliente, decrementar
-    if (prestamo.saldo_pendiente > 0 && prestamo.cliente_id) {
-      sincronizarPrestamosCliente(prestamo.cliente_id, -1);
+      // Actualizar estado local solo tras confirmación exitosa
+      setPrestamos(prev => {
+        const actualizados = prev.filter(p => p.id !== id);
+        localStorage.setItem('me_prestamos_data', JSON.stringify(actualizados));
+        return actualizados;
+      });
+
+      // Si estaba activo con saldo > 0 y pertenecía a un cliente, decrementar
+      if (prestamo.saldo_pendiente > 0 && prestamo.cliente_id) {
+        sincronizarPrestamosCliente(prestamo.cliente_id, -1);
+      }
+
+      return { success: true };
+    } catch (err) {
+      console.error('❌ Error al eliminar préstamo en Supabase:', err);
+      return { success: false, error: err.message || 'Error al eliminar el préstamo en la base de datos.' };
     }
-
-    return { success: true };
   }, [prestamos, sincronizarPrestamosCliente]);
 
   /**
