@@ -43,8 +43,8 @@ Login Híbrido (Credenciales + Biometría Facial) · Dashboard (con KPIs y anal�
 - **Compilador PDF Multipágina:** Exportación profesional de comprobantes mediante `pdfExportService.js` en 3 niveles (Individual, Por Categoría y Expediente Consolidado por Cliente).
 
 ### Funcionales — Autenticación y Enrolamiento Biométrico
-- Inicio de sesión con credenciales administrativas (`maria_admin` / `admin123`) o escaneo facial neuronal (`FaceLoginModal`).
-- Enrolamiento de nuevo rostro (`FaceEnrollModal`) con verificación estricta previa de credenciales de administrador.
+- Inicio de sesión con credenciales administrativas (`maria` / `DSE777`) o escaneo facial neuronal (`FaceLoginModal`).
+- Enrolamiento de nuevo rostro (`FaceEnrollModal`) con verificación estricta previa de credenciales de administrador (`maria` / `DSE777`).
 - Pantalla de verificación y transición autorizada `<AuthVerifyingScreen />` (1.6s).
 
 ---

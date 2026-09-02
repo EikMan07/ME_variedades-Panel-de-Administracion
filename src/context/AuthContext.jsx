@@ -34,15 +34,20 @@ export function AuthProvider({ children }) {
   }, [isSidebarCollapsed]);
 
   const login = (usuario, contrasena) => {
-    const usuarioLower = (usuario || '').trim().toLowerCase();
+    const usuarioLimpio = (usuario || '')
+      .trim()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+
+    // Autenticación estricta: ÚNICA Y EXCLUSIVAMENTE usuario "maria" con contraseña "DSE777"
     const esAdminValido = (
-      (usuarioLower === 'maria' || usuarioLower === 'maria@mevariedades.com' || usuarioLower === 'maria_admin' || usuarioLower === 'admin' || usuarioLower === 'eiker') &&
-      (contrasena === 'DSE777' || contrasena === 'admin123' || contrasena === 'admin')
+      (usuarioLimpio === 'maria' || usuarioLimpio === 'maria@mevariedades.com') &&
+      contrasena === 'DSE777'
     );
 
     if (esAdminValido) {
-      const nombreFormateado = (usuarioLower === 'maria' || usuarioLower === 'maria@mevariedades.com' || usuarioLower === 'maria_admin') ? 'María' : (usuario.charAt(0).toUpperCase() + usuario.slice(1));
-      setUser(nombreFormateado);
+      setUser('María');
       return { success: true };
     } else {
       throw new Error('Usuario o contraseña incorrectos. Por favor intenta de nuevo.');

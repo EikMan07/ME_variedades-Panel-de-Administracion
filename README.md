@@ -158,10 +158,10 @@ Para generar y consultar el documento formal de especificación del sistema en f
 
 ---
 
-## 🔑 Credenciales de Acceso (Entorno Local)
+## 🔑 Credenciales de Acceso
 
-- **Usuario**: `maria_admin` (o `maria`)
-- **Contraseña**: `admin123` (o `admin`)
+- **Usuario**: `maria` (o `maria@mevariedades.com`)
+- **Contraseña**: `DSE777`
 - **Acceso Biométrico**: Reconocimiento facial registrado mediante la cámara web.
 
 ---

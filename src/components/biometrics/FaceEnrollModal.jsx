@@ -60,7 +60,11 @@ export default function FaceEnrollModal({ isOpen, onClose, onEnrolled }) {
     if (e) e.preventDefault();
     setErrorAuth('');
 
-    const u = (usuario || '').trim().toLowerCase();
+    const u = (usuario || '')
+      .trim()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
     const p = contrasena || '';
 
     if (!u || !p) {
@@ -68,10 +72,10 @@ export default function FaceEnrollModal({ isOpen, onClose, onEnrolled }) {
       return;
     }
 
-    // Validación estricta de credenciales de Administrador
+    // Validación estricta de credenciales de Administrador: Única y exclusivamente maria con DSE777
     const esAdminValido = (
-      (u === 'maria' || u === 'maria@mevariedades.com' || u === 'maria_admin' || u === 'admin' || u === 'eiker') &&
-      (p === 'DSE777' || p === 'admin123' || p === 'admin')
+      (u === 'maria' || u === 'maria@mevariedades.com') &&
+      p === 'DSE777'
     );
 
     if (!esAdminValido) {
@@ -79,7 +83,7 @@ export default function FaceEnrollModal({ isOpen, onClose, onEnrolled }) {
       return;
     }
 
-    const nombreCuenta = (u === 'maria' || u === 'maria@mevariedades.com' || u === 'maria_admin') ? 'María' : (u.charAt(0).toUpperCase() + u.slice(1));
+    const nombreCuenta = 'María';
 
     setCapturing(true);
     try {
