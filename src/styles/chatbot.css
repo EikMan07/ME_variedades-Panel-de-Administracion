@@ -171,6 +171,7 @@
   gap: 0.35rem;
 }
 
+.btn-chat-action,
 .btn-chat-settings,
 .btn-chat-close {
   background: rgba(255, 255, 255, 0.05);
@@ -186,6 +187,7 @@
   transition: all var(--transition-fast);
 }
 
+.btn-chat-action:hover,
 .btn-chat-settings:hover,
 .btn-chat-close:hover {
   color: var(--color-texto-principal);

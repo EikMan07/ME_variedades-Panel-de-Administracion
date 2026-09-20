@@ -137,96 +137,34 @@ export function generarRespuestaLocal(consulta, ctx) {
   return `Hola María. Estoy conectado a la información de **ME Variedades** (${ctx.tienda.fecha_sistema}).\n\nPuedo responderte sobre tus **${ctx.metricas_clientes.total_registrados} clientes**, tus **${ctx.metricas_inventario.total_articulos_catalogo} productos**, cumpleaños del mes o ayudarte con la administración.\n\n*(💡 Puedes activar Google Gemini pulsando el ícono ⚙️ arriba).*`;
 }
 
-export async function consultarGemini(promptUsuario, historial, contextoVivo, apiKey) {
-  const MODELOS = [
-    'gemini-2.5-flash',
-    'gemini-2.0-flash',
-    'gemini-1.5-flash',
-    'gemini-2.5-flash-lite',
-    'gemini-3.6-flash'
-  ];
+export async function consultarGemini(promptUsuario, historial, contextoVivo) {
+  try {
+    const response = await fetch('/api/chatbot', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        promptUsuario,
+        historial,
+        contextoVivo
+      })
+    });
 
-  const systemInstruction = `
-Eres el Asistente Virtual Oficial con Inteligencia Artificial de "ME Variedades", la plataforma administrativa de María.
-Toda tu información proviene directamente de la base de datos y la documentación oficial del negocio. Tu rol es asesorar, guiar paso a paso, responder dudas operativas y analizar estadísticas del negocio con elegancia y precisión.
-
-DATOS VIVOS Y ACTUALIZADOS DE ME VARIEDADES:
-${JSON.stringify(contextoVivo, null, 2)}
-
-MANUAL OPERATIVO Y REGLAS:
-1. CLIENTES: Registro con nombre, teléfono (8 dígitos) y fecha de nacimiento. Bloqueo estricto de eliminación si tiene pedidos activos, saldo o préstamos.
-2. PRODUCTOS: Categorías válidas (perfume, camisa, short, pantalón, accesorio, zapato, crocs, maquillaje, vestido, aparato electrónico). Género obligatorio excepto en maquillaje. Stock bajo < 5, agotado = 0.
-3. DASHBOARD: Métricas de KPIs, cumpleaños del mes y del día ("¡Hoy!"), semaforización de alertas de mora y stock.
-
-DIRECTRICES DE RESPUESTA:
-- Trato cordial, profesional y elegante dirigido a María o al equipo.
-- Pasos numerados claros (1., 2., 3.) cuando pregunten cómo realizar una tarea.
-- Respuestas completas en Markdown con subtítulos y viñetas.
-- Nunca uses nomenclaturas técnicas internas como "RF-15" o "RNF" en las respuestas a la usuaria.
-  `.trim();
-
-  const requestBody = {
-    system_instruction: {
-      parts: [{ text: systemInstruction }]
-    },
-    contents: [
-      ...historial,
-      {
-        role: 'user',
-        parts: [{ text: promptUsuario }]
+    if (response.ok) {
+      const data = await response.json();
+      if (data?.text) {
+        return data.text;
       }
-    ],
-    generationConfig: {
-      temperature: 0.5,
-      maxOutputTokens: 2500,
-      topP: 0.95
     }
-  };
 
-  let errorAutenticacion = null;
-
-  for (const modelo of MODELOS) {
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent?key=${encodeURIComponent(apiKey)}`;
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-goog-api-key': apiKey
-        },
-        body: JSON.stringify(requestBody)
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const candidate = data.candidates && data.candidates[0];
-        if (candidate?.content?.parts?.[0]?.text) {
-          return candidate.content.parts[0].text;
-        }
-      }
-
-      const errorData = await response.json().catch(() => ({}));
-      const errMsg = errorData.error?.message || '';
-
-      if (response.status === 400 || response.status === 401 || response.status === 403 || errMsg.toLowerCase().includes('api key') || errMsg.toLowerCase().includes('key not found') || errMsg.toLowerCase().includes('unauthenticated')) {
-        errorAutenticacion = new Error('API_KEY_INVALID');
-        break;
-      }
-
-      console.warn(`Aviso Gemini: Modelo ${modelo} retornó estado ${response.status}. Probando siguiente modelo...`);
-    } catch (err) {
-      if (err.message === 'API_KEY_INVALID') {
-        errorAutenticacion = err;
-        break;
-      }
-      console.warn(`Error de red al consultar ${modelo}:`, err);
-    }
+    // Si el servidor retorna un código de error o payload sin texto
+    console.warn(`[Chatbot Client] El endpoint /api/chatbot respondió con estado ${response.status}. Activando fallback local.`);
+  } catch (err) {
+    console.warn('[Chatbot Client] No fue posible conectar con /api/chatbot:', err.message);
   }
 
-  if (errorAutenticacion) {
-    throw errorAutenticacion;
-  }
-
+  // Fallback local defensivo
   const respuestaLocal = generarRespuestaLocal(promptUsuario, contextoVivo);
-  return `${respuestaLocal}\n\n*(⚡ Respuesta local por sobrecarga temporal en servidores Gemini).*`;
+  return `${respuestaLocal}\n\n*(⚡ Respuesta local por contingencia de red).*`;
 }

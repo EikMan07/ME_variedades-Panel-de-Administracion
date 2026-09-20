@@ -66,18 +66,28 @@ export default function ModalDetallePago({ isOpen, onClose, pago }) {
         </div>
       </div>
 
-      <div style={{ marginBottom: '0.5rem' }}>
-        <span style={{ fontSize: '0.78rem', color: 'var(--color-texto-apagado)' }}>
-          Concepto: <strong style={{ color: 'var(--color-texto-principal)' }}>{pago.concepto}</strong>
-        </span>
-      </div>
-      {pago.fecha_acordada && (
-        <div style={{ marginBottom: '1rem' }}>
-          <span style={{ fontSize: '0.78rem', color: 'var(--color-texto-apagado)' }}>
-            Fecha acordada: <strong style={{ color: 'var(--color-texto-principal)' }}>{formatFecha(pago.fecha_acordada)}</strong>
-          </span>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '0.75rem', background: 'rgba(255,255,255,0.02)', padding: '0.65rem 0.85rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div>
+          <span style={{ fontSize: '0.72rem', color: 'var(--color-texto-apagado)', display: 'block' }}>Concepto</span>
+          <strong style={{ fontSize: '0.82rem', color: 'var(--color-texto-principal)' }}>{pago.concepto}</strong>
         </div>
-      )}
+        <div>
+          <span style={{ fontSize: '0.72rem', color: 'var(--color-texto-apagado)', display: 'block' }}>Tipo de Pago</span>
+          <strong style={{ fontSize: '0.82rem', color: 'var(--color-dorado)' }}>{pago.tipo_pago || 'No especificado'}</strong>
+        </div>
+        {pago.fecha_acordada && (
+          <div>
+            <span style={{ fontSize: '0.72rem', color: 'var(--color-texto-apagado)', display: 'block' }}>Fecha Acordada</span>
+            <strong style={{ fontSize: '0.82rem', color: 'var(--color-texto-principal)' }}>{formatFecha(pago.fecha_acordada)}</strong>
+          </div>
+        )}
+        {(pago.venta_asociada || pago.pedido_asociado) && (
+          <div>
+            <span style={{ fontSize: '0.72rem', color: 'var(--color-texto-apagado)', display: 'block' }}>Venta Asociada</span>
+            <strong style={{ fontSize: '0.82rem', color: 'var(--color-texto-principal)' }}>{pago.venta_asociada || pago.pedido_asociado}</strong>
+          </div>
+        )}
+      </div>
 
       <label className="form-label" style={{ marginBottom: '0.5rem', display: 'block' }}>Historial de Abonos</label>
       <div className="modal-abonos-list">

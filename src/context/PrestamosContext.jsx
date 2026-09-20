@@ -5,19 +5,50 @@ import { api } from '../services/api';
 const PrestamosContext = createContext(null);
 
 /**
- * Calcula el estado de semaforización de un préstamo según su saldo y fecha límite.
+ * Calcula el estado de semaforización de un préstamo evaluando la PRÓXIMA cuota pendiente
+ * y considerando abonos acumulados (parciales o totales):
  * - Liquidado: saldo <= 0
- * - Atrasado: saldo > 0 y fecha_limite < hoy (Rojo #B23A48)
- * - Próximo a vencer: saldo > 0 y fecha_limite <= hoy + 3 días (Ámbar #C9A24B)
- * - Al día: saldo > 0 y fecha_limite > hoy + 3 días (Verde #6E8F6B)
+ * - Atrasado: alguna cuota no cubierta por abonos ya venció (fecha_vencimiento < hoy)
+ * - Próximo a vencer: la cuota más próxima a vencer vence en <= 3 días
+ * - Al día: todas las cuotas vencidas están cubiertas o faltan más de 3 días para la próxima
  */
 export function calcularEstadoPrestamo(prestamo) {
+  if (!prestamo) return 'al_dia';
   const saldo = Number(prestamo.saldo_pendiente) || 0;
   if (saldo <= 0) return 'liquidado';
 
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
 
+  // Si cuenta con plan de cuotas acordadas, evaluamos secuencialmente contra los abonos
+  if (Array.isArray(prestamo.cuotas) && prestamo.cuotas.length > 0) {
+    let saldoAbonosRestante = (prestamo.abonos || []).reduce((sum, a) => sum + (Number(a.monto) || 0), 0);
+
+    for (const c of prestamo.cuotas) {
+      const montoCuota = Number(c.montoRealAcordado ?? c.monto ?? c.montoSugerido) || 0;
+
+      // Si el acumulado de abonos cubre esta cuota por completo, avanzamos a la siguiente
+      if (saldoAbonosRestante >= montoCuota) {
+        saldoAbonosRestante -= montoCuota;
+        continue;
+      }
+
+      // Esta cuota está parcialmente cubierta o impaga: es la PRÓXIMA cuota pendiente
+      const fechaVencStr = c.fechaVencimiento || c.fecha;
+      if (!fechaVencStr) continue;
+
+      const fechaVenc = new Date(fechaVencStr + 'T00:00:00');
+      if (fechaVenc < hoy) return 'atrasado';
+
+      const diffMs = fechaVenc - hoy;
+      const diffDias = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+      if (diffDias <= 3) return 'proximo';
+
+      return 'al_dia';
+    }
+  }
+
+  // Fallback para préstamos antiguos o sin cuotas detalladas (evaluación contra fecha_limite final)
   if (!prestamo.fecha_limite) return 'al_dia';
 
   const fechaLimite = new Date(prestamo.fecha_limite + 'T00:00:00');
@@ -62,7 +93,11 @@ function validarPrestamo(datos) {
   }
 
   if (!datos.fecha_limite || !datos.fecha_limite.trim()) {
-    errores.fecha_limite = 'La fecha límite de pago es obligatoria.';
+    if (datos.cuotas && datos.cuotas.length > 0) {
+      datos.fecha_limite = datos.cuotas[datos.cuotas.length - 1].fechaVencimiento;
+    } else {
+      errores.fecha_limite = 'La fecha límite de pago es obligatoria.';
+    }
   } else if (datos.fecha_entrega && datos.fecha_limite < datos.fecha_entrega) {
     errores.fecha_limite = 'La fecha límite no puede ser anterior a la fecha de entrega.';
   }
@@ -148,9 +183,15 @@ export function PrestamosProvider({ children }) {
         tasa_interes: tasa,
         interes_monto: interesMonto,
         total_devolver: totalDevolver,
+        monto_total: totalDevolver,
         saldo_pendiente: totalDevolver,
         fecha_entrega: datos.fecha_entrega,
         fecha_limite: datos.fecha_limite,
+        tipo_plazo: datos.tipo_plazo || 'mes',
+        num_plazos: Number(datos.num_plazos) || 1,
+        cuotas: datos.cuotas || [],
+        moratoria_tipo: datos.moratoria_tipo || 'semana',
+        moratoria_monto: Number(datos.moratoria_monto || 0),
         fecha_registro: new Date().toISOString(),
         abonos: []
       };
@@ -213,9 +254,9 @@ export function PrestamosProvider({ children }) {
   }, [prestamos, sincronizarPrestamosCliente]);
 
   /**
-   * RF-44: Editar términos del préstamo.
+   * RF-44: Editar términos del préstamo con persistencia en Supabase.
    */
-  const editarPrestamo = useCallback((id, datos) => {
+  const editarPrestamo = useCallback(async (id, datos) => {
     const errores = validarPrestamo(datos);
     if (Object.keys(errores).length > 0) {
       return { success: false, errores };
@@ -226,31 +267,54 @@ export function PrestamosProvider({ children }) {
     const interesMonto = Math.round(capital * (tasa / 100));
     const montoTotal = capital + interesMonto;
 
-    setPrestamos(prev => prev.map(p => {
-      if (p.id !== id) return p;
-      const totalAbonado = (p.abonos || []).reduce((sum, a) => sum + Number(a.monto), 0);
+    try {
+      const pActual = prestamos.find(p => p.id === id);
+      const totalAbonado = ((pActual && pActual.abonos) || []).reduce((sum, a) => sum + Number(a.monto), 0);
       const nuevoSaldo = Math.max(0, montoTotal - totalAbonado);
 
-      return {
-        ...p,
-        cliente_id: datos.cliente_id ? Number(datos.cliente_id) : null,
-        es_cliente_registrado: !!datos.cliente_id,
-        beneficiario_nombre: datos.beneficiario_nombre.trim(),
-        beneficiario_telefono: datos.beneficiario_telefono.trim(),
+      const datosUpdate = {
+        ...datos,
         monto_capital: capital,
         tasa_interes: tasa,
-        monto_interes: interesMonto,
-        monto_total: montoTotal,
-        saldo_pendiente: nuevoSaldo,
-        fecha_entrega: datos.fecha_entrega,
-        fecha_limite: datos.fecha_limite,
-        frecuencia_pago: datos.frecuencia_pago || p.frecuencia_pago,
-        notas: (datos.notas || '').trim(),
+        saldo_pendiente: nuevoSaldo
       };
-    }));
 
-    return { success: true };
-  }, []);
+      const prestamoActualizado = await api.updatePrestamo(id, datosUpdate);
+
+      setPrestamos(prev => prev.map(p => (p.id === id ? prestamoActualizado : p)));
+      return { success: true };
+    } catch (err) {
+      console.error('Error al persistir actualización en Supabase, aplicando local:', err);
+      setPrestamos(prev => prev.map(p => {
+        if (p.id !== id) return p;
+        const totalAbonado = (p.abonos || []).reduce((sum, a) => sum + Number(a.monto), 0);
+        const nuevoSaldo = Math.max(0, montoTotal - totalAbonado);
+
+        return {
+          ...p,
+          cliente_id: datos.cliente_id ? Number(datos.cliente_id) : null,
+          es_cliente_registrado: !!datos.cliente_id,
+          beneficiario_nombre: datos.beneficiario_nombre.trim(),
+          beneficiario_telefono: datos.beneficiario_telefono.trim(),
+          monto_capital: capital,
+          tasa_interes: tasa,
+          monto_interes: interesMonto,
+          monto_total: montoTotal,
+          saldo_pendiente: nuevoSaldo,
+          fecha_entrega: datos.fecha_entrega,
+          fecha_limite: datos.fecha_limite,
+          tipo_plazo: datos.tipo_plazo || p.tipo_plazo || 'mes',
+          num_plazos: Number(datos.num_plazos) || p.num_plazos || 1,
+          cuotas: datos.cuotas || p.cuotas || [],
+          moratoria_tipo: datos.moratoria_tipo || p.moratoria_tipo || 'semana',
+          moratoria_monto: Number(datos.moratoria_monto !== undefined ? datos.moratoria_monto : (p.moratoria_monto || 0)),
+          frecuencia_pago: datos.tipo_plazo || datos.frecuencia_pago || p.frecuencia_pago,
+          notas: (datos.notas || '').trim(),
+        };
+      }));
+      return { success: true };
+    }
+  }, [prestamos]);
 
   /**
    * RF-44: Eliminar registro de préstamo.

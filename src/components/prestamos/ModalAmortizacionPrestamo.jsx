@@ -7,6 +7,7 @@ import {
   getProgressClass
 } from './prestamosUtils';
 import Modal from '../common/Modal';
+import { calcularMoratoriaElemento, formatearMoneda } from '../../utils/utils';
 
 /**
  * Modal para ver la tabla de amortización, términos e historial de abonos de un préstamo.
@@ -20,6 +21,7 @@ export default function ModalAmortizacionPrestamo({ isOpen, onClose, prestamo })
   const progressClass = getProgressClass(prestamo);
   const diasInfo = calcularDiasRestantes(prestamo.fecha_limite);
   const totalAbonado = Math.max(0, prestamo.monto_total - (prestamo.saldo_pendiente || 0));
+  const calculoMora = calcularMoratoriaElemento(prestamo);
 
   const iconoModal = (
     <div className="icon-circle-badge slate-badge">
@@ -78,12 +80,28 @@ export default function ModalAmortizacionPrestamo({ isOpen, onClose, prestamo })
               {formatMoneda(prestamo.saldo_pendiente)}
             </span>
           </div>
+          {calculoMora.moraTotal > 0 && (
+            <div className="amortizacion-stat-item">
+              <span className="amortizacion-stat-label" style={{ color: '#fb7185' }}>Mora Acumulada</span>
+              <span className="amortizacion-stat-val" style={{ color: '#fb7185', fontWeight: 800 }}>
+                +{formatMoneda(calculoMora.moraTotal)}
+              </span>
+            </div>
+          )}
+          {calculoMora.moraTotal > 0 && (
+            <div className="amortizacion-stat-item">
+              <span className="amortizacion-stat-label" style={{ color: '#f59e0b' }}>Total Exigible (con mora)</span>
+              <span className="amortizacion-stat-val" style={{ color: '#f59e0b', fontWeight: 800 }}>
+                {formatMoneda(calculoMora.saldoTotalConMora)}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Barra de Progreso de Retorno */}
       <div style={{ marginBottom: '1.25rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem', fontSize: '0.78rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '0.4rem', fontSize: '0.78rem' }}>
           <span style={{ color: 'var(--color-texto-secundario)' }}>Progreso de retorno de capital e intereses</span>
           <span style={{ fontWeight: 600, color: 'var(--color-texto-principal)' }}>
             {porcentaje}% retornado ({formatMoneda(totalAbonado)} de {formatMoneda(prestamo.monto_total)})
@@ -115,6 +133,14 @@ export default function ModalAmortizacionPrestamo({ isOpen, onClose, prestamo })
             {prestamo.frecuencia_pago}
           </span>
         </div>
+        {Number(prestamo.moratoria_monto) > 0 && (
+          <div className="calculator-item">
+            <span className="calculator-item-label">Moratoria por Atraso</span>
+            <span className="calculator-item-val" style={{ color: '#f59e0b', fontSize: '0.85rem' }}>
+              {formatMoneda(prestamo.moratoria_monto)} / {prestamo.moratoria_tipo || 'semana'}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Fechas */}
@@ -134,6 +160,68 @@ export default function ModalAmortizacionPrestamo({ isOpen, onClose, prestamo })
         <div style={{ marginBottom: '1.25rem', background: 'rgba(255,255,255,0.03)', padding: '0.6rem 0.85rem', borderRadius: '6px', fontSize: '0.8rem' }}>
           <span style={{ color: 'var(--color-texto-apagado)' }}>Notas: </span>
           <span style={{ color: 'var(--color-texto-principal)' }}>{prestamo.notas}</span>
+        </div>
+      )}
+
+      {/* Cronograma de Cuotas Acordadas si existen */}
+      {prestamo.cuotas && prestamo.cuotas.length > 0 && (
+        <div style={{ marginBottom: '1.25rem' }}>
+          <label className="form-label" style={{ marginBottom: '0.4rem', display: 'block' }}>
+            Cronograma de Cuotas Acordadas ({prestamo.num_plazos || prestamo.cuotas.length} plazos • {prestamo.tipo_plazo || prestamo.frecuencia_pago})
+          </label>
+          <div style={{ overflowX: 'auto', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.84rem' }}>
+              <thead>
+                <tr style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--color-texto-secundario)', textAlign: 'left' }}>
+                  <th style={{ padding: '0.5rem 0.75rem' }}>#</th>
+                  <th style={{ padding: '0.5rem 0.75rem' }}>Fecha Vencimiento</th>
+                  <th style={{ padding: '0.5rem 0.75rem', textAlign: 'right' }}>Monto Acordado</th>
+                  <th style={{ padding: '0.5rem 0.75rem', textAlign: 'right' }}>Ref. Calculada</th>
+                </tr>
+              </thead>
+              <tbody>
+                {prestamo.cuotas.map((c, idx) => {
+                  const numC = c.numeroCuota || idx + 1;
+                  const moraCuota = calculoMora.cuotasConMora.find(m => m.numeroCuota === numC);
+                  return (
+                    <tr key={idx} style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                      <td style={{ padding: '0.5rem 0.75rem', fontWeight: 700, color: 'var(--color-dorado, #f59e0b)' }}>
+                        Cuota #{numC}
+                      </td>
+                      <td style={{ padding: '0.5rem 0.75rem', color: '#fff' }}>
+                        {formatFecha(c.fechaVencimiento)}
+                        {moraCuota && (
+                          <span style={{
+                            display: 'inline-block',
+                            marginLeft: '8px',
+                            fontSize: '0.7rem',
+                            padding: '1px 6px',
+                            borderRadius: '4px',
+                            background: 'rgba(244, 63, 94, 0.18)',
+                            color: '#fb7185',
+                            fontWeight: 600
+                          }}>
+                            {moraCuota.diasAtraso}d atraso • +{formatMoneda(moraCuota.montoMora)} mora
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ padding: '0.5rem 0.75rem', textAlign: 'right', fontWeight: 700, color: '#fff' }}>
+                        {formatMoneda(c.montoRealAcordado || c.monto)}
+                        {moraCuota && (
+                          <span style={{ display: 'block', fontSize: '0.72rem', color: '#fb7185', fontWeight: 600 }}>
+                            Total: {formatMoneda(moraCuota.montoTotalExigible)}
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ padding: '0.5rem 0.75rem', textAlign: 'right', color: 'var(--color-texto-apagado)', fontSize: '0.78rem' }}>
+                        {formatMoneda(c.montoSugerido || c.monto)}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 

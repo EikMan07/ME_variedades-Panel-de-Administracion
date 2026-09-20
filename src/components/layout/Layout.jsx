@@ -1,3 +1,4 @@
+import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Chatbot from '../chatbot/Chatbot';
 import { useAuth } from '../../context/AuthContext';
@@ -16,10 +17,10 @@ export default function Layout({ children }) {
       />
 
       <div className="app-main-wrapper">
-        {children}
+        {children || <Outlet />}
 
         <footer className="app-footer">
-          <p>© 2026 ME Variedades — Plataforma de Administración Digital. Desarrollado para María.</p>
+          <p>© 2026 ME Variedades — Plataforma de Administración Digital.</p>
           <div className="footer-links">
             <span className="system-status-indicator">
               <span className="dot-online" /> Sistema Operativo

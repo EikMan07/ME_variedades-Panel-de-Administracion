@@ -5,10 +5,11 @@
 Actúas como el desarrollador líder de "Proyecto María", la plataforma web de administración para **ME Variedades**, una empresa comercial dedicada a la venta de mercancía variada — indumentaria, calzado, accesorios, perfumería, maquillaje y aparatos electrónicos — que además realiza préstamos de dinero a terceros. El negocio se administraba en hojas físicas de papel, lo que dificultaba ordenar y consultar los datos de clientes, productos, pagos y préstamos. El sistema es administrado por **María**, y digitaliza esa operación en una plataforma web responsiva (celular, tablet y PC), con login personalizado, dashboard central, bóveda de facturas con OCR inteligente, autenticación biométrica y diseño "aesthetic" dark glassmorphism.
 
 ### Actores y roles del sistema
-- **Administradora (María) — acceso total.** Agrega, edita y elimina clientes, productos, pagos, cobros, pedidos, préstamos y facturas; visualiza el dashboard analítico y exporta expedientes en PDF.
+- **Administradora (María) — acceso total.** Agrega, edita y elimina clientes, productos, pagos, pedidos, préstamos y facturas; visualiza el dashboard analítico y exporta expedientes en PDF.
 
-### Módulos del sistema (alcance v4.2)
-Login Híbrido (Credenciales + Biometría Facial) · Dashboard (con KPIs y analítica interactiva) · Clientes CRM (con avisos de cumpleaños) · Pagos y Cuentas por Cobrar · Cobros · Productos e Inventario (10 categorías oficiales) · Pedidos (con descuento de existencias) · Préstamos a Terceros · Bóveda de Facturas y Comprobantes (con OCR automático y exportador PDF multipágina) · Asistente Virtual (chatbot con IA).
+### Módulos del sistema (alcance v4.0)
+Login Híbrido (Credenciales + Biometría Facial) · Dashboard (con KPIs y analítica interactiva) · Clientes CRM (con avisos de cumpleaños) · Pagos y Cuentas por Cobrar · Productos e Inventario (10 categorías oficiales) · Pedidos (con descuento de existencias) · Préstamos a Terceros · Bóveda de Facturas y Comprobantes (con OCR automático y exportador PDF multipágina) · Asistente Virtual (chatbot con IA).
+*(Nota v4.0: El módulo Cobros v3.1 fue depurado y su funcionalidad de recaudación se redistribuyó entre Préstamos y Ventas/Pagos).*
 
 ### Arquitectura de datos y rendimiento
 - **Fuente de verdad:** Supabase Cloud (PostgreSQL + Realtime WebSockets + Storage).
@@ -57,6 +58,7 @@ Login Híbrido (Credenciales + Biometría Facial) · Dashboard (con KPIs y anal�
 4. **Mobile-First Responsive Design:** Todas las vistas, TopBar, modales y widgets deben adaptarse con fluidez en pantallas móviles (`@media (max-width: 640px)`).
 5. **Compresión Previa de Imágenes:** Toda fotografía tomada o subida debe procesarse con `imageCompression.js` antes de transferirse a Supabase Storage.
 6. **Code Splitting & Dynamic Imports:** Las librerías pesadas (`jspdf`, `jspdf-autotable`, `tesseract.js`, `face-api.js`) solo deben cargarse bajo demanda al invocar su función correspondiente.
+7. **Secret Management Policy:** Las claves secretas (ej. `SUPABASE_SERVICE_ROLE_KEY`, `CRON_SECRET`, `GEMINI_API_KEY`) residen exclusivamente en `.env` (entorno local ignorado por Git) y en las variables de entorno de Vercel (servidor). Jamás deben llevar el prefijo `VITE_` ni escribirse directamente en el código fuente.
 
 ---
 
@@ -64,7 +66,7 @@ Login Híbrido (Credenciales + Biometría Facial) · Dashboard (con KPIs y anal�
 
 | Servicio | Archivo | Responsabilidad |
 |---|---|---|
-| **API Client** | `src/services/api.js` | CRUD centralizado con Supabase para clientes, productos, pedidos, pagos, cobros, préstamos y facturas. |
+| **API Client** | `src/services/api.js` | CRUD centralizado con Supabase para clientes, productos, pedidos, pagos, préstamos y facturas. |
 | **Supabase Client** | `src/services/supabase.js` | Inicialización de cliente Supabase con credenciales seguras. |
 | **Receipt OCR** | `src/services/receiptOcrService.js` | Extracción inteligente de referencias de comprobantes bancarios y SINPE con Tesseract OCR. |
 | **Image Compression** | `src/services/imageCompression.js` | Redimensionamiento y compresión en cliente (reducción de fotos de 8MB a <250KB vía Canvas). |

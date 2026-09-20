@@ -24,6 +24,8 @@ export default function ModalRegistrarPago({ isOpen, onClose, pagoToEdit = null 
     cliente_nombre: '',
     cliente_telefono: '',
     concepto: '',
+    tipo_pago: 'Semanal',
+    venta_asociada: '',
     pedido_asociado: '',
     monto_total: '',
     fecha_acordada: '',
@@ -39,13 +41,16 @@ export default function ModalRegistrarPago({ isOpen, onClose, pagoToEdit = null 
   useEffect(() => {
     if (isOpen) {
       if (pagoToEdit) {
+        const refVenta = pagoToEdit.venta_asociada || pagoToEdit.pedido_asociado || '';
         setForm({
           clienteBusqueda: pagoToEdit.cliente_nombre || '',
           cliente_id: pagoToEdit.cliente_id || '',
           cliente_nombre: pagoToEdit.cliente_nombre || '',
           cliente_telefono: pagoToEdit.cliente_telefono || '',
           concepto: pagoToEdit.concepto || '',
-          pedido_asociado: pagoToEdit.pedido_asociado || '',
+          tipo_pago: pagoToEdit.tipo_pago || 'Semanal',
+          venta_asociada: refVenta,
+          pedido_asociado: refVenta,
           monto_total: pagoToEdit.monto_total || '',
           fecha_acordada: pagoToEdit.fecha_acordada || '',
         });
@@ -102,12 +107,15 @@ export default function ModalRegistrarPago({ isOpen, onClose, pagoToEdit = null 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const refVenta = form.venta_asociada || form.pedido_asociado || '';
     const datos = {
       cliente_id: form.cliente_id,
       cliente_nombre: form.cliente_nombre,
       cliente_telefono: form.cliente_telefono,
       concepto: form.concepto,
-      pedido_asociado: form.pedido_asociado,
+      tipo_pago: form.tipo_pago || 'Semanal',
+      venta_asociada: refVenta,
+      pedido_asociado: refVenta,
       monto_total: form.monto_total,
       fecha_acordada: form.fecha_acordada,
     };
@@ -121,6 +129,9 @@ export default function ModalRegistrarPago({ isOpen, onClose, pagoToEdit = null 
       }
 
       if (resultado && !resultado.success) {
+        if (resultado.error) {
+          showToast({ tipo: 'error', mensaje: resultado.error });
+        }
         setErrores(resultado.errores || {});
         return;
       }
@@ -149,7 +160,7 @@ export default function ModalRegistrarPago({ isOpen, onClose, pagoToEdit = null 
     <div className="icon-circle-badge rose-badge">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="2" y="5" width="20" height="14" rx="2"></rect>
-        <line x1="2" y1="10" x2="22" y2="10"></line>
+        <line x1="12" y1="10" x2="22" y2="10"></line>
       </svg>
     </div>
   );
@@ -187,7 +198,7 @@ export default function ModalRegistrarPago({ isOpen, onClose, pagoToEdit = null 
               id="input-cliente-pago"
               type="text"
               className={`input-form ${errores.cliente_id ? 'input-error' : ''}`}
-              placeholder="Buscar cliente por nombre o telefono..."
+              placeholder="Buscar cliente por nombre o teléfono..."
               value={form.clienteBusqueda}
               onChange={(e) => handleClienteSearch(e.target.value)}
               autoComplete="off"
@@ -214,29 +225,56 @@ export default function ModalRegistrarPago({ isOpen, onClose, pagoToEdit = null 
           {errores.cliente_id && <span className="input-error-msg visible">{errores.cliente_id}</span>}
           {clientes.length === 0 && (
             <span className="input-error-msg visible" style={{ color: 'var(--color-advertencia)' }}>
-              No hay clientes registrados. Registra un cliente primero desde el modulo de Clientes.
+              No hay clientes registrados. Registra un cliente primero desde el módulo de Clientes.
             </span>
           )}
         </div>
 
-        {/* Concepto */}
+        {/* Concepto / Descripción — Corrección ortográfica y de placeholder */}
         <div className="form-group">
           <label className="form-label" htmlFor="input-concepto-pago">
-            Concepto / Descripcion <span className="required-star">*</span>
+            Concepto / Descripción <span className="required-star">*</span>
           </label>
           <input
             id="input-concepto-pago"
             type="text"
             className={`input-form ${errores.concepto ? 'input-error' : ''}`}
-            placeholder="Ej: Deuda por compra de ropa, saldo de pedido #5..."
+            placeholder="Ej: Deuda por mercadería, saldo de venta a crédito, abono..."
             value={form.concepto}
             onChange={(e) => handleChange('concepto', e.target.value)}
           />
           {errores.concepto && <span className="input-error-msg visible">{errores.concepto}</span>}
         </div>
 
+        {/* Tipo de Pago / Frecuencia de Cobro — CAMBIO-04 / RF-19 */}
+        <div className="form-group">
+          <label className="form-label">
+            Tipo de Pago <span className="required-star">*</span>
+          </label>
+          <div className="tipo-pago-grid">
+            {['Semanal', 'Quincenal', 'Mensual'].map((tipo) => {
+              const isActive = form.tipo_pago === tipo;
+              return (
+                <button
+                  key={tipo}
+                  type="button"
+                  className={`tipo-pago-card ${isActive ? 'active' : ''}`}
+                  onClick={() => handleChange('tipo_pago', tipo)}
+                  id={`btn-tipo-pago-${tipo.toLowerCase()}`}
+                >
+                  <span className={`tipo-pago-radio ${isActive ? 'checked' : ''}`}>
+                    {isActive && <span className="tipo-pago-dot" />}
+                  </span>
+                  <span className="tipo-pago-label">{tipo}</span>
+                </button>
+              );
+            })}
+          </div>
+          {errores.tipo_pago && <span className="input-error-msg visible">{errores.tipo_pago}</span>}
+        </div>
+
         <div className="form-row-2col">
-          {/* Monto Total — RF-19 */}
+          {/* Monto Total (₡) — Moneda Colones */}
           <div className="form-group">
             <label className="form-label" htmlFor="input-monto-pago">
               Monto Total (₡) <span className="required-star">*</span>
@@ -252,17 +290,12 @@ export default function ModalRegistrarPago({ isOpen, onClose, pagoToEdit = null 
                 value={form.monto_total}
                 onChange={(e) => handleChange('monto_total', e.target.value)}
               />
-              <span className="input-icon-suffix">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="12" y1="1" x2="12" y2="23"></line>
-                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                </svg>
-              </span>
+              <span className="input-icon-suffix currency-symbol-crc">₡</span>
             </div>
             {errores.monto_total && <span className="input-error-msg visible">{errores.monto_total}</span>}
           </div>
 
-          {/* Fecha Acordada — RF-18 */}
+          {/* Fecha Acordada de Pago — RF-18 con CustomDatePicker */}
           <div className="form-group">
             <label className="form-label" htmlFor="input-fecha-pago">
               Fecha Acordada de Pago
@@ -276,18 +309,21 @@ export default function ModalRegistrarPago({ isOpen, onClose, pagoToEdit = null 
           </div>
         </div>
 
-        {/* Pedido Asociado (Opcional) */}
+        {/* Venta Asociada (Opcional) — CAMBIO-02 */}
         <div className="form-group">
-          <label className="form-label" htmlFor="input-pedido-pago">
-            Pedido Asociado (Opcional)
+          <label className="form-label" htmlFor="input-venta-pago">
+            Venta Asociada (Opcional)
           </label>
           <input
-            id="input-pedido-pago"
+            id="input-venta-pago"
             type="text"
             className="input-form"
-            placeholder="Ej: #012 — referencia del pedido vinculado"
-            value={form.pedido_asociado}
-            onChange={(e) => handleChange('pedido_asociado', e.target.value)}
+            placeholder="Ej: #012 — referencia de la venta vinculada"
+            value={form.venta_asociada || form.pedido_asociado}
+            onChange={(e) => {
+              handleChange('venta_asociada', e.target.value);
+              handleChange('pedido_asociado', e.target.value);
+            }}
           />
         </div>
       </form>

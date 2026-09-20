@@ -17,8 +17,7 @@ const initialMetrics = {
   listaPedidos: [],
   listaPagos: [],
   listaPrestamos: [],
-  listaProductos: [],
-  listaCobros: []
+  listaProductos: []
 };
 
 export function DashboardProvider({ children }) {
@@ -53,7 +52,6 @@ export function DashboardProvider({ children }) {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'prestamos' }, () => cargarMetricas())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'productos' }, () => cargarMetricas())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'clientes' }, () => cargarMetricas())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'cobros' }, () => cargarMetricas())
       .subscribe();
 
     return () => {

@@ -60,6 +60,7 @@ El sistema sustituye por completo los registros manuales en papel por una soluci
 | **Motor OCR / Visión** | Tesseract.js (Carga dinámica bajo demanda) |
 | **Biometría Neuronal** | Face-API.js (TinyFaceDetector, FaceLandmark68Net) |
 | **Visualización de Datos** | Chart.js 4.x + ChartJS React |
+| **Serverless & Automatización** | Vercel Serverless Functions (`/api/*`) + Vercel Cron Jobs |
 | **Generador de Documentos** | jsPDF + jsPDF-AutoTable (Carga dinámica bajo demanda) |
 | **Métricas de Rendimiento** | Vercel Speed Insights (`@vercel/speed-insights`) |
 | **Estilos & UI** | Vanilla CSS (Dark Glassmorphism, CSS Grid, Flexbox, Mobile-First) |
@@ -70,6 +71,8 @@ El sistema sustituye por completo los registros manuales en papel por una soluci
 
 ```text
 ME-Variedades/
+├── api/                                         # Serverless Functions (Vercel)
+│   └── chatbot.js                               # Asistente virtual Gemini
 ├── public/                                      # Recursos públicos y modelos Face-API
 ├── src/
 │   ├── assets/                                  # Logotipo oficial e imágenes de marca
@@ -128,10 +131,20 @@ npm install
 Crea un archivo `.env` o `.env.local` en la raíz del proyecto:
 
 ```env
+# Cliente Frontend
 VITE_SUPABASE_URL=tu_supabase_url
 VITE_SUPABASE_ANON_KEY=tu_supabase_anon_key
-VITE_GEMINI_API_KEY=tu_gemini_api_key
+
+# Servidor / Vercel Serverless Function (RF-60: Nunca exponer con prefijo VITE_)
+GEMINI_API_KEY=tu_clave_de_google_ai_studio
 ```
+
+> **Nota de Seguridad e Inteligencia Artificial (RF-60)**:
+> Para el Asistente Virtual Inteligente en producción (Vercel), agrega la variable de entorno **`GEMINI_API_KEY`** directamente en **Vercel Dashboard > Project Settings > Environment Variables**.
+> - Nombre exacto: `GEMINI_API_KEY`
+> - Valor: Clave obtenida desde [Google AI Studio](https://aistudio.google.com/app/apikey)
+> - Entornos recomendados: `Production`, `Preview`, `Development`
+> - La clave es consumida exclusivamente por la Serverless Function `/api/chatbot.js` y jamás se expone al navegador.
 
 ### 4. Iniciar el Servidor de Desarrollo
 

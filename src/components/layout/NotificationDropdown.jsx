@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../../context/NotificationContext';
 import { NotificationIcons } from './NotificationIcons';
+import { generarLinkWhatsApp } from '../../utils/utils';
 
 export default function NotificationDropdown() {
   const {
@@ -20,7 +21,7 @@ export default function NotificationDropdown() {
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  // Cerrar al hacer clic fuera
+  // Cerrar al hacer clic fuera o presionar tecla Escape (Esc)
   useEffect(() => {
     function handleClickOutside(e) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -30,11 +31,19 @@ export default function NotificationDropdown() {
       }
     }
 
+    function handleKeyDown(e) {
+      if (e.key === 'Escape') {
+        closeDropdown();
+      }
+    }
+
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen, closeDropdown]);
 
@@ -42,13 +51,16 @@ export default function NotificationDropdown() {
 
   const handleActionClick = (notif) => {
     marcarComoLeida(notif.id);
-    if (notif.accion === 'whatsapp' && notif.telefono) {
-      const telLimpio = notif.telefono.replace(/[^0-9]/g, '');
-      const numCompleto = telLimpio.startsWith('506') ? telLimpio : `506${telLimpio}`;
-      const msg = encodeURIComponent(
-        `Estimado cliente, en ME Variedades le deseamos un feliz cumpleaños.`
+    if (notif.accion === 'whatsapp_cobro' && notif.linkWhatsApp) {
+      window.open(notif.linkWhatsApp, '_blank');
+    } else if (notif.accion === 'whatsapp' && notif.telefono) {
+      const url = generarLinkWhatsApp(
+        notif.telefono,
+        'Estimado cliente, en ME Variedades le deseamos un feliz cumpleaños.'
       );
-      window.open(`https://wa.me/${numCompleto}?text=${msg}`, '_blank');
+      if (url && url !== '#') {
+        window.open(url, '_blank');
+      }
     } else if (notif.link) {
       navigate(notif.link);
       closeDropdown();
@@ -148,7 +160,14 @@ export default function NotificationDropdown() {
                   </div>
                   <div className="notif-item-content">
                     <div className="notif-item-top">
-                      <h5>{item.titulo}</h5>
+                      <div className="notif-title-row">
+                        <h5>{item.titulo}</h5>
+                        {item.etiqueta && (
+                          <span className={`notif-pill notif-pill-${item.vencimiento || item.prioridad}`}>
+                            {item.etiqueta}
+                          </span>
+                        )}
+                      </div>
                       <button
                         type="button"
                         className="btn-icon-check"
@@ -164,6 +183,25 @@ export default function NotificationDropdown() {
                     </div>
 
                     <p>{item.mensaje}</p>
+
+                    {item.accion === 'whatsapp_cobro' && item.linkWhatsApp && (
+                      <div className="notif-item-footer">
+                        <a
+                          href={item.linkWhatsApp}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="notif-action-link whatsapp notif-btn-cobro"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            marcarComoLeida(item.id);
+                          }}
+                          title={`Cobrar por WhatsApp a ${item.clienteNombre}`}
+                        >
+                          {NotificationIcons.whatsapp}
+                          <span>Cobrar por WhatsApp</span>
+                        </a>
+                      </div>
+                    )}
 
                     {item.accion === 'whatsapp' && item.telefono && (
                       <div className="notif-item-footer">

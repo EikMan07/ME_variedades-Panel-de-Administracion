@@ -4,12 +4,13 @@
 export const ROUTES = {
   HOME: '/',
   LOGIN: '/login',
-  DASHBOARD: '/',
+  DASHBOARD: '/dashboard',
   CLIENTES: '/clientes',
   PRODUCTOS: '/productos',
-  PEDIDOS: '/pedidos',
+  VENTAS: '/ventas',
   PAGOS: '/pagos',
-  COBROS: '/cobros',
   PRESTAMOS: '/prestamos',
-  FACTURAS: '/facturas',
+  ESTADO_CUENTA: '/estado-cuenta',
+  FORBIDDEN: '/403',
+  NOT_FOUND: '/404',
 };

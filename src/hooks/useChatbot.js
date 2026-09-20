@@ -6,12 +6,16 @@ export function useChatbot() {
     return sessionStorage.getItem('me_chatbot_open') === 'true';
   });
 
-  const [apiKey, setApiKey] = useState(() => {
-    return localStorage.getItem('me_gemini_api_key') || '';
-  });
-
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Higiene de seguridad: purgar activamente cualquier clave residual en localStorage
+  useEffect(() => {
+    try {
+      localStorage.removeItem('me_gemini_api_key');
+    } catch {
+      // Ignorar entornos restringidos
+    }
+  }, []);
 
   const [messages, setMessages] = useState(() => {
     try {
@@ -77,18 +81,6 @@ export function useChatbot() {
     setIsOpen(false);
   }, []);
 
-  const saveApiKey = useCallback((newKey) => {
-    const trimmed = (newKey || '').trim();
-    if (trimmed) {
-      localStorage.setItem('me_gemini_api_key', trimmed);
-      setApiKey(trimmed);
-    } else {
-      localStorage.removeItem('me_gemini_api_key');
-      setApiKey('');
-    }
-    setIsDrawerOpen(false);
-  }, []);
-
   const clearChat = useCallback(() => {
     const initial = [
       {
@@ -124,12 +116,8 @@ export function useChatbot() {
     const liveContext = obtenerContextoEnVivo();
 
     try {
-      let botResponse = '';
-      if (apiKey) {
-        botResponse = await consultarGemini(textTrimmed, history, liveContext, apiKey);
-      } else {
-        botResponse = generarRespuestaLocal(textTrimmed, liveContext);
-      }
+      // Llamada segura al endpoint intermediario /api/chatbot (o fallback local automático)
+      const botResponse = await consultarGemini(textTrimmed, history, liveContext);
 
       const botMessage = {
         id: 'bot-' + Date.now(),
@@ -148,11 +136,7 @@ export function useChatbot() {
 
       setHistory(newHistory);
     } catch (err) {
-      let errorMsg = `Hubo un inconveniente al conectar con el servicio (${err.message}). Por favor verifica tu clave API en la configuración (⚙️) o intenta de nuevo.`;
-      if (err.message === 'API_KEY_INVALID') {
-        errorMsg = 'La clave API de Gemini no es válida. Haz clic en el ícono de engranaje (⚙️) para actualizarla.';
-      }
-
+      const errorMsg = `Hubo un inconveniente al procesar tu consulta (${err.message}). Por favor intenta nuevamente.`;
       const botErrorMessage = {
         id: 'err-' + Date.now(),
         role: 'assistant',
@@ -163,20 +147,16 @@ export function useChatbot() {
     } finally {
       setIsLoading(false);
     }
-  }, [apiKey, history, isLoading]);
+  }, [history, isLoading]);
 
   return {
     isOpen,
-    apiKey,
-    isDrawerOpen,
     isLoading,
     messages,
     messagesEndRef,
-    setIsDrawerOpen,
     toggleChat,
     openChat,
     closeChat,
-    saveApiKey,
     clearChat,
     sendMessage
   };

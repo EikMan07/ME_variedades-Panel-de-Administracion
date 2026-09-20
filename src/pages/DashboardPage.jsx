@@ -4,9 +4,9 @@ import KPICards from '../components/dashboard/KPICards';
 import AnalyticsChartSection from '../components/dashboard/AnalyticsChartSection';
 import StockDistributionCard from '../components/dashboard/StockDistributionCard';
 import ClientHighlightKPI from '../components/dashboard/ClientHighlightKPI';
+import CollectionAlertsCard from '../components/dashboard/CollectionAlertsCard';
 import BirthdayCard from '../components/dashboard/BirthdayCard';
 import AlertsCard from '../components/dashboard/AlertsCard';
-import RecentActivityCard from '../components/dashboard/RecentActivityCard';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -61,14 +61,14 @@ export default function DashboardPage() {
             {/* KPI Destacado: Total Clientes */}
             <ClientHighlightKPI />
 
+            {/* Recuadro de Notificaciones de Cobro (RF-08, RF-53 a RF-56) */}
+            <CollectionAlertsCard />
+
             {/* Widget: Cumpleaños del Mes */}
             <BirthdayCard />
 
             {/* Widget: Atención y Semaforización */}
             <AlertsCard />
-
-            {/* Widget: Últimas Transacciones */}
-            <RecentActivityCard />
           </div>
         </div>
       </main>

@@ -1,15 +1,17 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { ROUTES } from '../routes/paths';
 import AnimatedBackground from '../components/common/AnimatedBackground';
 import FaceLoginModal from '../components/biometrics/FaceLoginModal';
 import FaceEnrollModal from '../components/biometrics/FaceEnrollModal';
 import { AuthVerifyingScreen } from '../components/biometrics/AuthVerifyingScreen';
-import logoImg from '../assets/logo ME variedades.png';
+import logoImg from '../assets/logo-me-variedades.png';
 
 export default function LoginPage() {
   const { login, loginWithFace } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [usuario, setUsuario] = useState('');
   const [contrasena, setContrasena] = useState('');
@@ -228,7 +230,12 @@ export default function LoginPage() {
 
       {/* Pantalla de Transición y Verificación de Seguridad */}
       {isVerifying && (
-        <AuthVerifyingScreen onFinish={() => navigate('/')} />
+        <AuthVerifyingScreen
+          onFinish={() => {
+            const destino = location.state?.from?.pathname || ROUTES.DASHBOARD;
+            navigate(destino, { replace: true });
+          }}
+        />
       )}
     </div>
   );

@@ -36,7 +36,10 @@ function validarPago(datos) {
     errores.monto_total = 'El valor debe ser mayor a 0.';
   }
   if (!datos.concepto || !datos.concepto.trim()) {
-    errores.concepto = 'El concepto o descripcion es obligatorio.';
+    errores.concepto = 'El concepto o descripción es obligatorio.';
+  }
+  if (!datos.tipo_pago || !datos.tipo_pago.trim()) {
+    errores.tipo_pago = 'El tipo de pago / frecuencia de cobro es obligatorio.';
   }
   return errores;
 }
@@ -79,26 +82,13 @@ export function PagosProvider({ children }) {
       setPagos(prev => [nuevoRemoto, ...prev]);
       return { success: true, pago: nuevoRemoto };
     } catch (err) {
-      console.warn('Error al guardar pago en Supabase, guardando localmente:', err);
-      const maxId = pagos.length > 0 ? Math.max(...pagos.map(p => Number(p.id) || 0)) : 0;
-      const montoTotal = Number(datos.monto_total);
-      const nuevoLocal = {
-        id: maxId + 1,
-        cliente_id: datos.cliente_id,
-        cliente_nombre: datos.cliente_nombre,
-        cliente_telefono: datos.cliente_telefono || '',
-        concepto: (datos.concepto || '').trim(),
-        pedido_asociado: datos.pedido_asociado || '',
-        monto_total: montoTotal,
-        abonos: [],
-        saldo_pendiente: montoTotal,
-        fecha_acordada: datos.fecha_acordada || '',
-        fecha_registro: new Date().toISOString().split('T')[0],
+      console.error('❌ Error al guardar pago en Supabase:', err);
+      return {
+        success: false,
+        error: err.message || 'Error al guardar el pago en Supabase'
       };
-      setPagos(prev => [nuevoLocal, ...prev]);
-      return { success: true, pago: nuevoLocal };
     }
-  }, [pagos]);
+  }, []);
 
   const registrarAbono = useCallback(async (pagoId, montoAbono, nota = '') => {
     const pago = pagos.find(p => p.id === pagoId);
@@ -108,48 +98,64 @@ export function PagosProvider({ children }) {
     if (monto > pago.saldo_pendiente) return { success: false, error: 'El abono no puede superar el saldo pendiente.' };
 
     try {
-      await api.registrarAbono(pagoId, monto, nota);
-    } catch (err) {
-      console.warn('Error al registrar abono en Supabase, aplicando localmente:', err);
-    }
+      const pagoActualizado = await api.registrarAbono(pagoId, monto, nota);
+      if (!pagoActualizado) {
+        throw new Error('Supabase no devolvió el registro actualizado');
+      }
 
-    const nuevoAbono = { id: (pago.abonos?.length || 0) + 1, monto, nota: nota.trim(), fecha: new Date().toISOString().split('T')[0] };
-    setPagos(prev => prev.map(p => {
-      if (p.id !== pagoId) return p;
-      const nuevosAbonos = [...(p.abonos || []), nuevoAbono];
-      const totalAbonado = nuevosAbonos.reduce((sum, a) => sum + Number(a.monto), 0);
-      return { ...p, abonos: nuevosAbonos, saldo_pendiente: Math.max(0, p.monto_total - totalAbonado) };
-    }));
-    return { success: true };
+      setPagos(prev => prev.map(p => (p.id === pagoId ? pagoActualizado : p)));
+      return { success: true, pago: pagoActualizado };
+    } catch (err) {
+      console.error('❌ Error al registrar abono en Supabase:', err);
+      return {
+        success: false,
+        error: err.message || 'Error al registrar el abono en el servidor. No se guardaron cambios.'
+      };
+    }
   }, [pagos]);
 
-  const editarPago = useCallback((id, datos) => {
+  const editarPago = useCallback(async (id, datos) => {
     const errores = validarPago(datos);
     if (Object.keys(errores).length > 0) return { success: false, errores };
     const montoTotal = Number(datos.monto_total);
-    setPagos(prev => prev.map(p => {
-      if (p.id !== id) return p;
-      const totalAbonado = (p.abonos || []).reduce((sum, a) => sum + Number(a.monto), 0);
-      return {
-        ...p,
+    const refVenta = datos.venta_asociada || datos.pedido_asociado || null;
+
+    try {
+      const pagoActualizado = await api.updatePago(id, {
         cliente_id: datos.cliente_id,
-        cliente_nombre: datos.cliente_nombre,
-        cliente_telefono: datos.cliente_telefono || '',
         concepto: (datos.concepto || '').trim(),
-        pedido_asociado: datos.pedido_asociado || '',
+        tipo_pago: datos.tipo_pago || null,
+        pedido_asociado: refVenta,
         monto_total: montoTotal,
-        saldo_pendiente: Math.max(0, montoTotal - totalAbonado),
-        fecha_acordada: datos.fecha_acordada || '',
+        fecha_acordada: datos.fecha_acordada || null,
+      });
+
+      setPagos(prev => prev.map(p => (p.id === id ? pagoActualizado : p)));
+      return { success: true, pago: pagoActualizado };
+    } catch (err) {
+      console.error(`❌ Error al actualizar pago #${id} en Supabase:`, err);
+      return {
+        success: false,
+        error: err.message || 'Error al actualizar el pago en Supabase'
       };
-    }));
-    return { success: true };
+    }
   }, []);
 
-  const eliminarPago = useCallback((id) => {
+  const eliminarPago = useCallback(async (id) => {
     const pago = pagos.find(p => p.id === id);
     if (!pago) return { success: false, error: 'Pago no encontrado.' };
-    setPagos(prev => prev.filter(p => p.id !== id));
-    return { success: true };
+
+    try {
+      await api.deletePago(id);
+      setPagos(prev => prev.filter(p => p.id !== id));
+      return { success: true };
+    } catch (err) {
+      console.error(`❌ Error al eliminar pago #${id} en Supabase:`, err);
+      return {
+        success: false,
+        error: err.message || 'Error al eliminar el pago en Supabase'
+      };
+    }
   }, [pagos]);
 
   const filtrarPagos = useCallback((lista, { busqueda = '', filtroEstado = 'todos' }) => {

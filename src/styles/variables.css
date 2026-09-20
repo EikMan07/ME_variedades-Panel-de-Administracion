@@ -95,4 +95,51 @@
   --blur-glass: blur(12px);
   --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ========================================================
+     V4.0 NUEVA PALETA OSCURA FUTURISTA & GLASSMORHISM
+     ======================================================== */
+  --bg-cyber-dark: #0a0913;
+  --bg-cyber-surface: #120f24;
+  --bg-cyber-card: #181430;
+  --bg-cyber-elevated: #221c45;
+  --bg-cyber-input: rgba(255, 255, 255, 0.04);
+
+  /* Degradados Violeta y Azul Eléctrico */
+  --color-violeta: #8b5cf6;
+  --color-violeta-neon: #a855f7;
+  --color-azul-electrico: #3b82f6;
+  --color-cyan-electrico: #06b6d4;
+  --gradient-electric: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
+  --gradient-electric-glow: linear-gradient(135deg, #a855f7 0%, #2563eb 50%, #06b6d4 100%);
+  --gradient-violet-subtle: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%);
+  --glow-electric: 0 0 25px rgba(59, 130, 246, 0.35);
+  --glow-violet: 0 0 25px rgba(139, 92, 246, 0.35);
+
+  /* Glassmorphism Cyber Tokens */
+  --bg-glass-panel: rgba(18, 15, 36, 0.68);
+  --bg-glass-card: rgba(24, 20, 48, 0.58);
+  --bg-glass-modal: rgba(14, 12, 28, 0.88);
+  --border-glass-subtle: 1px solid rgba(139, 92, 246, 0.18);
+  --border-glass-electric: 1px solid rgba(59, 130, 246, 0.32);
+  --border-glass-glow: 1px solid rgba(168, 85, 247, 0.45);
+  --backdrop-blur-cyber: blur(16px);
+  --backdrop-blur-heavy: blur(24px);
+
+  /* ========================================================
+     SISTEMA DE ALERTAS PRIORITARIAS (NOTIFICACIONES V4.0)
+     ======================================================== */
+  /* Alerta Prioritaria Crítica / Vencida (Rojo Suave) */
+  --color-alerta-prioritaria: #f43f5e;
+  --color-alerta-rojo-suave: #fb7185;
+  --color-alerta-prioritaria-bg: rgba(244, 63, 94, 0.14);
+  --color-alerta-prioritaria-border: rgba(244, 63, 94, 0.35);
+  --color-alerta-prioritaria-glow: 0 0 18px rgba(244, 63, 94, 0.35);
+
+  /* Alerta Prioritaria Próxima / Advertencia (Ámbar) */
+  --color-alerta-ambar: #f59e0b;
+  --color-alerta-ambar-suave: #fbbf24;
+  --color-alerta-ambar-bg: rgba(245, 158, 11, 0.14);
+  --color-alerta-ambar-border: rgba(245, 158, 11, 0.35);
+  --color-alerta-ambar-glow: 0 0 18px rgba(245, 158, 11, 0.35);
 }

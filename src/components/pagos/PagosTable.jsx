@@ -42,6 +42,7 @@ export default function PagosTable({ pagos, onVerDetalle, onAbono, onEditar, onE
             <tr>
               <th>Cliente</th>
               <th>Concepto / Origen</th>
+              <th>Tipo de Pago</th>
               <th>Monto Total</th>
               <th>Saldo Pendiente</th>
               <th>Fecha Acordada</th>
@@ -56,7 +57,9 @@ export default function PagosTable({ pagos, onVerDetalle, onAbono, onEditar, onE
               const porcentaje = calcularPorcentajePagado(pago);
               const progressClass = getProgressClass(pago);
               const estadoValor = calcularEstadoPago(pago);
-              const fechaClass = estadoValor === 'vencido' ? 'fecha-vencida' : estadoValor === 'proximo' ? 'fecha-proxima' : '';
+              const esVencido = estadoValor === 'vencido';
+              const fechaClass = esVencido ? 'fecha-vencida' : estadoValor === 'proximo' ? 'fecha-proxima' : '';
+              const refVenta = pago.venta_asociada || pago.pedido_asociado || '';
 
               const nombreCliente =
                 pago.cliente_nombre ||
@@ -70,7 +73,7 @@ export default function PagosTable({ pagos, onVerDetalle, onAbono, onEditar, onE
                 'Sin teléfono';
 
               return (
-                <tr key={pago.id}>
+                <tr key={pago.id} className={esVencido ? 'row-pago-vencido' : ''}>
                   {/* Cliente */}
                   <td>
                     <div className="pago-cliente-cell">
@@ -88,10 +91,17 @@ export default function PagosTable({ pagos, onVerDetalle, onAbono, onEditar, onE
                   <td>
                     <div className="pago-concepto-cell">
                       <span className="pago-concepto-text" title={pago.concepto}>{pago.concepto}</span>
-                      {pago.pedido_asociado && (
-                        <span className="pago-pedido-tag">Pedido: {pago.pedido_asociado}</span>
+                      {refVenta && (
+                        <span className="pago-pedido-tag">Venta: {refVenta}</span>
                       )}
                     </div>
+                  </td>
+
+                  {/* Tipo de Pago / Frecuencia — RF-19 */}
+                  <td>
+                    <span className={`badge-tipo-pago tipo-${pago.tipo_pago ? pago.tipo_pago.toLowerCase().replace(/\s+/g, '-') : 'no-especificado'}`}>
+                      {pago.tipo_pago || 'No especificado'}
+                    </span>
                   </td>
 
                   {/* Monto Total */}
@@ -128,9 +138,20 @@ export default function PagosTable({ pagos, onVerDetalle, onAbono, onEditar, onE
                     </span>
                   </td>
 
-                  {/* Estado */}
+                  {/* Estado — RF-21 & RF-22 Alerta Vencido */}
                   <td>
-                    <span className={`estado-badge ${estadoClass}`}>{estadoLabel}</span>
+                    {esVencido ? (
+                      <span className="estado-badge badge-vencido badge-alerta-vencido" title="Cuenta vencida pendiente de cobro">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10" />
+                          <line x1="12" y1="8" x2="12" y2="12" />
+                          <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        <span>Vencido</span>
+                      </span>
+                    ) : (
+                      <span className={`estado-badge ${estadoClass}`}>{estadoLabel}</span>
+                    )}
                   </td>
 
                   {/* Acciones */}

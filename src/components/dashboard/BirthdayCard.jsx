@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useDashboard } from '../../context/DashboardContext';
+import { generarLinkWhatsApp } from '../../utils/utils';
 
 export default function BirthdayCard() {
   const { metrics = {} } = useDashboard?.() || {};
@@ -93,7 +94,7 @@ export default function BirthdayCard() {
 
                 {/* Botón de acción para felicitar / contactar */}
                 <a
-                  href={`https://wa.me/506${phoneClean}?text=${encodeURIComponent(`¡Hola ${c.nombre_completo}! En ME Variedades te deseamos un muy feliz cumpleaños.`)}`}
+                  href={generarLinkWhatsApp(c.telefono, `¡Hola ${c.nombre_completo}! En ME Variedades te deseamos un muy feliz cumpleaños.`)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-birthday-congratulate"

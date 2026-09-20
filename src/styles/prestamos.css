@@ -310,9 +310,25 @@
   color: #88c985;
 }
 
+.prestamo-saldo-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
 .prestamo-saldo-amount {
   font-weight: 700;
   font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.prestamo-total-de-label {
+  font-size: 0.72rem;
+  color: var(--color-texto-apagado);
+  white-space: nowrap;
+  margin-left: auto;
 }
 
 .saldo-liquidado { color: var(--rose-soft); }
@@ -522,6 +538,16 @@
 }
 
 @media (max-width: 600px) {
+  .prestamo-saldo-row {
+    gap: 0.25rem 0.5rem;
+  }
+  .prestamo-saldo-amount {
+    font-size: 0.9rem;
+  }
+  .prestamo-total-de-label {
+    font-size: 0.68rem;
+    margin-left: 0;
+  }
   .prestamos-kpis-grid {
     grid-template-columns: 1fr;
   }
@@ -541,3 +567,70 @@
     align-items: flex-start;
   }
 }
+
+/* ========================================================
+   AUTOCOMPLETE DE CLIENTES (MODAL PRÉSTAMOS)
+   ======================================================== */
+.autocomplete-wrapper {
+  position: relative;
+}
+
+.autocomplete-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: rgba(22, 19, 21, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm, 8px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
+  z-index: 1300;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.autocomplete-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 0.9rem;
+  cursor: pointer;
+  transition: background var(--transition-fast, 0.2s ease);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-item:hover {
+  background: rgba(154, 110, 121, 0.15);
+}
+
+.autocomplete-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-rosa-empolvado, #d4a5b0), var(--color-rosa-vino, #8a4e58));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.autocomplete-nombre {
+  font-size: 0.85rem;
+  color: var(--color-texto-principal, #ffffff);
+  font-weight: 500;
+}
+
+.autocomplete-tel {
+  font-size: 0.72rem;
+  color: var(--color-texto-apagado, #94a3b8);
+}
+

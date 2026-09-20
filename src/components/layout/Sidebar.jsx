@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { ROUTES } from '../../routes/paths';
 import Modal from '../common/Modal';
-import logoImg from '../../assets/logo ME variedades.png';
+import logoImg from '../../assets/logo-me-variedades.png';
 
 export default function Sidebar({ onOpenChatbot }) {
   const { user, isSidebarCollapsed, isSidebarMobileOpen, logout, closeMobileSidebar } = useAuth();
@@ -30,7 +31,7 @@ export default function Sidebar({ onOpenChatbot }) {
       >
         {/* Encabezado con Logo (Fijo Superior) */}
         <div className="sidebar-header">
-          <NavLink to="/" className="sidebar-brand" onClick={handleNavClick}>
+          <NavLink to={ROUTES.DASHBOARD} className="sidebar-brand" onClick={handleNavClick}>
             <div className="brand-logo-circle">
               <img src={logoImg} alt="Logo ME Variedades" className="brand-logo-img" />
             </div>
@@ -57,11 +58,11 @@ export default function Sidebar({ onOpenChatbot }) {
 
         {/* Área Central de Navegación (Enlaces con Scroll Interno) */}
         <nav className="sidebar-nav">
-          <div className="nav-section-title">PRINCIPAL</div>
+          <div className="nav-section-title">INICIO</div>
           <ul className="nav-list">
             <li className="nav-item">
               <NavLink
-                to="/"
+                to={ROUTES.DASHBOARD}
                 end
                 className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
                 onClick={handleNavClick}
@@ -76,7 +77,10 @@ export default function Sidebar({ onOpenChatbot }) {
                 <span className="links_name">Dashboard</span>
               </NavLink>
             </li>
+          </ul>
 
+          <div className="nav-section-title">ADMINISTRACIÓN</div>
+          <ul className="nav-list">
             <li className="nav-item">
               <NavLink
                 to="/clientes"
@@ -109,56 +113,26 @@ export default function Sidebar({ onOpenChatbot }) {
                 <span className="links_name">Productos e Inventario</span>
               </NavLink>
             </li>
-
-            <li className="nav-item">
-              <NavLink
-                to="/pedidos"
-                className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-                onClick={handleNavClick}
-                title="Pedidos"
-              >
-                <svg className="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                  <line x1="16" y1="13" x2="8" y2="13"></line>
-                  <line x1="16" y1="17" x2="8" y2="17"></line>
-                  <polyline points="10 9 9 9 8 9"></polyline>
-                </svg>
-                <span className="links_name">Pedidos</span>
-              </NavLink>
-            </li>
           </ul>
 
-          <div className="nav-section-title">FINANZAS</div>
+          <div className="nav-section-title">CAJA / TRANSACCIONES</div>
           <ul className="nav-list">
             <li className="nav-item">
               <NavLink
-                to="/pagos"
+                to="/ventas"
                 className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
                 onClick={handleNavClick}
-                title="Pagos y Cuentas"
+                title="Ventas"
               >
                 <svg className="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="2" y="5" width="20" height="14" rx="2"></rect>
-                  <line x1="2" y1="10" x2="22" y2="10"></line>
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                  <line x1="3" y1="6" x2="21" y2="6"></line>
+                  <path d="M16 10a4 4 0 0 1-8 0"></path>
                 </svg>
-                <span className="links_name">Pagos y Cuentas</span>
+                <span className="links_name">Ventas</span>
               </NavLink>
             </li>
-            <li className="nav-item">
-              <NavLink
-                to="/cobros"
-                className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-                onClick={handleNavClick}
-                title="Cobros"
-              >
-                <svg className="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-                <span className="links_name">Cobros</span>
-              </NavLink>
-            </li>
+
             <li className="nav-item">
               <NavLink
                 to="/prestamos"
@@ -173,21 +147,39 @@ export default function Sidebar({ onOpenChatbot }) {
                 <span className="links_name">Préstamos</span>
               </NavLink>
             </li>
+
             <li className="nav-item">
               <NavLink
-                to="/facturas"
+                to="/pagos"
                 className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
                 onClick={handleNavClick}
-                title="Facturas y Comprobantes"
+                title="Pagos y Cuentas"
               >
                 <svg className="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                  <line x1="16" y1="13" x2="8" y2="13"></line>
-                  <line x1="16" y1="17" x2="8" y2="17"></line>
-                  <polyline points="10 9 9 9 8 9"></polyline>
+                  <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                  <line x1="2" y1="10" x2="22" y2="10"></line>
                 </svg>
-                <span className="links_name">Facturas y Comprobantes</span>
+                <span className="links_name">Pagos y Cuentas</span>
+              </NavLink>
+            </li>
+          </ul>
+
+          <div className="nav-section-title">CONSULTAS / REPORTES</div>
+          <ul className="nav-list">
+            <li className="nav-item">
+              <NavLink
+                to="/estado-cuenta"
+                className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                onClick={handleNavClick}
+                title="Estado de Cuenta"
+              >
+                <svg className="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                  <line x1="8" y1="7" x2="16" y2="7"></line>
+                  <line x1="8" y1="11" x2="16" y2="11"></line>
+                </svg>
+                <span className="links_name">Estado de Cuenta</span>
               </NavLink>
             </li>
           </ul>

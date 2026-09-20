@@ -1,0 +1,315 @@
+/* ============================================================================
+   SISTEMA DE COMPONENTES BASE — PROYECTO MARÍA (v4.0)
+   Glassmorphism, Degradados Eléctricos y Alertas Prioritarias
+   ============================================================================ */
+
+/* ==========================================
+   1. CONTENEDORES GLASSMORHPISM
+   ========================================== */
+
+.glass-panel {
+  background: var(--bg-glass-panel, rgba(18, 15, 36, 0.68));
+  backdrop-filter: var(--backdrop-blur-cyber, blur(16px));
+  -webkit-backdrop-filter: var(--backdrop-blur-cyber, blur(16px));
+  border: var(--border-glass-subtle, 1px solid rgba(139, 92, 246, 0.18));
+  border-radius: var(--radius-lg, 20px);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: all var(--transition-normal, 0.25s ease);
+}
+
+.glass-card {
+  background: var(--bg-glass-card, rgba(24, 20, 48, 0.58));
+  backdrop-filter: var(--backdrop-blur-cyber, blur(16px));
+  -webkit-backdrop-filter: var(--backdrop-blur-cyber, blur(16px));
+  border: var(--border-glass-subtle, 1px solid rgba(139, 92, 246, 0.18));
+  border-radius: var(--radius-card, 16px);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-card, 0 4px 20px -2px rgba(0, 0, 0, 0.4));
+  transition: transform var(--transition-fast, 0.2s ease), border-color var(--transition-fast, 0.2s ease), box-shadow var(--transition-fast, 0.2s ease);
+}
+
+.glass-card:hover {
+  border-color: rgba(139, 92, 246, 0.35);
+  box-shadow: 0 8px 25px -4px rgba(139, 92, 246, 0.15), var(--shadow-card, 0 4px 20px -2px rgba(0, 0, 0, 0.4));
+  transform: translateY(-2px);
+}
+
+.glass-modal {
+  background: var(--bg-glass-modal, rgba(14, 12, 28, 0.92));
+  backdrop-filter: var(--backdrop-blur-heavy, blur(24px));
+  -webkit-backdrop-filter: var(--backdrop-blur-heavy, blur(24px));
+  border: var(--border-glass-electric, 1px solid rgba(59, 130, 246, 0.32));
+  border-radius: var(--radius-lg, 20px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), var(--glow-electric, 0 0 25px rgba(59, 130, 246, 0.25));
+}
+
+.glass-input {
+  background: var(--bg-cyber-input, rgba(255, 255, 255, 0.04));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: var(--border-glass-subtle, 1px solid rgba(139, 92, 246, 0.2));
+  border-radius: var(--radius-input, 12px);
+  color: var(--text-primary, #ffffff);
+  padding: 0.65rem 1rem;
+  font-size: 0.9rem;
+  transition: all var(--transition-fast, 0.2s ease);
+}
+
+.glass-input:focus {
+  outline: none;
+  border-color: var(--color-violeta, #8b5cf6);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ==========================================
+   2. BOTONES CON DEGRADADOS ELÉCTRICOS
+   ========================================== */
+
+.btn-gradient-electric {
+  background: var(--gradient-electric, linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%));
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm, 12px);
+  padding: 0.65rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.25);
+  transition: all var(--transition-fast, 0.2s ease);
+}
+
+.btn-gradient-electric:hover {
+  background: var(--gradient-electric-glow, linear-gradient(135deg, #a855f7 0%, #2563eb 50%, #06b6d4 100%));
+  box-shadow: var(--glow-electric, 0 0 25px rgba(59, 130, 246, 0.45));
+  transform: translateY(-1px);
+}
+
+.btn-gradient-electric:active {
+  transform: translateY(0);
+}
+
+.btn-glass {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-primary, #ffffff);
+  border-radius: var(--radius-sm, 12px);
+  padding: 0.65rem 1.25rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.2s ease);
+}
+
+.btn-glass:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* ==========================================
+   3. SISTEMA DE ALERTAS PRIORITARIAS (NOTIFICACIONES)
+   ========================================== */
+
+/* Contenedor de Alerta Prioritaria Base */
+.alert-prioritaria {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1rem 1.15rem;
+  border-radius: var(--radius-md, 16px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  transition: all var(--transition-fast, 0.2s ease);
+}
+
+/* Alerta Prioritaria Roja (Crítica / Vencida) */
+.alert-prioritaria-rojo,
+.alert-prioritaria-red {
+  background: var(--color-alerta-prioritaria-bg, rgba(244, 63, 94, 0.14));
+  border: var(--color-alerta-prioritaria-border, 1px solid rgba(244, 63, 94, 0.35));
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(244, 63, 94, 0.12);
+}
+
+.alert-prioritaria-rojo .alert-icon,
+.alert-prioritaria-red .alert-icon {
+  color: var(--color-alerta-rojo-suave, #fb7185);
+  flex-shrink: 0;
+}
+
+/* Alerta Prioritaria Ámbar (Próxima a Vencer / Advertencia) */
+.alert-prioritaria-ambar,
+.alert-prioritaria-amber {
+  background: var(--color-alerta-ambar-bg, rgba(245, 158, 11, 0.14));
+  border: var(--color-alerta-ambar-border, 1px solid rgba(245, 158, 11, 0.35));
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.12);
+}
+
+.alert-prioritaria-ambar .alert-icon,
+.alert-prioritaria-amber .alert-icon {
+  color: var(--color-alerta-ambar-suave, #fbbf24);
+  flex-shrink: 0;
+}
+
+/* Badges de Alerta Prioritaria */
+.badge-alerta-prioritaria {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.badge-alerta-rojo {
+  background: rgba(244, 63, 94, 0.18);
+  border: 1px solid rgba(244, 63, 94, 0.4);
+  color: var(--color-alerta-rojo-suave, #fb7185);
+}
+
+.badge-alerta-ambar {
+  background: rgba(245, 158, 11, 0.18);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: var(--color-alerta-ambar-suave, #fbbf24);
+}
+
+/* Punto indicador de notificación urgente */
+.notification-dot-priority {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.notification-dot-priority.dot-red {
+  background-color: var(--color-alerta-prioritaria, #f43f5e);
+  box-shadow: var(--color-alerta-prioritaria-glow, 0 0 10px rgba(244, 63, 94, 0.6));
+}
+
+.notification-dot-priority.dot-amber {
+  background-color: var(--color-alerta-ambar, #f59e0b);
+  box-shadow: var(--color-alerta-ambar-glow, 0 0 10px rgba(245, 158, 11, 0.6));
+}
+
+/* Efecto de Pulso de Alerta Suave */
+.pulse-alerta-prioritaria {
+  animation: pulse-prioridad 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-prioridad {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.05);
+  }
+}
+
+/* Banner de Notificación Prioritaria */
+.banner-alerta-prioritaria {
+  background: linear-gradient(90deg, rgba(244, 63, 94, 0.18) 0%, rgba(245, 158, 11, 0.12) 100%);
+  border-left: 4px solid var(--color-alerta-prioritaria, #f43f5e);
+  border-radius: var(--radius-sm, 12px);
+  padding: 0.9rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* Card de Previsualización de Cuota */
+.cuota-card-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm, 12px);
+  transition: all var(--transition-fast, 0.2s ease);
+}
+
+.cuota-card-preview:hover {
+  background: rgba(139, 92, 246, 0.06);
+  border-color: rgba(139, 92, 246, 0.25);
+}
+
+/* ========================================================
+   AUTOCOMPLETE DE CLIENTES COMPARTIDO
+   Usado en modales de Préstamos, Pagos y Ventas
+   ======================================================== */
+.autocomplete-wrapper {
+  position: relative;
+}
+
+.autocomplete-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: rgba(22, 19, 21, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm, 8px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
+  z-index: 1300;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.autocomplete-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 0.9rem;
+  cursor: pointer;
+  transition: background var(--transition-fast, 0.2s ease);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-item:hover {
+  background: rgba(154, 110, 121, 0.15);
+}
+
+.autocomplete-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-rosa-empolvado, #d4a5b0), var(--color-rosa-vino, #8a4e58));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.autocomplete-nombre {
+  font-size: 0.85rem;
+  color: var(--color-texto-principal, #ffffff);
+  font-weight: 500;
+}
+
+.autocomplete-tel {
+  font-size: 0.72rem;
+  color: var(--color-texto-apagado, #94a3b8);
+}
+

@@ -1,7 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import ProtectedRoute from './ProtectedRoute';
-import Layout from '../components/layout/Layout';
+import PrivateRoutes from './PrivateRoutes';
 import { ROUTES } from './paths';
 
 // Code Splitting Dinámico con React.lazy para carga ultrarrápida
@@ -9,11 +8,12 @@ const LoginPage = lazy(() => import('../pages/LoginPage'));
 const DashboardPage = lazy(() => import('../pages/DashboardPage'));
 const ClientesPage = lazy(() => import('../pages/ClientesPage'));
 const ProductosPage = lazy(() => import('../pages/ProductosPage'));
-const PedidosPage = lazy(() => import('../pages/PedidosPage'));
+const VentasPage = lazy(() => import('../pages/VentasPage'));
 const PagosPage = lazy(() => import('../pages/PagosPage'));
-const CobrosPage = lazy(() => import('../pages/CobrosPage'));
 const PrestamosPage = lazy(() => import('../pages/PrestamosPage'));
-const FacturasPage = lazy(() => import('../pages/FacturasPage'));
+const EstadoCuentaPage = lazy(() => import('../pages/EstadoCuentaPage'));
+const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
+const ForbiddenPage = lazy(() => import('../pages/ForbiddenPage'));
 
 // Fallback de carga elegante y sin parpadeos
 function PageLoadingFallback() {
@@ -49,6 +49,7 @@ function PageLoadingFallback() {
 
 /**
  * Enrutador modular principal de la aplicación optimizado con Code Splitting.
+ * Implementa el patrón canónico con PrivateRoutes (guardián único + Layout persistente con Outlet).
  */
 export default function AppRoutes() {
   return (
@@ -57,97 +58,27 @@ export default function AppRoutes() {
         {/* Ruta Pública de Autenticación */}
         <Route path={ROUTES.LOGIN} element={<LoginPage />} />
 
-        {/* Rutas Protegidas dentro del Layout SPA */}
-        <Route
-          path={ROUTES.DASHBOARD}
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <DashboardPage />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
+        {/* Páginas de Estado HTTP y Seguridad (Acceso público/general) */}
+        <Route path={ROUTES.FORBIDDEN} element={<ForbiddenPage />} />
+        <Route path={ROUTES.NOT_FOUND} element={<NotFoundPage />} />
 
-        <Route
-          path={ROUTES.CLIENTES}
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <ClientesPage />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
+        {/* Redirección canónica de la raíz al Dashboard con nombre */}
+        <Route path="/" element={<Navigate to={ROUTES.DASHBOARD} replace />} />
 
-        <Route
-          path={ROUTES.PRODUCTOS}
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <ProductosPage />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
+        {/* Rutas Protegidas bajo el Guardián Único Reutilizable (PrivateRoutes) */}
+        <Route element={<PrivateRoutes />}>
+          <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
+          <Route path={ROUTES.CLIENTES} element={<ClientesPage />} />
+          <Route path={ROUTES.PRODUCTOS} element={<ProductosPage />} />
+          <Route path={ROUTES.VENTAS} element={<VentasPage />} />
+          <Route path="/pedidos" element={<Navigate to={ROUTES.VENTAS} replace />} />
+          <Route path={ROUTES.PAGOS} element={<PagosPage />} />
+          <Route path={ROUTES.PRESTAMOS} element={<PrestamosPage />} />
+          <Route path={ROUTES.ESTADO_CUENTA} element={<EstadoCuentaPage />} />
+        </Route>
 
-        <Route
-          path={ROUTES.PEDIDOS}
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <PedidosPage />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path={ROUTES.PAGOS}
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <PagosPage />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path={ROUTES.COBROS}
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <CobrosPage />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path={ROUTES.PRESTAMOS}
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <PrestamosPage />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path={ROUTES.FACTURAS}
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <FacturasPage />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Redirección por defecto */}
-        <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
+        {/* Comodín 404 para cualquier ruta inexistente */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Suspense>
   );

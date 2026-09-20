@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documento de Requerimientos de Software (SRS V4.0) — ME Variedades</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ==========================================================================
+       SISTEMA DE ESTILOS TIPOGRÁFICOS Y DE IMPRESIÓN — SRS V4.0 ME VARIEDADES
+       ========================================================================== */
+    :root {
+      --font-title: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      --color-primario: #8d4f62;
+      --color-primario-oscuro: #5e2634;
+      --color-rosa-pastel: #f9dbe4;
+      --color-rosa-acento: #e598ad;
+      --color-cyan: #0d9488;
+      --color-cyan-bg: #f0fdfa;
+      --color-dorado: #b45309;
+      --color-dorado-bg: #fffbeb;
+
+      --color-texto: #1e1b1c;
+      --color-texto-suave: #4a4446;
+      --color-texto-muted: #736b6e;
+      --color-fondo: #ffffff;
+      --color-fondo-alt: #fdfafb;
+      --color-borde: #ebd8df;
+      --color-borde-subtle: #f3e9ed;
+
+      --sombra-card: 0 4px 16px rgba(141, 79, 98, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      font-size: 10.5pt;
+      line-height: 1.55;
+      color: var(--color-texto);
+      background-color: #ede8ea;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Contenedor tipo Hoja para vista en Pantalla */
+    .document-wrapper {
+      max-width: 900px;
+      margin: 30px auto;
+      background: var(--color-fondo);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+      border-radius: 8px;
+    }
+
+    .page {
+      padding: 48px 56px;
+      background: #ffffff;
+      position: relative;
+    }
+
+    .page:not(:last-child) {
+      border-bottom: 1px solid var(--color-borde-subtle);
+    }
+
+    /* ==========================================================================
+       PORTADA PROFESIONAL (PÁGINA 1)
+       ========================================================================== */
+    .cover-page {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 1060px;
+      padding: 80px 60px 60px;
+      text-align: center;
+      background: linear-gradient(180deg, #ffffff 0%, #fffbfc 50%, #faf3f5 100%);
+    }
+
+    .cover-header-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 18px;
+      background: var(--color-rosa-pastel);
+      color: var(--color-primario-oscuro);
+      border-radius: 999px;
+      font-size: 8.5pt;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin: 0 auto 24px;
+    }
+
+    .cover-title-main {
+      font-family: var(--font-title);
+      font-size: 32pt;
+      font-weight: 800;
+      color: var(--color-primario);
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .cover-subtitle {
+      font-size: 14pt;
+      font-weight: 500;
+      color: var(--color-texto-suave);
+      margin-bottom: 40px;
+    }
+
+    .cover-brand-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 40px auto;
+      padding: 24px 36px;
+      background: #ffffff;
+      border: 1px solid var(--color-borde);
+      border-radius: 16px;
+      box-shadow: var(--sombra-card);
+      max-width: 440px;
+    }
+
+    .brand-logo-text {
+      font-family: var(--font-title);
+      font-size: 20pt;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+    }
+
+    .brand-logo-text .m-char { color: #1e1b1c; }
+    .brand-logo-text .e-char { color: var(--color-primario); }
+    .brand-logo-text .sub-text { font-size: 14pt; font-weight: 600; color: #4a4446; margin-left: 4px; }
+
+    .brand-tagline {
+      font-size: 9pt;
+      color: var(--color-texto-muted);
+      margin-top: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .cover-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      max-width: 580px;
+      margin: 0 auto;
+      text-align: left;
+      background: #ffffff;
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid var(--color-borde);
+    }
+
+    .meta-item-label {
+      font-size: 8pt;
+      font-weight: 700;
+      color: var(--color-primario);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 2px;
+    }
+
+    .meta-item-value {
+      font-size: 10pt;
+      font-weight: 600;
+      color: var(--color-texto);
+    }
+
+    .cover-footer {
+      font-size: 8.5pt;
+      color: var(--color-texto-muted);
+      border-top: 1px solid var(--color-borde);
+      padding-top: 20px;
+    }
+
+    /* ==========================================================================
+       ENCABEZADOS Y ESTRUCTURA DE SECCIONES
+       ========================================================================== */
+    .section-title {
+      font-family: var(--font-title);
+      font-size: 16pt;
+      font-weight: 700;
+      color: var(--color-primario);
+      letter-spacing: -0.01em;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--color-rosa-pastel);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .section-title:first-child {
+      margin-top: 0;
+    }
+
+    .subsection-title {
+      font-family: var(--font-title);
+      font-size: 12pt;
+      font-weight: 700;
+      color: var(--color-primario-oscuro);
+      margin-top: 18px;
+      margin-bottom: 8px;
+    }
+
+    p {
+      margin-bottom: 10px;
+      color: var(--color-texto-suave);
+      text-align: justify;
+    }
+
+    /* ==========================================================================
+       TABLAS FORMATEADAS PARA SRS
+       ========================================================================== */
+    .table-container {
+      width: 100%;
+      margin: 14px 0 20px;
+      overflow: hidden;
+      border: 1px solid var(--color-borde);
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9pt;
+      text-align: left;
+    }
+
+    thead th {
+      background: var(--color-primario);
+      color: #ffffff;
+      font-family: var(--font-title);
+      font-weight: 600;
+      padding: 8px 12px;
+      text-transform: uppercase;
+      font-size: 8pt;
+      letter-spacing: 0.05em;
+      border: none;
+    }
+
+    tbody td {
+      padding: 7px 12px;
+      border-top: 1px solid var(--color-borde-subtle);
+      color: var(--color-texto-suave);
+      vertical-align: top;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: var(--color-fondo-alt);
+    }
+
+    .col-id {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--color-primario-oscuro);
+      white-space: nowrap;
+      width: 65px;
+    }
+
+    .col-priority {
+      text-align: center;
+      width: 85px;
+    }
+
+    /* Badges de Prioridad MoSCoW */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-must {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    .badge-should {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+
+    .badge-could {
+      background: #e0e7ff;
+      color: #3730a3;
+      border: 1px solid #c7d2fe;
+    }
+
+    .badge-feature {
+      background: var(--color-rosa-pastel);
+      color: var(--color-primario-oscuro);
+      border: 1px solid var(--color-rosa-acento);
+      font-weight: 600;
+    }
+
+    /* ==========================================================================
+       TARJETAS DE HISTORIAS DE USUARIO (HU)
+       ========================================================================== */
+    .user-story-card {
+      margin: 12px 0 16px;
+      padding: 14px 18px;
+      background: #ffffff;
+      border: 1px solid var(--color-borde);
+      border-left: 4px solid var(--color-primario);
+      border-radius: 6px;
+      box-shadow: var(--sombra-card);
+      page-break-inside: avoid;
+    }
+
+    .user-story-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .user-story-title {
+      font-family: var(--font-title);
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: var(--color-primario-oscuro);
+    }
+
+    .user-story-body {
+      font-size: 9pt;
+      margin-bottom: 8px;
+      color: var(--color-texto-suave);
+    }
+
+    .user-story-criteria-title {
+      font-size: 8.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--color-primario);
+      margin-top: 6px;
+      margin-bottom: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    ul.criteria-list {
+      list-style-type: none;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    ul.criteria-list li {
+      position: relative;
+      padding-left: 16px;
+      font-size: 8.8pt;
+      color: var(--color-texto-suave);
+      margin-bottom: 3px;
+    }
+
+    ul.criteria-list li::before {
+      content: "•";
+      position: absolute;
+      left: 4px;
+      color: var(--color-primario);
+      font-weight: bold;
+    }
+
+    /* Cajas Informativas Destacadas */
+    .info-callout {
+      padding: 12px 16px;
+      background: #fff5f7;
+      border: 1px solid #f2cfd9;
+      border-radius: 6px;
+      margin: 12px 0;
+      font-size: 9pt;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .info-callout.cyan {
+      background: var(--color-cyan-bg);
+      border-color: #99f6e4;
+      color: #115e59;
+    }
+
+    .info-callout-icon {
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .info-callout-content {
+      flex: 1;
+    }
+
+    .info-callout-title {
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    /* Lista Estándar */
+    ul.doc-list {
+      padding-left: 20px;
+      margin-bottom: 12px;
+    }
+
+    ul.doc-list li {
+      font-size: 9.5pt;
+      color: var(--color-texto-suave);
+      margin-bottom: 4px;
+    }
+
+    /* Pie de página de documento */
+    .page-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 32px;
+      padding-top: 10px;
+      border-top: 1px solid var(--color-borde-subtle);
+      font-size: 8pt;
+      color: var(--color-texto-muted);
+    }
+
+    /* ==========================================================================
+       REGLAS ESTRICTAS DE IMPRESIÓN (@media print)
+       ========================================================================== */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 16mm 14mm 16mm 14mm;
+      }
+
+      body {
+        background-color: #ffffff !important;
+        font-size: 9.5pt !important;
+        color: #000000 !important;
+      }
+
+      .document-wrapper {
+        max-width: 100% !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+      }
+
+      .page {
+        padding: 0 !important;
+        border: none !important;
+        page-break-after: always !important;
+        break-after: page !important;
+      }
+
+      .page:last-child {
+        page-break-after: auto !important;
+        break-after: auto !important;
+      }
+
+      .cover-page {
+        min-height: 98vh !important;
+        padding: 40px 20px 20px !important;
+      }
+
+      .page-break {
+        page-break-before: always !important;
+        break-before: page !important;
+      }
+
+      .no-break {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      thead th {
+        background-color: #8d4f62 !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .badge-must,
+      .badge-should,
+      .badge-could,
+      .badge-feature,
+      .info-callout,
+      .cover-header-tag {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .btn-print-floating {
+        display: none !important;
+      }
+    }
+
+    /* Botón flotante para imprimir en pantalla */
+    .btn-print-floating {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--color-primario);
+      color: #ffffff;
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-family: var(--font-title);
+      font-weight: 700;
+      font-size: 11pt;
+      box-shadow: 0 8px 24px rgba(141, 79, 98, 0.35);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 9999;
+      transition: all 0.2s ease;
+    }
+
+    .btn-print-floating:hover {
+      background: var(--color-primario-oscuro);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(94, 38, 52, 0.45);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Botón de Acción Rápida para Guardar en PDF -->
+  <button class="btn-print-floating" onclick="window.print()" title="Imprimir o Guardar en PDF (Ctrl + P)">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 9 6 2 18 2 18 9"></polyline>
+      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+      <rect x="6" y="14" width="12" height="8"></rect>
+    </svg>
+    <span>Imprimir / Guardar PDF (Ctrl+P)</span>
+  </button>
+
+  <div class="document-wrapper">
+
+    <!-- ======================================================================
+         PÁGINA 1: PORTADA OFICIAL SRS V4.0
+         ====================================================================== -->
+    <div class="page cover-page">
+      <div>
+        <div class="cover-header-tag">Especificación de Requerimientos de Software (SRS)</div>
+        <h1 class="cover-title-main">ESPECIFICACIÓN DE SOFTWARE</h1>
+        <div class="cover-subtitle">Automatización de Ventas, Préstamos y Cobro</div>
+      </div>
+
+      <div class="cover-brand-badge">
+        <div class="brand-logo-text">
+          <span class="m-char">M</span><span class="e-char">E</span><span class="sub-text">VARIEDADES</span>
+        </div>
+        <div class="brand-tagline">Plataforma Administrativa y Operativa</div>
+      </div>
+
+      <div>
+        <div class="cover-meta-grid">
+          <div>
+            <div class="meta-item-label">Proyecto</div>
+            <div class="meta-item-value">Proyecto María — Web App</div>
+          </div>
+          <div>
+            <div class="meta-item-label">Cliente / Negocio</div>
+            <div class="meta-item-value">ME Variedades</div>
+          </div>
+          <div>
+            <div class="meta-item-label">Administradora</div>
+            <div class="meta-item-value">María</div>
+          </div>
+          <div>
+            <div class="meta-item-label">Versión de Documento</div>
+            <div class="meta-item-value">Versión 4.0 (reemplaza a la v3.1)</div>
+          </div>
+          <div>
+            <div class="meta-item-label">Arquitectura</div>
+            <div class="meta-item-value">HTML5 + CSS3 + JavaScript · API REST</div>
+          </div>
+          <div>
+            <div class="meta-item-label">Fecha de Actualización</div>
+            <div class="meta-item-value">Septiembre 2026</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cover-footer">
+        Documento técnico confidencial elaborado para la administración exclusiva de ME Variedades.
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 2: INTRODUCCIÓN, OBJETIVOS Y MÉTRICAS
+         ====================================================================== -->
+    <div class="page">
+      <h2 class="section-title">1. Introducción y Contexto del Problema</h2>
+
+      <p>
+        <strong>ME Variedades</strong> es una empresa comercial dedicada a la venta de mercancía variada — indumentaria, calzado, accesorios, perfumería, maquillaje y aparatos electrónicos — que además vende a crédito y realiza préstamos de dinero a terceros. La versión 3.1 centralizó esta información en una plataforma web, pero la operación diaria reveló que el seguimiento de cobros seguía dependiendo de que la administradora recordara manualmente fechas y montos, sin automatización real del cálculo de cuotas ni de los recordatorios de pago.
+      </p>
+
+      <p>
+        Esta versión 4.0 actualiza el sistema para automatizar el cálculo de cuotas y fechas de pago (tanto en ventas a crédito como en préstamos), generar recordatorios visibles y accionables para la administradora, y entregar a cada cliente un estado de cuenta formal en PDF. El módulo de Cobros de la versión anterior se elimina, ya que su función quedaba cubierta de forma parcial y menos precisa; su funcionalidad se absorbe y mejora dentro de los módulos de Pagos y Cuentas por Cobrar, y de Préstamos.
+      </p>
+
+      <div class="info-callout">
+        <div class="info-callout-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+          </svg>
+        </div>
+        <div class="info-callout-content">
+          <strong>Propósito de la Versión 4.0:</strong> Automatizar el cálculo de fechas y montos de cuotas de Ventas y Préstamos, generar notificaciones de cobro accionables (con enlace directo a WhatsApp) y entregar un estado de cuenta descargable en PDF por cliente.
+        </div>
+      </div>
+
+      <h3 class="subsection-title">1.1 Objetivo General del Sistema</h3>
+      <p>
+        Evolucionar la plataforma web de ME Variedades para que el cálculo de cuotas, fechas de pago y avisos de cobro (de ventas a crédito y préstamos) sea automático, editable cuando la operación real lo requiera, y visible de forma inmediata para la administradora — reduciendo la dependencia de su memoria y del cálculo manual, y dejando evidencia formal (estado de cuenta) de cada cliente.
+      </p>
+
+      <h3 class="subsection-title">1.2 Métricas de Éxito</h3>
+      <ul class="doc-list">
+        <li><strong>0% de pagos fuera de fecha por olvido:</strong> ningún pago de préstamo o venta a crédito debe cobrarse tarde por falta de recordatorio.</li>
+        <li><strong>100% de fechas calculadas automáticamente:</strong> la administradora no debe calcular manualmente ninguna fecha de cuota.</li>
+        <li><strong>100% de avisos emitidos:</strong> un día antes y el mismo día de cada pago, con nombre del cliente y monto correcto.</li>
+        <li><strong>Estado de cuenta en menos de 10 segundos:</strong> generación y descarga del PDF de cualquier cliente de forma inmediata.</li>
+        <li><strong>Continuidad de las métricas de v3.1:</strong> 0% de extravío de datos y detección del 100% de cumpleaños de clientes.</li>
+      </ul>
+
+      <h3 class="subsection-title">1.3 Registro de Cambios respecto a la Versión 3.1</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">CAMBIO-01</td>
+              <td>Se elimina el módulo de Cobros. Su función de cálculo de días de cobro se traslada, mejorada, al módulo de Préstamos y al de Pagos y Cuentas por Cobrar.</td>
+              <td class="col-priority"><span class="badge badge-feature">Nuevo</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">CAMBIO-02</td>
+              <td>El módulo de Pedidos se renombra a Ventas, y se le agregan los campos: precio de facturación, precio de venta real, tipo y número de plazo, y cantidad de cuotas.</td>
+              <td class="col-priority"><span class="badge badge-feature">Nuevo</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">CAMBIO-03</td>
+              <td>El módulo de Préstamos incorpora tipo de plazo (semana/quincena/mes) y número de plazos en campos separados, cálculo automático de fechas de cuota y fecha final, y edición manual del monto sugerido por cuota (modelo híbrido).</td>
+              <td class="col-priority"><span class="badge badge-feature">Nuevo</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">CAMBIO-04</td>
+              <td>El módulo de Pagos y Cuentas por Cobrar incorpora el campo tipo de pago (semanal/quincenal/mensual).</td>
+              <td class="col-priority"><span class="badge badge-feature">Nuevo</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">CAMBIO-05</td>
+              <td>Nuevo módulo: Estado de Cuenta por cliente, con descarga en PDF.</td>
+              <td class="col-priority"><span class="badge badge-feature">Nuevo</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">CAMBIO-06</td>
+              <td>Nuevo módulo transversal: Notificaciones de cobro, con recuadro destacado en el dashboard y enlace directo a WhatsApp.</td>
+              <td class="col-priority"><span class="badge badge-feature">Nuevo</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 2 de 17</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 3: ACTORES, ROLES Y ALCANCE V4.0
+         ====================================================================== -->
+    <div class="page">
+      <h2 class="section-title">2. Actores y Usuarios del Sistema</h2>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 170px;">Rol / Actor</th>
+              <th>Descripción y Responsabilidades</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Administradora<br>(María)</strong></td>
+              <td>Acceso total: agrega, edita y elimina clientes, productos y el contenido de cada módulo (Pagos y Cuentas por Cobrar, Ventas, Préstamos); ve el dashboard completo, el historial, las notificaciones de cobro y descarga estados de cuenta.</td>
+            </tr>
+            <tr>
+              <td><strong>Colaborador</strong></td>
+              <td>Acceso a las operaciones del día a día (registrar clientes, productos y ventas) sin permiso para editar ni eliminar registros, ni para gestionar préstamos.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="section-title">3. Alcance del Sistema (Versión 4.0)</h2>
+
+      <h3 class="subsection-title">3.1 Dentro del Alcance</h3>
+      <ul class="doc-list">
+        <li><strong>Login personalizado</strong> con el nombre de la administradora (María) y estilo visual moderno, aesthetic y futurista (sin cambios respecto a v3.1).</li>
+        <li><strong>Dashboard</strong> con acceso a Clientes, Pagos y Cuentas por Cobrar, Productos, Ventas, Préstamos, Estado de Cuenta y Asistente Virtual, más el recuadro de notificaciones de cobro.</li>
+        <li><strong>Gestión de Clientes:</strong> alta, edición, validación de campos, calendario de cumpleaños, aviso de cumpleaños, buscador y eliminación con reglas de restricción (sin cambios respecto a v3.1).</li>
+        <li><strong>Gestión de Productos:</strong> alta y edición con imagen, tipo, categoría y costo; buscador por tipo; control de stock; eliminación (sin cambios respecto a v3.1).</li>
+        <li><strong>Pagos y Cuentas por Cobrar</strong> por cliente, incluyendo tipo de pago (semanal/quincenal/mensual).</li>
+        <li><strong>Ventas</strong> (antes Pedidos): precio de facturación, precio de venta real, tipo y número de plazo, y cálculo automático de cuotas y fechas.</li>
+        <li><strong>Préstamos:</strong> tipo y número de plazo, cálculo automático de fechas de cuota y fecha final, cálculo híbrido de interés y cuotas (sugerido y editable).</li>
+        <li><strong>Estado de Cuenta</strong> por cliente, con descarga en PDF.</li>
+        <li><strong>Notificaciones de cobro</strong> en el dashboard (préstamos, ventas y pagos a crédito), con enlace directo a WhatsApp del cliente.</li>
+        <li><strong>Asistente virtual</strong> (chatbot) integrado con un servicio de IA para resolver dudas de uso de la plataforma (sin cambios respecto a v3.1).</li>
+      </ul>
+
+      <h3 class="subsection-title">3.2 Fuera del Alcance (Versiones Futuras)</h3>
+      <ul class="doc-list">
+        <li>Facturación electrónica ante el Ministerio de Hacienda.</li>
+        <li>Pasarela de pagos en línea con tarjeta (se mantiene el registro manual de pagos).</li>
+        <li>Envío automático de mensajes de WhatsApp vía API (en esta versión el envío es manual, mediante un enlace directo que abre la conversación).</li>
+        <li>Aplicación móvil nativa (se entrega solo aplicación web responsiva adaptada a móviles).</li>
+        <li>Módulo de Cobros de la versión 3.1 (eliminado; ver CAMBIO-01).</li>
+      </ul>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 3 de 17</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 4: REQUERIMIENTOS FUNCIONALES (AUTENTICACIÓN Y DASHBOARD)
+         ====================================================================== -->
+    <div class="page">
+      <h2 class="section-title">4. Requerimientos Funcionales (RF)</h2>
+
+      <h3 class="subsection-title">4.1 Autenticación (Login)</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RF-01</td>
+              <td>El sistema debe permitir el inicio de sesión de María mediante usuario/correo y contraseña.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-02</td>
+              <td>El login debe mostrar el nombre de la administradora (María) y un diseño visual moderno, aesthetic y futurista.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-03</td>
+              <td>El sistema debe mostrar retroalimentación visual clara cuando el usuario o la contraseña sean incorrectos.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-04</td>
+              <td>El sistema debe restringir el acceso al dashboard y a los módulos a usuarios no autenticados.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="subsection-title">4.2 Dashboard</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RF-05</td>
+              <td>El dashboard debe dar acceso a los módulos de Clientes, Pagos y Cuentas por Cobrar, Productos, Ventas, Préstamos, Estado de Cuenta y al Asistente Virtual.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-06</td>
+              <td>El dashboard debe mostrar un aviso visual de los clientes que cumplen años en el día o en la semana, para gestionar su gratificación.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-07</td>
+              <td>El dashboard debe mostrar indicadores generales: total de clientes, saldo pendiente de cobro, préstamos activos y productos con stock bajo.</td>
+              <td class="col-priority"><span class="badge badge-should">Should</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-08</td>
+              <td>El dashboard debe mostrar un recuadro de notificaciones de cobro, visualmente destacado (color de alerta, ubicación prioritaria), independiente del aviso de cumpleaños.</td>
+              <td class="col-priority"><span class="badge badge-feature">Nuevo</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 4 de 17</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 5: REQUERIMIENTOS FUNCIONALES (CLIENTES)
+         ====================================================================== -->
+    <div class="page">
+      <h3 class="subsection-title">4.3 Módulo de Clientes</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RF-09</td>
+              <td>El sistema debe permitir agregar un cliente con nombre completo, fecha de cumpleaños (mes y día) y número de teléfono.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-10</td>
+              <td>El calendario de cumpleaños debe permitir seleccionar el mes y el día correspondiente según el mes elegido.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-11</td>
+              <td>El sistema debe validar cada campo del alta de cliente y mostrar un mensaje de error específico si algún dato es inválido o está incompleto.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-12</td>
+              <td>El sistema debe visualizar a los clientes que cumplen años en la fecha actual, para gestionar su gratificación.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-13</td>
+              <td>El módulo de clientes debe incluir un buscador por nombre que filtre la lista.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-14</td>
+              <td>El administrador debe poder editar los datos de un cliente ya registrado.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-15</td>
+              <td>El administrador debe poder eliminar un cliente del listado.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-16</td>
+              <td>El sistema no debe permitir eliminar un cliente con ventas, pagos pendientes o préstamos activos a su nombre; debe mostrar el motivo.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-17</td>
+              <td>El sistema debe solicitar confirmación antes de eliminar un cliente.</td>
+              <td class="col-priority"><span class="badge badge-should">Should</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 5 de 17</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 6: REQUERIMIENTOS FUNCIONALES (PAGOS Y PRODUCTOS)
+         ====================================================================== -->
+    <div class="page">
+      <h3 class="subsection-title">4.4 Módulo de Pagos y Cuentas por Cobrar</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RF-18</td>
+              <td>El módulo de pagos debe mostrar la lista de clientes registrados en el módulo de clientes.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-19</td>
+              <td>El sistema debe permitir registrar la fecha de pago acordada para cada cliente y el tipo de pago (semanal, quincenal o mensual).</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-20</td>
+              <td>El sistema debe registrar los pagos realizados por cada cliente y calcular el saldo pendiente.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-21</td>
+              <td>El sistema debe listar los pagos pendientes de cada cliente, indicando el monto adeudado.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-22</td>
+              <td>El sistema debe señalar visualmente los pagos que están vencidos.</td>
+              <td class="col-priority"><span class="badge badge-should">Should</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-23</td>
+              <td>El administrador debe poder editar o eliminar un pago ya registrado, con confirmación previa para la eliminación.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="subsection-title">4.5 Módulo de Productos</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RF-24</td>
+              <td>El sistema debe permitir agregar un producto con: imagen, nombre, tipo de producto y costo.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-25</td>
+              <td>El tipo de producto debe seleccionarse entre: perfume, camisa, short, pantalón, accesorio, zapato, crocs, maquillaje, vestido y aparato electrónico.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-26</td>
+              <td>Si el tipo seleccionado no es maquillaje, el sistema debe solicitar además si el producto es de hombre o de mujer.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-27</td>
+              <td>El sistema debe permitir tomar una foto con la cámara o elegir una imagen de la galería del dispositivo.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-28</td>
+              <td>El módulo de productos debe incluir un buscador que filtre según el tipo de producto.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-29</td>
+              <td>El sistema debe mostrar el stock disponible de cada tipo de producto.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-30</td>
+              <td>El administrador debe poder editar los datos de un producto ya registrado.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-31</td>
+              <td>Al eliminar un producto, el sistema debe restar automáticamente la unidad correspondiente del stock.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 6 de 17</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 7: REQUERIMIENTOS FUNCIONALES (VENTAS)
+         ====================================================================== -->
+    <div class="page">
+      <h3 class="subsection-title">4.6 Módulo de Ventas (antes "Pedidos")</h3>
+      <div class="info-callout">
+        <div class="info-callout-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+          </svg>
+        </div>
+        <div class="info-callout-content">
+          <strong>Nota de diseño:</strong> el módulo de Pedidos se renombra a Ventas y amplía sus campos para soportar ventas a crédito con cuotas, usando el mismo motor de cálculo de fechas y montos que Préstamos (ver 4.7), para que todo el sistema calcule fechas de una sola forma.
+        </div>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RF-32</td>
+              <td>El sistema debe permitir buscar un cliente y, desde su ficha, crear una nueva venta.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-33</td>
+              <td>Al crear una venta, el sistema debe mostrar la lista de productos disponibles para seleccionar el o los productos deseados.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-34</td>
+              <td>El sistema debe registrar, para cada venta: el precio de facturación del producto y el precio real al que se vendió.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-35</td>
+              <td>Si la venta es a crédito, el sistema debe permitir registrar el tipo de plazo (semana, quincena o mes) y el número de plazos, en campos separados.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-36</td>
+              <td>El sistema debe calcular automáticamente, a partir de la fecha de la venta, el tipo de plazo y el número de plazos, la fecha de cada cuota y la fecha final de pago, contando los días de forma exacta (semana = 7 días, quincena = 15 días, mes = 30 días).</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-37</td>
+              <td>El sistema debe calcular automáticamente el monto sugerido de cada cuota, dividiendo el precio de venta entre el número de cuotas.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-38</td>
+              <td>El administrador debe poder editar manualmente el monto sugerido de cualquier cuota antes de confirmar la venta, conservando el valor calculado como referencia.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-39</td>
+              <td>El sistema debe descontar del stock del producto la cantidad incluida en la venta.</td>
+              <td class="col-priority"><span class="badge badge-should">Should</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-40</td>
+              <td>El administrador debe poder editar o eliminar una venta ya registrada.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 7 de 17</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 8: REQUERIMIENTOS FUNCIONALES (PRÉSTAMOS)
+         ====================================================================== -->
+    <div class="page">
+      <h3 class="subsection-title">4.7 Módulo de Préstamos</h3>
+      <div class="info-callout">
+        <div class="info-callout-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+          </svg>
+        </div>
+        <div class="info-callout-content">
+          <strong>Nota de diseño:</strong> el cálculo de fechas usa conteo de días exactos desde la fecha de entrega del préstamo (no fechas fijas de calendario), para evitar ambigüedad con fin de mes. El cálculo del monto de interés es un modelo híbrido: el sistema sugiere, pero la administradora puede ajustar antes de confirmar.
+        </div>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RF-41</td>
+              <td>El sistema debe permitir registrar un préstamo indicando la persona (cliente o tercero), el monto del capital y la fecha de entrega del dinero (mediante calendario).</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-42</td>
+              <td>El sistema debe permitir definir la tasa de interés del préstamo.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-43</td>
+              <td>El sistema debe permitir registrar, en campos separados, el tipo de plazo (semana, quincena o mes) y el número de plazos (por ejemplo: tipo = quincena, número = 2).</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-44</td>
+              <td>A partir de la fecha de entrega, el tipo de plazo y el número de plazos, el sistema debe calcular automáticamente la fecha de cada cuota y la fecha final del préstamo, contando los días de forma exacta (semana = 7 días, quincena = 15 días, mes = 30 días, sin excepciones de fin de mes).</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-45</td>
+              <td>El sistema debe calcular automáticamente el monto total a devolver (capital más interés) y el valor sugerido de cada cuota.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-46</td>
+              <td>El administrador debe poder editar manualmente el monto sugerido de cualquier cuota antes de confirmar el registro del préstamo. El sistema debe conservar tanto el valor calculado originalmente como el valor real acordado.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-47</td>
+              <td>El sistema debe listar los préstamos activos con su estado (al día, próximo a vencer, atrasado).</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-48</td>
+              <td>El sistema debe permitir registrar abonos a un préstamo y actualizar el saldo pendiente.</td>
+              <td class="col-priority"><span class="badge badge-should">Should</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-49</td>
+              <td>El administrador debe poder editar los términos de un préstamo o eliminarlo, con confirmación previa.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 8 de 17</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 9: ESTADO DE CUENTA Y NOTIFICACIONES DE COBRO
+         ====================================================================== -->
+    <div class="page">
+      <h3 class="subsection-title">4.8 Módulo de Estado de Cuenta (Nuevo)</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RF-50</td>
+              <td>El sistema debe permitir consultar, por cliente, un estado de cuenta combinado con el historial de ventas a crédito y préstamos: montos, fechas de cuota, pagos realizados y saldo pendiente.</td>
+              <td class="col-priority"><span class="badge badge-feature">Nuevo</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-51</td>
+              <td>El sistema debe permitir descargar el estado de cuenta de un cliente en formato PDF.</td>
+              <td class="col-priority"><span class="badge badge-feature">Nuevo</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-52</td>
+              <td>El PDF del estado de cuenta debe incluir: nombre del cliente, detalle de cada movimiento (venta o préstamo), montos, fechas, saldo total pendiente y fecha de generación del documento.</td>
+              <td class="col-priority"><span class="badge badge-feature">Nuevo</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="subsection-title">4.9 Notificaciones de Cobro (Nuevo, transversal a Ventas, Pagos y Préstamos)</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RF-53</td>
+              <td>El sistema debe generar una notificación un día antes y el mismo día de la fecha en que un cliente debe pagar una cuota de préstamo, venta a crédito o cuenta por cobrar.</td>
+              <td class="col-priority"><span class="badge badge-feature">Nuevo</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-54</td>
+              <td>Cada notificación debe mostrar el nombre del cliente y el monto que debe pagar en esa fecha.</td>
+              <td class="col-priority"><span class="badge badge-feature">Nuevo</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-55</td>
+              <td>Las notificaciones vigentes del día deben mostrarse en el recuadro destacado del dashboard (ver RF-08).</td>
+              <td class="col-priority"><span class="badge badge-feature">Nuevo</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-56</td>
+              <td>Cada notificación debe incluir un enlace directo a WhatsApp (con el número del cliente) para que la administradora pueda contactarlo con un solo toque.</td>
+              <td class="col-priority"><span class="badge badge-feature">Nuevo</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 9 de 17</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 10: ASISTENTE VIRTUAL, ESTILO VISUAL Y MANEJO DE ERRORES
+         ====================================================================== -->
+    <div class="page">
+      <h3 class="subsection-title">4.10 Asistente Virtual (Chatbot con IA)</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RF-57</td>
+              <td>El sistema debe integrar un asistente virtual (chatbot) accesible desde cualquier pantalla de la plataforma (botón flotante).</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-58</td>
+              <td>El chatbot debe responder preguntas del usuario sobre el funcionamiento y uso de la plataforma.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-59</td>
+              <td>El chatbot debe conectarse a un servicio de inteligencia artificial mediante una API key para generar sus respuestas.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RF-60</td>
+              <td>La API key del servicio de IA debe resguardarse en un servidor/endpoint intermedio; el frontend nunca debe contener la API key en texto plano.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="subsection-title">4.11 Estilo Visual y Multiplataforma</h3>
+      <ul class="doc-list">
+        <li>Paleta oscura con acentos en degradado (violeta/azul eléctrico) sobre fondo gris azulado muy oscuro, para un look futurista (sin cambios respecto a v3.1).</li>
+        <li>Tarjetas con bordes redondeados, sombras suaves y efecto "glassmorphism" en paneles del dashboard.</li>
+        <li>El recuadro de notificaciones de cobro (RF-08) debe diferenciarse visualmente del resto del dashboard mediante un color de alerta (por ejemplo, ámbar o rojo suave), para que sea imposible de pasar por alto.</li>
+        <li>Tipografía moderna sin serifas, con jerarquía clara entre títulos y datos.</li>
+        <li>Diseño 100% responsivo: celular, tablet y computadora.</li>
+      </ul>
+
+      <h3 class="subsection-title">4.12 Manejo de Errores</h3>
+      <ul class="doc-list">
+        <li>Todo campo obligatorio vacío debe mostrar un mensaje de error específico al intentar guardar.</li>
+        <li>El número de teléfono debe validarse en formato numérico y con la cantidad de dígitos esperada.</li>
+        <li>El calendario de cumpleaños y las fechas de entrega de venta/préstamo no deben permitir un día inválido para el mes seleccionado.</li>
+        <li>Si el número de plazos digitado es cero o negativo, el sistema debe rechazar el registro y explicar el motivo.</li>
+        <li>Toda acción de edición o eliminación bloqueada por una regla de negocio (por ejemplo RF-16) debe mostrar un mensaje explicando por qué no se puede realizar.</li>
+      </ul>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 10 de 17</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 11: REQUERIMIENTOS NO FUNCIONALES (RNF)
+         ====================================================================== -->
+    <div class="page">
+      <h2 class="section-title">5. Requerimientos No Funcionales (RNF)</h2>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              <th style="width: 140px;">Categoría</th>
+              <th>Descripción del Requerimiento</th>
+              <th class="col-priority">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id">RNF-01</td>
+              <td><strong>Rendimiento</strong></td>
+              <td>La carga de cualquier módulo o tabla de datos no debe exceder los 2 segundos.</td>
+              <td class="col-priority"><span class="badge badge-should">Should</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RNF-02</td>
+              <td><strong>Seguridad</strong></td>
+              <td>La contraseña de acceso debe almacenarse cifrada, las rutas del dashboard deben requerir sesión activa y la API key del chatbot debe protegerse en el backend.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RNF-03</td>
+              <td><strong>Usabilidad</strong></td>
+              <td>La interfaz debe mantener el estilo moderno, aesthetic y futurista solicitado, con buena legibilidad y contraste.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RNF-04</td>
+              <td><strong>Multiplataforma</strong></td>
+              <td>La aplicación debe poder utilizarse desde celulares, computadoras y tablets, con diseño responsivo (mobile-first).</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RNF-05</td>
+              <td><strong>Persistencia</strong></td>
+              <td>Los datos de clientes, productos, pagos, ventas y préstamos deben mantenerse guardados de forma permanente.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RNF-06</td>
+              <td><strong>Disponibilidad</strong></td>
+              <td>El sistema debe estar accesible durante el horario en que la administradora gestiona el negocio.</td>
+              <td class="col-priority"><span class="badge badge-could">Could</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RNF-07</td>
+              <td><strong>Permisos</strong></td>
+              <td>Toda operación de edición o eliminación debe validar en el servidor que el usuario tiene el rol adecuado, no solo ocultar el botón en la interfaz.</td>
+              <td class="col-priority"><span class="badge badge-must">Must</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RNF-08</td>
+              <td><strong>Consistencia de cálculo</strong></td>
+              <td>La lógica de conteo de días de plazo (semana = 7, quincena = 15, mes = 30) debe implementarse en una única función compartida, utilizada tanto por Ventas como por Préstamos, para evitar resultados distintos entre módulos.</td>
+              <td class="col-priority"><span class="badge badge-feature">Nuevo</span></td>
+            </tr>
+            <tr>
+              <td class="col-id">RNF-09</td>
+              <td><strong>Puntualidad</strong></td>
+              <td>Las notificaciones de cobro (RF-53) deben generarse y estar visibles en el dashboard antes de las 8:00 a.m. del día correspondiente.</td>
+              <td class="col-priority"><span class="badge badge-should">Should</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 11 de 17</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 12: HISTORIAS DE USUARIO (1/3)
+         ====================================================================== -->
+    <div class="page">
+      <h2 class="section-title">6. Historias de Usuario (HU) y Criterios de Aceptación</h2>
+
+      <div class="user-story-card">
+        <div class="user-story-header">
+          <span class="user-story-title">HU-01: Registro de una venta a crédito con cálculo automático de cuotas</span>
+          <span class="badge badge-must">Must</span>
+        </div>
+        <div class="user-story-body">
+          <strong>Como:</strong> María, administradora del sistema<br>
+          <strong>Quiero:</strong> Registrar una venta a un cliente indicando el precio de facturación, el precio real de venta, el tipo de plazo y el número de plazos<br>
+          <strong>Para:</strong> Que el sistema calcule automáticamente las fechas y montos de cada cuota, sin tener que calcularlos yo misma
+        </div>
+        <div class="user-story-criteria-title">Criterios de Aceptación:</div>
+        <ul class="criteria-list">
+          <li>El formulario solicita producto, precio de facturación, precio de venta, tipo de plazo y número de plazos.</li>
+          <li>Al guardar los datos del plazo, el sistema muestra la fecha de cada cuota y el monto sugerido, calculados automáticamente.</li>
+          <li>María puede ajustar el monto de una cuota específica antes de confirmar, sin perder el cálculo de referencia.</li>
+          <li>La venta queda asociada al cliente y visible en su estado de cuenta.</li>
+        </ul>
+      </div>
+
+      <div class="user-story-card">
+        <div class="user-story-header">
+          <span class="user-story-title">HU-02: Registro de un préstamo con fechas automáticas</span>
+          <span class="badge badge-must">Must</span>
+        </div>
+        <div class="user-story-body">
+          <strong>Como:</strong> María, administradora del sistema<br>
+          <strong>Quiero:</strong> Registrar un préstamo indicando el capital, la tasa de interés, la fecha de entrega, el tipo de plazo y el número de plazos<br>
+          <strong>Para:</strong> Que el sistema calcule automáticamente cuándo debe pagar el cliente cada cuota y cuándo vence el préstamo, sin contar los días manualmente
+        </div>
+        <div class="user-story-criteria-title">Criterios de Aceptación:</div>
+        <ul class="criteria-list">
+          <li>El formulario solicita persona, monto, tasa de interés, fecha de entrega (calendario), tipo de plazo (semana/quincena/mes) y número de plazos, en campos separados.</li>
+          <li>Ejemplo: tipo de plazo = quincena, número = 2, fecha de entrega = ayer → el sistema calcula la fecha de la primera cuota (a 15 días) y la fecha final (a 30 días).</li>
+          <li>El sistema muestra el monto total a devolver y el monto sugerido de cada cuota antes de guardar.</li>
+          <li>María puede ajustar manualmente el monto de una cuota si el acuerdo real con el cliente es distinto al calculado.</li>
+          <li>El préstamo aparece en la lista de préstamos activos con su estado (al día, próximo a vencer, atrasado).</li>
+        </ul>
+      </div>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 12 de 17</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 13: HISTORIAS DE USUARIO (2/3)
+         ====================================================================== -->
+    <div class="page">
+      <div class="user-story-card">
+        <div class="user-story-header">
+          <span class="user-story-title">HU-03: Aviso de cobro del día con acceso directo a WhatsApp</span>
+          <span class="badge badge-must">Must</span>
+        </div>
+        <div class="user-story-body">
+          <strong>Como:</strong> María, administradora del sistema<br>
+          <strong>Quiero:</strong> Ver de forma inmediata en el dashboard qué clientes deben pagar hoy o mañana, cuánto deben pagar, y poder escribirles por WhatsApp con un solo toque<br>
+          <strong>Para:</strong> No olvidar ningún cobro y poder recordarle al cliente el mismo día que le corresponde pagar
+        </div>
+        <div class="user-story-criteria-title">Criterios de Aceptación:</div>
+        <ul class="criteria-list">
+          <li>El dashboard muestra un recuadro destacado (color de alerta) con los clientes que tienen pago de préstamo, venta a crédito o cuenta por cobrar programado para hoy o mañana.</li>
+          <li>Cada aviso muestra el nombre del cliente y el monto exacto a pagar.</li>
+          <li>Cada aviso incluye un botón o enlace que abre directamente la conversación de WhatsApp con ese cliente.</li>
+          <li>El aviso se genera automáticamente un día antes y el mismo día de la fecha de pago, sin que María tenga que revisarlo manualmente cliente por cliente.</li>
+        </ul>
+      </div>
+
+      <div class="user-story-card">
+        <div class="user-story-header">
+          <span class="user-story-title">HU-04: Descarga del estado de cuenta de un cliente</span>
+          <span class="badge badge-must">Must</span>
+        </div>
+        <div class="user-story-body">
+          <strong>Como:</strong> María, administradora del sistema<br>
+          <strong>Quiero:</strong> Descargar en PDF el estado de cuenta de un cliente específico<br>
+          <strong>Para:</strong> Tener un respaldo formal de lo que el cliente debe, sus pagos realizados y su saldo, para mostrarlo si el cliente tiene dudas o reclamos
+        </div>
+        <div class="user-story-criteria-title">Criterios de Aceptación:</div>
+        <ul class="criteria-list">
+          <li>Desde la ficha del cliente hay un botón "Descargar estado de cuenta".</li>
+          <li>El PDF generado incluye nombre del cliente, historial de ventas a crédito y préstamos, pagos realizados, saldo pendiente y fecha de generación.</li>
+          <li>El PDF se descarga correctamente desde celular, tablet y computadora.</li>
+        </ul>
+      </div>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 13 de 17</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 14: HISTORIAS DE USUARIO (3/3)
+         ====================================================================== -->
+    <div class="page">
+      <div class="user-story-card">
+        <div class="user-story-header">
+          <span class="user-story-title">HU-05: Intento de eliminar un cliente con actividad pendiente</span>
+          <span class="badge badge-must">Must</span>
+        </div>
+        <div class="user-story-body">
+          <strong>Como:</strong> María, administradora del sistema<br>
+          <strong>Quiero:</strong> Que el sistema me impida eliminar por error a un cliente que todavía tiene ventas, pagos o préstamos activos<br>
+          <strong>Para:</strong> No perder el historial de un cliente con quien la empresa todavía tiene cuentas pendientes
+        </div>
+        <div class="user-story-criteria-title">Criterios de Aceptación:</div>
+        <ul class="criteria-list">
+          <li>Al presionar "Eliminar" sobre un cliente con actividad pendiente, el sistema no borra el registro.</li>
+          <li>Se muestra un mensaje indicando que el cliente tiene ventas, pagos o préstamos activos y por eso no puede eliminarse.</li>
+          <li>Un cliente sin actividad pendiente sí puede eliminarse, previa confirmación.</li>
+        </ul>
+      </div>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 14 de 17</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 15: MATRIZ DE PRIORIZACIÓN MOSCOW
+         ====================================================================== -->
+    <div class="page">
+      <h2 class="section-title">7. Matriz de Priorización MoSCoW</h2>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 140px;">Categoría</th>
+              <th>Requerimientos Incluidos</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-must">Must<br>(Imprescindibles)</span></td>
+              <td>RF-01 a RF-06, RF-09 a RF-21, RF-23 a RF-27, RF-29 a RF-36, RF-38, RF-40 a RF-47, RF-49 a RF-54, RF-56 a RF-60 · RNF-02 a RNF-05, RNF-07</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-should">Should<br>(Importantes)</span></td>
+              <td>RF-07, RF-17, RF-22, RF-28, RF-39, RF-48, RNF-01, RNF-09</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-could">Could<br>(Deseables)</span></td>
+              <td>RNF-06</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-feature">Nuevo<br>en v4.0</span></td>
+              <td>RF-08, RF-50 a RF-56, RNF-08 (marcados también con su prioridad Must/Should original)</td>
+            </tr>
+            <tr>
+              <td><span class="badge" style="background:#fee2e2; color:#991b1b; border:1px solid #fecaca;">Won't<br>(Fuera del MVP)</span></td>
+              <td>Facturación electrónica, pasarela de pagos en línea, aplicación móvil nativa, envío automático de WhatsApp vía API, módulo de Cobros (eliminado)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 15 de 17</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 16: ESPECIFICACIÓN TÉCNICA DE IMPLEMENTACIÓN
+         ====================================================================== -->
+    <div class="page">
+      <h2 class="section-title">8. Especificación Técnica de Implementación (HTML, CSS y JS)</h2>
+
+      <h3 class="subsection-title">8.1 Arquitectura General</h3>
+      <ul class="doc-list">
+        <li>Estructura de carpetas: /index.html (login), /dashboard.html, /modules/ clientes.html, pagos.html, productos.html, ventas.html, prestamos.html, estado-cuenta.html; /css/ variables.css, base.css, components.css; /js/ con un archivo por módulo (auth.js, clientes.js, pagos.js, ventas.js, prestamos.js, estado-cuenta.js, notificaciones.js) más utils.js y api.js compartidos.</li>
+        <li>El módulo de Cobros (cobros.html / cobros.js) de la v3.1 se elimina del proyecto; su lógica de cálculo de días se traslada a utils.js (ver 8.6).</li>
+        <li>JavaScript en módulos ES6 (import/export) para mantener cada módulo funcional aislado.</li>
+        <li>Backend/API REST como fuente de verdad de los datos; localStorage solo como caché temporal.</li>
+      </ul>
+
+      <h3 class="subsection-title">8.2 Módulo de Ventas</h3>
+      <ul class="doc-list">
+        <li>HTML: formulario con producto, precio de facturación, precio de venta, selector de tipo de plazo (semana/quincena/mes) y campo numérico de cantidad de plazos.</li>
+        <li>JS: al completar tipo y número de plazo, <code>calcularFechasYCuotas(fechaInicio, tipoPlazo, numPlazos, montoTotal)</code> (función compartida en utils.js) devuelve las fechas y montos sugeridos; cada monto de cuota se muestra en un input editable antes de confirmar.</li>
+      </ul>
+
+      <h3 class="subsection-title">8.3 Módulo de Préstamos</h3>
+      <ul class="doc-list">
+        <li>HTML: formulario con persona, capital, tasa de interés, fecha de entrega (input type="date"), selector de tipo de plazo y campo numérico de cantidad de plazos.</li>
+        <li>JS: <code>calcularInteresYTotal(capital, tasa)</code> calcula el monto total a devolver; <code>calcularFechasYCuotas(...)</code> (la misma función usada en Ventas) genera las fechas de cuota y la fecha final. Ambos cálculos se muestran como sugerencia editable antes de guardar; el sistema conserva el valor sugerido y el valor real acordado.</li>
+      </ul>
+
+      <h3 class="subsection-title">8.4 Módulo de Estado de Cuenta</h3>
+      <ul class="doc-list">
+        <li>JS: estadoCuenta.js consulta el historial combinado de ventas y préstamos de un cliente vía api.js.</li>
+        <li>Generación de PDF en el cliente mediante una librería como jsPDF (o generación en el backend, a definir por el equipo de desarrollo), incluyendo nombre del cliente, detalle de movimientos, saldo y fecha de generación.</li>
+      </ul>
+
+      <h3 class="subsection-title">8.5 Notificaciones de Cobro</h3>
+      <ul class="doc-list">
+        <li>JS: notificaciones.js revisa diariamente (al cargar el dashboard) las fechas de cuota próximas a vencer (hoy y mañana) de Ventas y Préstamos, y las pinta en el recuadro destacado del dashboard.</li>
+        <li>Cada notificación incluye un enlace con formato <code>https://wa.me/&lt;numero&gt;</code> para abrir la conversación de WhatsApp del cliente directamente.</li>
+      </ul>
+
+      <h3 class="subsection-title">8.6 Utilidad Compartida de Cálculo de Plazos</h3>
+      <div class="info-callout">
+        <div class="info-callout-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+          </svg>
+        </div>
+        <div class="info-callout-content">
+          <strong>Nota de diseño:</strong> esta es la pieza más importante de la arquitectura de esta versión: una sola función de cálculo de fechas usada por Ventas y Préstamos evita que ambos módulos calculen fechas de forma distinta.
+        </div>
+      </div>
+      <ul class="doc-list">
+        <li><code>utils.js</code> expone <code>calcularFechasYCuotas(fechaInicio, tipoPlazo, numPlazos, montoTotal)</code>, donde tipoPlazo ∈ {semana, quincena, mes} se traduce internamente a 7, 15 o 30 días exactos, sin excepciones de fin de mes.</li>
+        <li>La función devuelve un arreglo de objetos <code>{ numeroCuota, fecha, montoSugerido }</code>, siendo la fecha de la última cuota la fecha final del préstamo o venta.</li>
+      </ul>
+
+      <h3 class="subsection-title">8.7 Asistente Virtual (Chatbot con IA)</h3>
+      <ul class="doc-list">
+        <li>HTML/CSS: botón flotante y panel lateral/inferior (sin cambios respecto a v3.1).</li>
+        <li>JS: chatbot.js envía solicitudes al endpoint propio del backend, nunca de forma directa al proveedor de IA, para proteger credenciales.</li>
+      </ul>
+
+      <div class="page-footer">
+        <span>ME Variedades — SRS V4.0</span>
+        <span>Página 16 de 17</span>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         PÁGINA 17: SUPUESTOS, RESTRICCIONES Y APROBACIÓN
+         ====================================================================== -->
+    <div class="page no-break">
+      <h2 class="section-title">9. Supuestos y Restricciones</h2>
+
+      <ul class="doc-list">
+        <li>Entorno de ejecución: navegadores web modernos (Chrome, Firefox, Edge, Safari), en celular, tablet y computadora.</li>
+        <li>Tecnología base: HTML5, CSS3 y JavaScript, con posibilidad de un framework front-end a definir por el equipo de desarrollo.</li>
+        <li>El sistema es de uso interno de ME Variedades; no se contempla registro público de usuarios.</li>
+        <li>El envío de recordatorios por WhatsApp es manual (un toque abre la conversación); no se integra la API de WhatsApp Business en esta versión.</li>
+        <li>Un cliente puede tener múltiples ventas y, si corresponde, múltiples préstamos asociados a su nombre.</li>
+        <li>El conteo de días de plazo (semana = 7, quincena = 15, mes = 30 días exactos) aplica por igual a Ventas y Préstamos; se definió así, en lugar de fechas fijas de calendario, por decisión explícita de la administradora.</li>
+        <li>Servicio de IA: el Asistente Virtual requiere conexión a internet y una cuenta o API key contratada por ME Variedades con el proveedor que se elija.</li>
+      </ul>
+
+      <h3 class="subsection-title" style="margin-top: 32px;">Conformidad y Aprobación Formal del SRS V4.0</h3>
+      <p>
+        El presente documento constituye la especificación formal y actualizada de la plataforma <strong>ME Variedades (Versión 4.0)</strong>, y reemplaza en su totalidad a la versión 3.1.
+      </p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 50px; text-align: center;">
+        <div>
+          <div style="border-top: 1.5px solid #1e1b1c; padding-top: 8px; font-weight: 700; font-family: var(--font-title);">
+            María
+          </div>
+          <div style="font-size: 8.5pt; color: var(--color-texto-muted);">
+            Administradora y Propietaria<br>ME Variedades
+          </div>
+        </div>
+
+        <div>
+          <div style="border-top: 1.5px solid #1e1b1c; padding-top: 8px; font-weight: 700; font-family: var(--font-title);">
+            Equipo de Desarrollo
+          </div>
+          <div style="font-size: 8.5pt; color: var(--color-texto-muted);">
+            Septiembre 2026
+          </div>
+        </div>
+      </div>
+
+      <div class="page-footer" style="margin-top: 50px;">
+        <span>ME Variedades — SRS V4.0 Final</span>
+        <span>Página 17 de 17</span>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

@@ -1,5 +1,5 @@
-import { supabase, SUPABASE_URL, SUPABASE_KEY } from './supabase';
-import { comprimirImagen } from './imageCompression';
+import { supabase, SUPABASE_URL, SUPABASE_KEY } from './supabase.js';
+import { comprimirImagen } from './imageCompression.js';
 
 /**
  * SERVICIO CENTRALIZADO DE API (SUPABASE CLIENT & CRUD)
@@ -419,21 +419,45 @@ export async function uploadProductoImagen(file) {
 // ==============================================================================
 
 /**
- * Normalizador seguro para objetos de Pedidos.
+ * Normalizador seguro para objetos de Pedidos (Ventas).
  */
 export function normalizarPedido(p) {
   if (!p) return p;
-  const tot = Number(p.total !== undefined && p.total !== null ? p.total : p.costo_total) || 0;
+  const tot = Number(p.total !== undefined && p.total !== null ? p.total : (p.precio_venta_real || p.costo_total)) || 0;
   const fecha = p.created_at || p.fecha_registro || new Date().toISOString();
+  const cuotas = Array.isArray(p.cuotas) ? p.cuotas : [];
+  const tipoPlazo = p.tipo_plazo || p.tipoPlazo || null;
+  const numPlazos = p.num_plazos !== undefined && p.num_plazos !== null
+    ? Number(p.num_plazos)
+    : (p.numPlazos ? Number(p.numPlazos) : (cuotas.length > 0 ? cuotas.length : null));
+  const modalidad = (p.modalidad || (cuotas.length > 0 ? 'credito' : 'contado')).toLowerCase();
+  const cantidad = Number(p.cantidad) || 1;
+  const precioFacturacion = p.precio_facturacion !== undefined && p.precio_facturacion !== null
+    ? Number(p.precio_facturacion)
+    : (p.precioFacturacion !== undefined ? Number(p.precioFacturacion) : null);
+  const precioVentaReal = p.precio_venta_real !== undefined && p.precio_venta_real !== null
+    ? Number(p.precio_venta_real)
+    : (p.precioVentaReal !== undefined ? Number(p.precioVentaReal) : (tot > 0 && cantidad > 0 ? Math.round(tot / cantidad) : tot));
+
   return {
     ...p,
     id: Number(p.id),
     cliente_id: Number(p.cliente_id),
     producto_id: Number(p.producto_id),
-    cantidad: Number(p.cantidad) || 1,
+    cantidad: cantidad,
     total: tot,
-    costo_total: tot,
+    costo_total: p.costo_total !== undefined ? Number(p.costo_total) : tot,
+    modalidad: modalidad,
+    tipo_venta: modalidad === 'credito' ? 'Crédito' : 'Contado',
+    precio_facturacion: precioFacturacion,
+    precio_venta_real: precioVentaReal,
+    tipo_plazo: tipoPlazo,
+    num_plazos: numPlazos,
+    cuotas: cuotas,
+    moratoria_tipo: p.moratoria_tipo || 'semana',
+    moratoria_monto: Number(p.moratoria_monto || 0),
     fecha_registro: fecha,
+    fecha_venta: p.fecha_venta || fecha.split('T')[0],
     created_at: fecha,
     estado: p.estado || 'Activo',
     clientes: p.clientes || p.cliente || null,
@@ -474,16 +498,15 @@ export async function getPedidos() {
 }
 
 /**
- * Crear un nuevo pedido en Supabase (el trigger descontará el stock en BD).
+ * Crear un nuevo pedido en Supabase con soporte completo para ventas a crédito y cuotas.
  */
 export async function createPedido(pedidoData) {
   console.log('📤 Creando pedido en Supabase:', pedidoData);
   const cantidad = Number(pedidoData.cantidad) || 1;
-  const clienteId = Number(pedidoData.cliente_id);
-  const productoId = Number(pedidoData.producto_id);
+  const clienteId = Number(pedidoData.cliente_id || pedidoData.clienteId);
+  const productoId = Number(pedidoData.producto_id || pedidoData.productoId);
 
-  // Obtener costo del producto si no viene especificado
-  let total = Number(pedidoData.total !== undefined ? pedidoData.total : pedidoData.costo_total) || 0;
+  let total = Number(pedidoData.total !== undefined ? pedidoData.total : (pedidoData.precio_venta_real || pedidoData.precioVentaReal || pedidoData.costo_total)) || 0;
   if (!total) {
     const { data: prod } = await supabase
       .from('productos')
@@ -499,15 +522,37 @@ export async function createPedido(pedidoData) {
     }
   }
 
+  const cuotas = Array.isArray(pedidoData.cuotas) ? pedidoData.cuotas : [];
+  const tipoPlazo = pedidoData.tipo_plazo || pedidoData.tipoPlazo || null;
+  const numPlazos = pedidoData.num_plazos !== undefined && pedidoData.num_plazos !== null
+    ? Number(pedidoData.num_plazos)
+    : (pedidoData.numPlazos ? Number(pedidoData.numPlazos) : (cuotas.length > 0 ? cuotas.length : null));
+  const modalidad = (pedidoData.modalidad || (cuotas.length > 0 ? 'credito' : 'contado')).toLowerCase();
+  const precioFacturacion = pedidoData.precio_facturacion !== undefined && pedidoData.precio_facturacion !== null
+    ? Number(pedidoData.precio_facturacion)
+    : (pedidoData.precioFacturacion !== undefined ? Number(pedidoData.precioFacturacion) : null);
+  const precioVentaReal = pedidoData.precio_venta_real !== undefined && pedidoData.precio_venta_real !== null
+    ? Number(pedidoData.precio_venta_real)
+    : (pedidoData.precioVentaReal !== undefined ? Number(pedidoData.precioVentaReal) : (total > 0 && cantidad > 0 ? Math.round(total / cantidad) : total));
+
   const payload = {
     cliente_id: clienteId,
     producto_id: productoId,
     cantidad: cantidad,
     total: total,
-    estado: pedidoData.estado || 'Activo'
+    estado: pedidoData.estado || 'Activo',
+    cuotas: cuotas,
+    tipo_plazo: tipoPlazo,
+    num_plazos: numPlazos,
+    modalidad: modalidad,
+    precio_facturacion: precioFacturacion,
+    precio_venta_real: precioVentaReal,
+    moratoria_tipo: pedidoData.moratoria_tipo || pedidoData.moratoriaTipo || 'semana',
+    moratoria_monto: Number(pedidoData.moratoria_monto !== undefined ? pedidoData.moratoria_monto : (pedidoData.moratoriaMonto || 0))
   };
 
-  const { data, error } = await supabase
+  let data, error;
+  const res1 = await supabase
     .from('pedidos')
     .insert([payload])
     .select(`
@@ -516,6 +561,27 @@ export async function createPedido(pedidoData) {
       productos (id, nombre, costo)
     `);
 
+  data = res1.data;
+  error = res1.error;
+
+  // Fallback si la migración de moratoria aún no se ha corrido en Supabase
+  if (error && error.message && error.message.includes('moratoria')) {
+    console.warn('⚠️ Columna moratoria no detectada en Supabase pedidos, reintentando sin campos de moratoria:', error.message);
+    const payloadFallback = { ...payload };
+    delete payloadFallback.moratoria_tipo;
+    delete payloadFallback.moratoria_monto;
+    const res2 = await supabase
+      .from('pedidos')
+      .insert([payloadFallback])
+      .select(`
+        *,
+        clientes (id, nombre_completo, telefono),
+        productos (id, nombre, costo)
+      `);
+    data = res2.data;
+    error = res2.error;
+  }
+
   if (error) {
     console.error('❌ Error al crear pedido en Supabase:', error);
     throw error;
@@ -523,7 +589,7 @@ export async function createPedido(pedidoData) {
 
   const pedidoGuardado = data && data.length > 0 ? data[0] : payload;
   console.log('🎉 Pedido guardado exitosamente en Supabase:', pedidoGuardado);
-  return normalizarPedido(pedidoGuardado);
+  return normalizarPedido({ ...payload, ...pedidoGuardado });
 }
 
 /**
@@ -531,32 +597,68 @@ export async function createPedido(pedidoData) {
  */
 export async function updatePedido(id, pedidoData) {
   console.log(`📤 Actualizando pedido #${id} en Supabase:`, pedidoData);
-  const cantidad = Number(pedidoData.cantidad) || 1;
-  const clienteId = Number(pedidoData.cliente_id);
-  const productoId = Number(pedidoData.producto_id);
+  const payload = {};
 
-  let total = Number(pedidoData.total !== undefined ? pedidoData.total : pedidoData.costo_total) || 0;
-  if (!total) {
-    const { data: prod } = await supabase
-      .from('productos')
-      .select('costo')
-      .eq('id', productoId)
-      .maybeSingle();
-
-    if (prod) {
-      total = cantidad * (Number(prod.costo) || 0);
-    }
+  const clienteId = pedidoData.cliente_id || pedidoData.clienteId;
+  if (clienteId !== undefined && clienteId !== null) {
+    payload.cliente_id = Number(clienteId);
   }
 
-  const payload = {
-    cliente_id: clienteId,
-    producto_id: productoId,
-    cantidad: cantidad,
-    total: total,
-    estado: pedidoData.estado || 'Activo'
-  };
+  const productoId = pedidoData.producto_id || pedidoData.productoId;
+  if (productoId !== undefined && productoId !== null) {
+    payload.producto_id = Number(productoId);
+  }
 
-  const { data, error } = await supabase
+  if (pedidoData.cantidad !== undefined && pedidoData.cantidad !== null) {
+    payload.cantidad = Number(pedidoData.cantidad);
+  }
+
+  if (pedidoData.total !== undefined && pedidoData.total !== null) {
+    payload.total = Number(pedidoData.total);
+  }
+
+  if (pedidoData.estado !== undefined && pedidoData.estado !== null) {
+    payload.estado = pedidoData.estado;
+  }
+
+  if (pedidoData.cuotas !== undefined) {
+    payload.cuotas = Array.isArray(pedidoData.cuotas) ? pedidoData.cuotas : [];
+  }
+
+  if (pedidoData.tipo_plazo !== undefined || pedidoData.tipoPlazo !== undefined) {
+    payload.tipo_plazo = pedidoData.tipo_plazo || pedidoData.tipoPlazo || null;
+  }
+
+  if (pedidoData.num_plazos !== undefined || pedidoData.numPlazos !== undefined) {
+    const np = pedidoData.num_plazos !== undefined ? pedidoData.num_plazos : pedidoData.numPlazos;
+    payload.num_plazos = np !== null ? Number(np) : null;
+  }
+
+  if (pedidoData.modalidad !== undefined && pedidoData.modalidad !== null) {
+    payload.modalidad = String(pedidoData.modalidad).toLowerCase();
+  }
+
+  if (pedidoData.precio_facturacion !== undefined || pedidoData.precioFacturacion !== undefined) {
+    const pf = pedidoData.precio_facturacion !== undefined ? pedidoData.precio_facturacion : pedidoData.precioFacturacion;
+    payload.precio_facturacion = pf !== null ? Number(pf) : null;
+  }
+
+  if (pedidoData.precio_venta_real !== undefined || pedidoData.precioVentaReal !== undefined) {
+    const pvr = pedidoData.precio_venta_real !== undefined ? pedidoData.precio_venta_real : pedidoData.precioVentaReal;
+    payload.precio_venta_real = pvr !== null ? Number(pvr) : null;
+  }
+
+  if (pedidoData.moratoria_tipo !== undefined || pedidoData.moratoriaTipo !== undefined) {
+    payload.moratoria_tipo = pedidoData.moratoria_tipo || pedidoData.moratoriaTipo || 'semana';
+  }
+
+  if (pedidoData.moratoria_monto !== undefined || pedidoData.moratoriaMonto !== undefined) {
+    const mm = pedidoData.moratoria_monto !== undefined ? pedidoData.moratoria_monto : pedidoData.moratoriaMonto;
+    payload.moratoria_monto = mm !== null ? Number(mm) : 0;
+  }
+
+  let data, error;
+  const resUpdate1 = await supabase
     .from('pedidos')
     .update(payload)
     .eq('id', Number(id))
@@ -565,6 +667,27 @@ export async function updatePedido(id, pedidoData) {
       clientes (id, nombre_completo, telefono),
       productos (id, nombre, costo)
     `);
+
+  data = resUpdate1.data;
+  error = resUpdate1.error;
+
+  if (error && error.message && error.message.includes('moratoria')) {
+    console.warn('⚠️ Reintentando updatePedido sin columnas de moratoria:', error.message);
+    const payloadFallback = { ...payload };
+    delete payloadFallback.moratoria_tipo;
+    delete payloadFallback.moratoria_monto;
+    const resUpdate2 = await supabase
+      .from('pedidos')
+      .update(payloadFallback)
+      .eq('id', Number(id))
+      .select(`
+        *,
+        clientes (id, nombre_completo, telefono),
+        productos (id, nombre, costo)
+      `);
+    data = resUpdate2.data;
+    error = resUpdate2.error;
+  }
 
   if (error) {
     console.error(`❌ Error al actualizar pedido #${id} en Supabase:`, error);
@@ -609,6 +732,7 @@ export function normalizarPago(p) {
   const montoTotal = Number(p.monto_total) || 0;
   const montoPagado = Number(p.monto_pagado) || 0;
   const saldoPendiente = Number(p.saldo_pendiente !== undefined ? p.saldo_pendiente : Math.max(0, montoTotal - montoPagado));
+  const referenciaVenta = p.venta_asociada || p.pedido_asociado || '';
 
   return {
     ...p,
@@ -618,7 +742,9 @@ export function normalizarPago(p) {
     cliente_telefono: tel,
     clientes: clienteObj,
     concepto: p.concepto || '',
-    pedido_asociado: p.pedido_asociado || '',
+    tipo_pago: p.tipo_pago ? String(p.tipo_pago) : 'No especificado',
+    pedido_asociado: referenciaVenta,
+    venta_asociada: referenciaVenta,
     monto_total: montoTotal,
     monto_pagado: montoPagado,
     saldo_pendiente: saldoPendiente,
@@ -662,15 +788,18 @@ export async function getPagos() {
  * Crear nuevo registro de pago/cuenta por cobrar.
  */
 export async function createPago(pagoData) {
+  console.log('📤 Creando pago/cuenta en Supabase:', pagoData);
   const montoTotal = Number(pagoData.monto_total) || 0;
+  const referenciaVenta = pagoData.venta_asociada || pagoData.pedido_asociado || null;
   const payload = {
     cliente_id: Number(pagoData.cliente_id),
     concepto: (pagoData.concepto || '').trim(),
-    pedido_asociado: pagoData.pedido_asociado || null,
+    pedido_asociado: referenciaVenta,
     monto_total: montoTotal,
     monto_pagado: 0,
     saldo_pendiente: montoTotal,
     fecha_acordada: pagoData.fecha_acordada || null,
+    tipo_pago: pagoData.tipo_pago || null,
     estado: pagoData.estado || 'pendiente',
     abonos: []
   };
@@ -687,7 +816,83 @@ export async function createPago(pagoData) {
     console.error('❌ Error al crear pago en Supabase:', error);
     throw error;
   }
-  return normalizarPago(data && data.length > 0 ? data[0] : payload);
+  const result = normalizarPago(data && data.length > 0 ? data[0] : payload);
+  return result;
+}
+
+/**
+ * Actualizar un pago/cuenta por cobrar existente en Supabase.
+ */
+export async function updatePago(id, pagoData) {
+  console.log(`📤 Actualizando pago #${id} en Supabase:`, pagoData);
+  const payload = {};
+
+  if (pagoData.cliente_id !== undefined && pagoData.cliente_id !== null) {
+    payload.cliente_id = Number(pagoData.cliente_id);
+  }
+  if (pagoData.concepto !== undefined && pagoData.concepto !== null) {
+    payload.concepto = String(pagoData.concepto).trim();
+  }
+  if (pagoData.pedido_asociado !== undefined || pagoData.venta_asociada !== undefined) {
+    payload.pedido_asociado = pagoData.pedido_asociado || pagoData.venta_asociada || null;
+  }
+  if (pagoData.monto_total !== undefined && pagoData.monto_total !== null) {
+    payload.monto_total = Number(pagoData.monto_total);
+  }
+  if (pagoData.monto_pagado !== undefined && pagoData.monto_pagado !== null) {
+    payload.monto_pagado = Number(pagoData.monto_pagado);
+  }
+  if (pagoData.saldo_pendiente !== undefined && pagoData.saldo_pendiente !== null) {
+    payload.saldo_pendiente = Number(pagoData.saldo_pendiente);
+  }
+  if (pagoData.fecha_acordada !== undefined) {
+    payload.fecha_acordada = pagoData.fecha_acordada || null;
+  }
+  if (pagoData.tipo_pago !== undefined) {
+    payload.tipo_pago = pagoData.tipo_pago || null;
+  }
+  if (pagoData.estado !== undefined && pagoData.estado !== null) {
+    payload.estado = pagoData.estado;
+  }
+  if (pagoData.abonos !== undefined) {
+    payload.abonos = Array.isArray(pagoData.abonos) ? pagoData.abonos : [];
+  }
+
+  const { data, error } = await supabase
+    .from('pagos')
+    .update(payload)
+    .eq('id', Number(id))
+    .select(`
+      *,
+      clientes (id, nombre_completo, telefono)
+    `);
+
+  if (error) {
+    console.error(`❌ Error al actualizar pago #${id} en Supabase:`, error);
+    throw error;
+  }
+
+  const pagoActualizado = data && data.length > 0 ? data[0] : { id, ...payload };
+  console.log(`✅ Pago #${id} actualizado exitosamente:`, pagoActualizado);
+  return normalizarPago(pagoActualizado);
+}
+
+/**
+ * Eliminar un pago/cuenta por cobrar en Supabase.
+ */
+export async function deletePago(id) {
+  console.log(`🗑️ Eliminando pago #${id} en Supabase...`);
+  const { error } = await supabase
+    .from('pagos')
+    .delete()
+    .eq('id', Number(id));
+
+  if (error) {
+    console.error(`❌ Error al eliminar pago #${id} en Supabase:`, error);
+    throw error;
+  }
+  console.log(`✅ Pago #${id} eliminado de Supabase`);
+  return { success: true };
 }
 
 /**
@@ -742,91 +947,7 @@ export async function registrarAbono(pagoId, montoAbono, nota = '') {
   return normalizarPago(data && data.length > 0 ? data[0] : null);
 }
 
-// ==============================================================================
-// 5. MÓDULO: COBROS (HISTORIAL DE RECAUDACIÓN)
-// ==============================================================================
 
-/**
- * Normalizador seguro para registros de Cobros.
- */
-export function normalizarCobro(c) {
-  if (!c) return c;
-  const clienteObj = c.clientes || c.cliente || null;
-  const nombre = c.cliente_nombre || clienteObj?.nombre_completo || '';
-  const tel = c.cliente_telefono || clienteObj?.telefono || '';
-
-  return {
-    ...c,
-    id: Number(c.id),
-    cliente_id: Number(c.cliente_id),
-    cliente_nombre: nombre,
-    cliente_telefono: tel,
-    clientes: clienteObj,
-    monto_cobrado: Number(c.monto_cobrado) || 0,
-    fecha_cobro: c.fecha_cobro || (c.created_at ? c.created_at.split('T')[0] : new Date().toISOString().split('T')[0]),
-    metodo_pago: c.metodo_pago || c.metodo_cobro || 'Efectivo',
-    metodo_cobro: c.metodo_pago || c.metodo_cobro || 'Efectivo',
-    numero_recibo: c.numero_recibo || '',
-    concepto: c.concepto || ''
-  };
-}
-
-/**
- * Obtener listado de cobros realizados con relación a clientes.
- */
-export async function getCobros() {
-  console.log('🔄 Consultando cobros desde Supabase...');
-  const { data, error } = await supabase
-    .from('cobros')
-    .select(`
-      *,
-      clientes (id, nombre_completo, telefono)
-    `)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.warn('Fallback a select básico de cobros:', error.message);
-    const { data: basicData, error: basicErr } = await supabase
-      .from('cobros')
-      .select('*')
-      .order('id', { ascending: false });
-
-    if (basicErr) {
-      console.error('❌ Error getCobros:', basicErr);
-      throw basicErr;
-    }
-    return (basicData || []).map(normalizarCobro);
-  }
-  return (data || []).map(normalizarCobro);
-}
-
-/**
- * Registrar un nuevo cobro en Supabase.
- */
-export async function registrarCobro(cobroData) {
-  const payload = {
-    cliente_id: Number(cobroData.cliente_id),
-    monto_cobrado: Number(cobroData.monto_cobrado) || 0,
-    fecha_cobro: cobroData.fecha_cobro || new Date().toISOString().split('T')[0],
-    metodo_pago: cobroData.metodo_cobro || cobroData.metodo_pago || 'Efectivo',
-    numero_recibo: cobroData.numero_recibo || null,
-    concepto: (cobroData.concepto_nota || cobroData.concepto || '').trim()
-  };
-
-  const { data, error } = await supabase
-    .from('cobros')
-    .insert([payload])
-    .select(`
-      *,
-      clientes (id, nombre_completo, telefono)
-    `);
-
-  if (error) {
-    console.error('❌ Error al registrar cobro en Supabase:', error);
-    throw error;
-  }
-  return normalizarCobro(data && data.length > 0 ? data[0] : payload);
-}
 
 // ==============================================================================
 // 6. MÓDULO: PRÉSTAMOS
@@ -847,6 +968,20 @@ export function normalizarPrestamo(pr) {
   const total = Number(pr.total_devolver || pr.monto_total) || (capital + interes);
   const saldo = Number(pr.saldo_pendiente !== undefined ? pr.saldo_pendiente : total);
 
+  const cuotas = Array.isArray(pr.cuotas) ? pr.cuotas : [];
+  const tipoPlazo = pr.tipo_plazo || null;
+  const numPlazos = pr.num_plazos !== undefined && pr.num_plazos !== null
+    ? Number(pr.num_plazos)
+    : (cuotas.length > 0 ? cuotas.length : null);
+
+  // Frecuencia de pago legible: si existe tipo_plazo o frecuencia_pago previa, respetarla
+  let frecuencia = tipoPlazo || pr.frecuencia_pago || null;
+  if (!frecuencia) {
+    if (numPlazos === 1) frecuencia = 'Pago único';
+    else if (numPlazos > 1) frecuencia = `${numPlazos} cuotas`;
+    else frecuencia = 'No especificado';
+  }
+
   return {
     ...pr,
     id: Number(pr.id),
@@ -864,7 +999,12 @@ export function normalizarPrestamo(pr) {
     saldo_pendiente: saldo,
     fecha_entrega: pr.fecha_entrega || '',
     fecha_limite: pr.fecha_limite || '',
-    frecuencia_pago: pr.frecuencia_pago || 'Pago único',
+    tipo_plazo: tipoPlazo,
+    num_plazos: numPlazos,
+    cuotas: cuotas,
+    moratoria_tipo: pr.moratoria_tipo || 'semana',
+    moratoria_monto: Number(pr.moratoria_monto || 0),
+    frecuencia_pago: frecuencia,
     estado: pr.estado || (saldo <= 0 ? 'liquidado' : 'al_dia'),
     abonos: Array.isArray(pr.abonos) ? pr.abonos : []
   };
@@ -900,12 +1040,18 @@ export async function getPrestamos() {
 }
 
 /**
- * Crear nuevo préstamo en Supabase.
+ * Crear nuevo préstamo en Supabase con soporte completo para cuotas y plazos.
  */
 export async function createPrestamo(prestamoData) {
   const capital = Number(prestamoData.monto_capital) || 0;
   const tasa = Number(prestamoData.tasa_interes) || 0;
   const totalDevolver = capital + (capital * (tasa / 100));
+
+  const cuotas = Array.isArray(prestamoData.cuotas) ? prestamoData.cuotas : [];
+  const tipoPlazo = prestamoData.tipo_plazo || null;
+  const numPlazos = prestamoData.num_plazos !== undefined && prestamoData.num_plazos !== null
+    ? Number(prestamoData.num_plazos)
+    : (cuotas.length > 0 ? cuotas.length : 1);
 
   const payload = {
     cliente_id: prestamoData.cliente_id ? Number(prestamoData.cliente_id) : null,
@@ -918,10 +1064,16 @@ export async function createPrestamo(prestamoData) {
     fecha_entrega: prestamoData.fecha_entrega || new Date().toISOString().split('T')[0],
     fecha_limite: prestamoData.fecha_limite,
     estado: 'al_dia',
-    abonos: []
+    abonos: [],
+    cuotas: cuotas,
+    tipo_plazo: tipoPlazo,
+    num_plazos: numPlazos,
+    moratoria_tipo: prestamoData.moratoria_tipo || 'semana',
+    moratoria_monto: Number(prestamoData.moratoria_monto || 0)
   };
 
-  const { data, error } = await supabase
+  let data, error;
+  const resPrestamo1 = await supabase
     .from('prestamos')
     .insert([payload])
     .select(`
@@ -929,11 +1081,95 @@ export async function createPrestamo(prestamoData) {
       clientes (id, nombre_completo, telefono)
     `);
 
+  data = resPrestamo1.data;
+  error = resPrestamo1.error;
+
+  if (error && error.message && error.message.includes('moratoria')) {
+    console.warn('⚠️ Columna moratoria no detectada en Supabase prestamos, reintentando sin campos de moratoria:', error.message);
+    const payloadFallback = { ...payload };
+    delete payloadFallback.moratoria_tipo;
+    delete payloadFallback.moratoria_monto;
+    const resPrestamo2 = await supabase
+      .from('prestamos')
+      .insert([payloadFallback])
+      .select(`
+        *,
+        clientes (id, nombre_completo, telefono)
+      `);
+    data = resPrestamo2.data;
+    error = resPrestamo2.error;
+  }
+
   if (error) {
     console.error('❌ Error al crear préstamo en Supabase:', error);
     throw error;
   }
   return normalizarPrestamo(data && data.length > 0 ? data[0] : payload);
+}
+
+/**
+ * Actualizar préstamo existente en Supabase.
+ */
+export async function updatePrestamo(id, prestamoData) {
+  const capital = Number(prestamoData.monto_capital) || 0;
+  const tasa = Number(prestamoData.tasa_interes) || 0;
+  const totalDevolver = capital + (capital * (tasa / 100));
+
+  const payload = {
+    cliente_id: prestamoData.cliente_id ? Number(prestamoData.cliente_id) : null,
+    nombre_tercero: prestamoData.beneficiario_nombre || prestamoData.nombre_tercero || null,
+    telefono: prestamoData.beneficiario_telefono || prestamoData.telefono || null,
+    monto_capital: capital,
+    tasa_interes: tasa,
+    total_devolver: totalDevolver,
+    fecha_entrega: prestamoData.fecha_entrega,
+    fecha_limite: prestamoData.fecha_limite,
+    tipo_plazo: prestamoData.tipo_plazo || null,
+    num_plazos: prestamoData.num_plazos !== undefined && prestamoData.num_plazos !== null ? Number(prestamoData.num_plazos) : null,
+    cuotas: Array.isArray(prestamoData.cuotas) ? prestamoData.cuotas : [],
+    moratoria_tipo: prestamoData.moratoria_tipo || 'semana',
+    moratoria_monto: Number(prestamoData.moratoria_monto || 0)
+  };
+
+  if (prestamoData.saldo_pendiente !== undefined) {
+    payload.saldo_pendiente = Number(prestamoData.saldo_pendiente);
+  }
+
+  let data, error;
+  const resUpdateP1 = await supabase
+    .from('prestamos')
+    .update(payload)
+    .eq('id', id)
+    .select(`
+      *,
+      clientes (id, nombre_completo, telefono)
+    `);
+
+  data = resUpdateP1.data;
+  error = resUpdateP1.error;
+
+  if (error && error.message && error.message.includes('moratoria')) {
+    console.warn('⚠️ Reintentando updatePrestamo sin columnas de moratoria:', error.message);
+    const payloadFallback = { ...payload };
+    delete payloadFallback.moratoria_tipo;
+    delete payloadFallback.moratoria_monto;
+    const resUpdateP2 = await supabase
+      .from('prestamos')
+      .update(payloadFallback)
+      .eq('id', id)
+      .select(`
+        *,
+        clientes (id, nombre_completo, telefono)
+      `);
+    data = resUpdateP2.data;
+    error = resUpdateP2.error;
+  }
+
+  if (error) {
+    console.error('❌ Error al actualizar préstamo en Supabase:', error);
+    throw error;
+  }
+  return normalizarPrestamo(data && data.length > 0 ? data[0] : null);
 }
 
 /**
@@ -1006,275 +1242,7 @@ export async function deletePrestamo(id) {
   return { success: true };
 }
 
-// ==============================================================================
-// 7. MÓDULO: FACTURAS & COMPROBANTES (STORAGE + DB)
-// ==============================================================================
 
-/**
- * Normalizador seguro para registros de Facturas y Comprobantes.
- */
-export function normalizarFactura(f) {
-  if (!f) return f;
-  const clienteObj = f.clientes || f.cliente || null;
-  const nombre = f.cliente_nombre || clienteObj?.nombre_completo || '';
-  const tel = f.cliente_telefono || clienteObj?.telefono || '';
-
-  return {
-    ...f,
-    id: Number(f.id),
-    cliente_id: Number(f.cliente_id),
-    cliente_nombre: nombre,
-    cliente_telefono: tel,
-    clientes: clienteObj,
-    tipo_categoria: f.tipo_categoria || 'pedidos',
-    identificador_ref: f.identificador_ref || f.referencia_id || '',
-    referencia_id: f.identificador_ref || f.referencia_id || '',
-    archivo_url: f.archivo_url || '',
-    archivo_data: f.archivo_url || f.archivo_data || '',
-    archivo_nombre: f.archivo_nombre || 'documento_adjunto',
-    archivo_tipo: f.archivo_tipo || 'image',
-    archivo_size: Number(f.archivo_size) || 0,
-    monto: f.monto ? Number(f.monto) : null,
-    fecha_emision: f.fecha_emision || (f.created_at ? f.created_at.split('T')[0] : new Date().toISOString().split('T')[0]),
-    notas: f.notas || ''
-  };
-}
-
-/**
- * Obtener listado de facturas y comprobantes digitalizados con relación a clientes.
- */
-export async function getFacturas() {
-  console.log('🔄 Consultando facturas desde Supabase...');
-  const { data, error } = await supabase
-    .from('facturas_comprobantes')
-    .select(`
-      *,
-      clientes (id, nombre_completo, telefono)
-    `)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.warn('Fallback a select básico de facturas:', error.message);
-    const { data: basicData, error: basicErr } = await supabase
-      .from('facturas_comprobantes')
-      .select('*')
-      .order('id', { ascending: false });
-
-    if (basicErr) {
-      console.error('❌ Error getFacturas:', basicErr);
-      throw basicErr;
-    }
-    return (basicData || []).map(normalizarFactura);
-  }
-  return (data || []).map(normalizarFactura);
-}
-
-/**
- * Subir archivo binario a Supabase Storage y guardar registro en facturas_comprobantes.
- */
-export async function uploadFactura(fileOrBlob, metadata) {
-  let archivoUrl = metadata.archivo_url || '';
-
-  if (fileOrBlob) {
-    let fileToUpload = fileOrBlob;
-
-    if (typeof fileOrBlob === 'string' && fileOrBlob.startsWith('data:')) {
-      const parts = fileOrBlob.split(';base64,');
-      const contentType = parts[0].split(':')[1];
-      const raw = window.atob(parts[1]);
-      const rawLength = raw.length;
-      const uInt8Array = new Uint8Array(rawLength);
-      for (let i = 0; i < rawLength; ++i) {
-        uInt8Array[i] = raw.charCodeAt(i);
-      }
-      fileToUpload = new Blob([uInt8Array], { type: contentType });
-    }
-
-    if (fileToUpload instanceof Blob || (typeof fileToUpload === 'object' && fileToUpload?.type?.startsWith('image/'))) {
-      fileToUpload = await comprimirImagen(fileToUpload, { maxWidth: 1400, maxHeight: 1400, quality: 0.84 });
-    }
-
-    const fileExt = metadata.archivo_nombre ? metadata.archivo_nombre.split('.').pop() : 'jpg';
-    const fileName = `factura_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
-    const filePath = `${fileName}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from('comprobantes-facturas')
-      .upload(filePath, fileToUpload, {
-        cacheControl: '31536000, immutable',
-        upsert: true
-      });
-
-    if (uploadError) {
-      console.warn('Advertencia al subir archivo a Storage (usando fallback URL):', uploadError);
-      archivoUrl = typeof fileOrBlob === 'string' ? fileOrBlob : '';
-    } else {
-      const { data: publicUrlData } = supabase.storage
-        .from('comprobantes-facturas')
-        .getPublicUrl(filePath);
-      archivoUrl = publicUrlData.publicUrl;
-    }
-  }
-
-  const payload = {
-    cliente_id: Number(metadata.cliente_id),
-    tipo_categoria: metadata.tipo_categoria || 'pedidos',
-    identificador_ref: metadata.referencia_id || metadata.identificador_ref || null,
-    archivo_url: archivoUrl || '',
-    archivo_nombre: metadata.archivo_nombre || 'comprobante_adjunto',
-    archivo_tipo: metadata.archivo_tipo || 'image',
-    archivo_size: Number(metadata.archivo_size) || 0,
-    monto: metadata.monto ? Number(metadata.monto) : null,
-    notas: (metadata.notas || '').trim(),
-    fecha_emision: metadata.fecha_emision || new Date().toISOString().split('T')[0]
-  };
-
-  const { data, error } = await supabase
-    .from('facturas_comprobantes')
-    .insert([payload])
-    .select(`
-      *,
-      clientes (id, nombre_completo, telefono)
-    `);
-
-  if (error) {
-    console.error('❌ Error al guardar comprobante en base de datos Supabase:', error);
-    throw error;
-  }
-
-  return normalizarFactura(data && data.length > 0 ? data[0] : payload);
-}
-
-/**
- * Eliminar factura de la base de datos y de Supabase Storage.
- */
-export async function deleteFactura(id, archivoUrl = '') {
-  console.log(`🗑️ Eliminando factura ID ${id} de Supabase...`);
-
-  // 1. Si no se pasó la URL, intentar consultarla antes de borrar el registro
-  let urlStorage = archivoUrl;
-  if (!urlStorage) {
-    try {
-      const { data: facturaRow } = await supabase
-        .from('facturas_comprobantes')
-        .select('archivo_url')
-        .eq('id', Number(id))
-        .maybeSingle();
-
-      if (facturaRow?.archivo_url) {
-        urlStorage = facturaRow.archivo_url;
-      }
-    } catch (e) {
-      console.warn('No se pudo consultar archivo_url para eliminación previa:', e);
-    }
-  }
-
-  // 2. Si existe un archivo en Supabase Storage, eliminarlo
-  if (urlStorage && (urlStorage.includes('comprobantes-facturas') || urlStorage.includes('supabase.co/storage'))) {
-    try {
-      let filePath = '';
-      if (urlStorage.includes('comprobantes-facturas/')) {
-        filePath = urlStorage.split('comprobantes-facturas/')[1];
-      } else {
-        const urlParts = urlStorage.split('/');
-        filePath = urlParts[urlParts.length - 1];
-      }
-
-      if (filePath) {
-        const cleanPath = decodeURIComponent(filePath.split('?')[0]);
-        console.log(`🗑️ Eliminando archivo del bucket comprobantes-facturas: ${cleanPath}`);
-        const { error: storageError } = await supabase.storage
-          .from('comprobantes-facturas')
-          .remove([cleanPath]);
-
-        if (storageError) {
-          console.warn('Advertencia al eliminar archivo de storage:', storageError.message);
-        } else {
-          console.log(`✅ Archivo ${cleanPath} eliminado de Storage.`);
-        }
-      }
-    } catch (e) {
-      console.warn('No se pudo procesar la ruta del archivo en storage:', e);
-    }
-  }
-
-  // 3. Eliminar el registro en la tabla facturas_comprobantes
-  const { error } = await supabase
-    .from('facturas_comprobantes')
-    .delete()
-    .eq('id', Number(id));
-
-  if (error) {
-    console.error('❌ Error al eliminar factura en Supabase:', error.message);
-    throw error;
-  }
-
-  console.log(`✅ Factura ID ${id} eliminada correctamente de Supabase.`);
-  return { success: true };
-}
-
-/**
- * Eliminar de forma recursiva toda la carpeta de comprobantes de un cliente:
- * 1. Elimina todos los archivos físicos asociados en Supabase Storage (bucket 'comprobantes-facturas').
- * 2. Elimina todos los registros correspondientes en la tabla 'facturas_comprobantes'.
- */
-export async function deleteCarpetaFacturasCliente(clienteId) {
-  const numId = Number(clienteId);
-  console.log(`🗑️ Eliminando carpeta de facturas del cliente ID #${numId}...`);
-
-  // 1. Consultar todos los comprobantes del cliente para obtener las URLs de los archivos
-  const { data: facturas, error: fetchErr } = await supabase
-    .from('facturas_comprobantes')
-    .select('id, archivo_url')
-    .eq('cliente_id', numId);
-
-  if (fetchErr) {
-    console.error('❌ Error al consultar comprobantes para eliminación masiva:', fetchErr);
-    throw fetchErr;
-  }
-
-  // 2. Extraer rutas relativas para el bucket comprobantes-facturas
-  const filePaths = [];
-  (facturas || []).forEach(f => {
-    const url = f.archivo_url || '';
-    if (url.includes('comprobantes-facturas/')) {
-      const p = url.split('comprobantes-facturas/')[1];
-      if (p) filePaths.push(decodeURIComponent(p.split('?')[0]));
-    } else if (url.includes('supabase.co/storage')) {
-      const parts = url.split('/');
-      const p = parts[parts.length - 1];
-      if (p) filePaths.push(decodeURIComponent(p.split('?')[0]));
-    }
-  });
-
-  // 3. Eliminar archivos de Supabase Storage
-  if (filePaths.length > 0) {
-    console.log(`🗑️ Eliminando ${filePaths.length} archivo(s) físico(s) de Storage:`, filePaths);
-    const { error: storageErr } = await supabase.storage
-      .from('comprobantes-facturas')
-      .remove(filePaths);
-
-    if (storageErr) {
-      console.warn('⚠️ Advertencia al eliminar archivos físicos de storage:', storageErr.message);
-    } else {
-      console.log('✅ Archivos físicos de comprobantes eliminados con éxito de Storage.');
-    }
-  }
-
-  // 4. Eliminar todos los registros de la tabla facturas_comprobantes
-  const { error: deleteErr } = await supabase
-    .from('facturas_comprobantes')
-    .delete()
-    .eq('cliente_id', numId);
-
-  if (deleteErr) {
-    console.error('❌ Error al eliminar registros de facturas en Supabase:', deleteErr);
-    throw deleteErr;
-  }
-
-  console.log(`✅ Carpeta de cliente ID #${numId} eliminada exitosamente (${facturas?.length || 0} comprobantes).`);
-  return { success: true, count: facturas?.length || 0 };
-}
 
 // ==============================================================================
 // 8. MÓDULO: DASHBOARD & MÉTRICAS EN VIVO
@@ -1335,16 +1303,6 @@ export async function getDashboardMetrics() {
       .eq('mes_cumpleanos', mesActual)
       .order('dia_cumpleanos', { ascending: true });
 
-    // 7. Cobros recientes
-    const { data: listaCobros, error: errCobros } = await supabase
-      .from('cobros')
-      .select(`
-        *,
-        clientes (id, nombre_completo, telefono)
-      `)
-      .order('created_at', { ascending: false })
-      .limit(10);
-
     // Cálculos agregados
     const saldoCuentasCobrar = (listaPagos || []).reduce(
       (acc, p) => acc + (parseFloat(p.saldo_pendiente) || 0),
@@ -1392,7 +1350,6 @@ export async function getDashboardMetrics() {
       listaPagos: (listaPagos || []).map(normalizarPago),
       listaPrestamos: (listaPrestamos || []).map(normalizarPrestamo),
       listaProductos: listaProductos || [],
-      listaCobros: (listaCobros || []).map(normalizarCobro),
     };
   } catch (err) {
     console.error('❌ Error al calcular getDashboardMetrics:', err);
@@ -1413,6 +1370,7 @@ export const api = {
   createProducto,
   updateProducto,
   adjustStock,
+  ajustarStock: adjustStock,
   deleteProducto,
   uploadProductoImagen,
   // Pedidos
@@ -1423,20 +1381,15 @@ export const api = {
   // Pagos
   getPagos,
   createPago,
+  updatePago,
+  deletePago,
   registrarAbono,
-  // Cobros
-  getCobros,
-  registrarCobro,
   // Préstamos
   getPrestamos,
   createPrestamo,
+  updatePrestamo,
   registrarAbonoPrestamo,
   deletePrestamo,
-  // Facturas
-  getFacturas,
-  uploadFactura,
-  deleteFactura,
-  deleteCarpetaFacturasCliente,
   // Dashboard
   getDashboardMetrics,
 };

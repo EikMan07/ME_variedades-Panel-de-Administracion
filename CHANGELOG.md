@@ -6,6 +6,38 @@ El formato se basa en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/
 
 ---
 
+## [Pendiente / Backlog de Construcción SRS v4.0]
+- **H-09: Recuadro Destacado de Notificaciones de Cobro en Dashboard (RF-08, RF-53 a RF-56)**:
+  - Tarea de desarrollo pendiente (no de limpieza): Implementar en `DashboardPage.jsx` el recuadro destacado de cobros del día y del día siguiente con enlace directo a WhatsApp (`https://wa.me/...`), sustituyendo/simplificando las pestañas de historial del Topbar según especificación vigente.
+
+---
+
+## [4.3.0] - 2026-09-06
+
+### 🧹 Limpieza y Refactorización Arquitectónica (Clean Architecture)
+- **Eliminación de Prototipo Legacy (H-01)**:
+  - Eliminado `dashboard.html` de la raíz, carpeta `/modules/` y carpeta `/js/`.
+- **Purga de Cascarones de Pedidos (H-04)**:
+  - Eliminados `PedidosPage.jsx`, `OrderContext.jsx`, `OrderModal.jsx` y carpeta `src/components/pedidos/`.
+  - Limpieza de alias residuales (`useOrders`, `OrderProvider`) en `VentasContext.jsx` y ruta `PEDIDOS` en `paths.js`.
+- **Eliminación de Hook Huérfano (H-08)**:
+  - Eliminado `src/hooks/useDebounce.js`.
+- **Desmontaje de Facturas / OCR (H-02)**:
+  - Desmontadas rutas y providers de Facturas.
+  - Eliminados `FacturasPage.jsx`, `FacturasContext.jsx`, carpeta `src/components/facturas/`, `receiptOcrService.js`, `pdfExportService.js` y `facturas.css`.
+  - Desinstalada dependencia `tesseract.js`.
+- **Reorganización de Base de Datos y Scripts (H-07)**:
+  - Eliminado script destructivo `supabase_reset_clean_data.sql`.
+  - Reorganizados scripts de esquema (`supabase_schema.sql`, `supabase_cascade_and_rls_fix.sql`, `supabase_auth_users_clean.sql`) en la carpeta `/supabase/`.
+- **Estandarización de Estilos y Assets (H-05, H-06)**:
+  - Renombrado `pedidos.css` a `ventas.css` y actualizado `@import` en `index.css`.
+  - Eliminados assets corruptos y huérfanos (`index.img`, `hero.png`, `react.svg`, `vite.svg`, copias `.jpg`).
+  - Estandarizado logo oficial a `logo-me-variedades.png` (kebab-case) en `src/assets/` y `/public/imgs/`.
+- **Biometría Facial (H-03)**:
+  - Conservada intacta al 100% por uso activo diario de la administradora.
+
+---
+
 ## [4.2.0] - 2026-08-31
 
 ### ✨ Añadido (Added)

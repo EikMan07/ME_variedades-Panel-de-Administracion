@@ -9,8 +9,10 @@ export function playNotificationSound() {
   // Función inerte: todos los efectos de audio han sido suprimidos
 }
 
+import { obtenerNotificacionesCobro } from './cobroNotificationService.js';
+
 // Generador de alertas inteligentes a partir de datos reales de Supabase
-export function generarNotificaciones({ clientes = [], productos = [], pagos = [], prestamos = [] }) {
+export function generarNotificaciones({ clientes = [], productos = [], pagos = [], prestamos = [], pedidos = [] }) {
   const notificaciones = [];
   const hoy = new Date();
   const diaActual = hoy.getDate();
@@ -68,76 +70,31 @@ export function generarNotificaciones({ clientes = [], productos = [], pagos = [
     }
   });
 
-  // 3. Alertas de Pagos y Cuentas por Cobrar
-  pagos.forEach(p => {
-    const saldo = parseFloat(p.saldo_pendiente) || 0;
-    const fechaRef = p.fecha_acordada || p.fecha_vencimiento || p.fecha_limite;
-    const nombreCliente = p.clientes?.nombre_completo || p.cliente_nombre || p.cliente || 'Cliente';
-
-    if (saldo > 0 && fechaRef) {
-      const fechaLimite = new Date(fechaRef);
-      const diffDias = Math.ceil((fechaLimite - hoy) / (1000 * 60 * 60 * 24));
-
-      if (diffDias < 0) {
-        notificaciones.push({
-          id: `pago-vencido-${p.id}`,
-          tipo: 'pago_vencido',
-          titulo: 'Cuenta Vencida',
-          mensaje: `Saldo de ${nombreCliente} (₡${saldo.toLocaleString('es-CR')}) con ${Math.abs(diffDias)} días de atraso.`,
-          etiqueta: 'Vencido',
-          prioridad: 'critica',
-          accion: 'finanzas',
-          link: '/pagos'
-        });
-      } else if (diffDias <= 2) {
-        notificaciones.push({
-          id: `pago-proximo-${p.id}`,
-          tipo: 'pago_proximo',
-          titulo: 'Pago por Vencer',
-          mensaje: `Saldo de ${nombreCliente} (₡${saldo.toLocaleString('es-CR')}) vence ${diffDias === 0 ? 'hoy' : `en ${diffDias} días`}.`,
-          etiqueta: 'Por vencer',
-          prioridad: 'media',
-          accion: 'finanzas',
-          link: '/pagos'
-        });
-      }
-    }
-  });
-
-  // 4. Alertas de Préstamos
-  prestamos.forEach(pr => {
-    const saldo = parseFloat(pr.saldo_pendiente) || 0;
-    const fechaRef = pr.fecha_limite || pr.fecha_vencimiento || pr.fecha_acordada;
-    const nombreBeneficiario = pr.nombre_tercero || pr.clientes?.nombre_completo || pr.cliente_nombre || 'Beneficiario';
-
-    if (saldo > 0 && fechaRef) {
-      const fechaLimite = new Date(fechaRef);
-      const diffDias = Math.ceil((fechaLimite - hoy) / (1000 * 60 * 60 * 24));
-
-      if (diffDias <= 3 && diffDias >= 0) {
-        notificaciones.push({
-          id: `prestamo-vence-${pr.id}`,
-          tipo: 'prestamo_proximo',
-          titulo: 'Vencimiento de Préstamo',
-          mensaje: `Préstamo a ${nombreBeneficiario} (₡${saldo.toLocaleString('es-CR')}) vence ${diffDias === 0 ? 'hoy' : `en ${diffDias} días`}.`,
-          etiqueta: 'Atención',
-          prioridad: 'alta',
-          accion: 'prestamos',
-          link: '/prestamos'
-        });
-      } else if (diffDias < 0) {
-        notificaciones.push({
-          id: `prestamo-vencido-${pr.id}`,
-          tipo: 'prestamo_proximo',
-          titulo: 'Préstamo Atrasado',
-          mensaje: `Préstamo a ${nombreBeneficiario} (₡${saldo.toLocaleString('es-CR')}) con ${Math.abs(diffDias)} días vencido.`,
-          etiqueta: 'Vencido',
-          prioridad: 'critica',
-          accion: 'prestamos',
-          link: '/prestamos'
-        });
-      }
-    }
+  // 3. Notificaciones de Cobro (Préstamos, Ventas a Crédito y Cuentas por Cobrar)
+  // Consumo estricto de la misma fuente de verdad (cobroNotificationService)
+  const cobrosNotifs = obtenerNotificacionesCobro({ prestamos, pedidos, pagos });
+  cobrosNotifs.forEach((cn) => {
+    notificaciones.push({
+      id: cn.id,
+      tipo: `cobro_${cn.vencimiento}`, // 'cobro_atrasado' | 'cobro_hoy' | 'cobro_manana'
+      titulo: cn.vencimiento === 'atrasado'
+        ? 'Cobro Atrasado'
+        : (cn.vencimiento === 'hoy' ? 'Cuota Vence Hoy' : 'Cuota Vence Mañana'),
+      mensaje: `${cn.clienteNombre} • ${cn.concepto} (${cn.montoCobroFormateado})`,
+      etiqueta: cn.vencimiento === 'atrasado' ? 'Atrasado' : (cn.vencimiento === 'hoy' ? 'Hoy' : 'Mañana'),
+      prioridad: cn.vencimiento === 'atrasado' ? 'critica' : (cn.vencimiento === 'hoy' ? 'alta' : 'media'),
+      accion: 'whatsapp_cobro',
+      linkWhatsApp: cn.linkWhatsApp,
+      telefono: cn.telefono,
+      clienteNombre: cn.clienteNombre,
+      montoCobro: cn.montoCobro,
+      montoCobroFormateado: cn.montoCobroFormateado,
+      concepto: cn.concepto,
+      origen: cn.origen,
+      origenTexto: cn.origenTexto,
+      vencimiento: cn.vencimiento,
+      link: cn.origen === 'prestamo' ? '/prestamos' : (cn.origen === 'venta_credito' ? '/ventas' : '/pagos')
+    });
   });
 
   return notificaciones;

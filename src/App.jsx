@@ -2,11 +2,9 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ClientProvider } from './context/ClientContext';
 import { ProductProvider } from './context/ProductContext';
-import { OrderProvider } from './context/OrderContext';
+import { VentasProvider } from './context/VentasContext';
 import { PagosProvider } from './context/PagosContext';
-import { CobrosProvider } from './context/CobrosContext';
 import { PrestamosProvider } from './context/PrestamosContext';
-import { FacturasProvider } from './context/FacturasContext';
 import { DashboardProvider } from './context/DashboardContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { ToastProvider } from './components/common/Toast';
@@ -20,22 +18,18 @@ export default function App() {
         <AuthProvider>
           <ClientProvider>
             <ProductProvider>
-              <OrderProvider>
+              <VentasProvider>
                 <PagosProvider>
-                  <CobrosProvider>
-                    <PrestamosProvider>
-                      <FacturasProvider>
-                        <DashboardProvider>
-                          <NotificationProvider>
-                            <AppRoutes />
-                            <SpeedInsights />
-                          </NotificationProvider>
-                        </DashboardProvider>
-                      </FacturasProvider>
-                    </PrestamosProvider>
-                  </CobrosProvider>
+                  <PrestamosProvider>
+                    <DashboardProvider>
+                      <NotificationProvider>
+                        <AppRoutes />
+                        <SpeedInsights />
+                      </NotificationProvider>
+                    </DashboardProvider>
+                  </PrestamosProvider>
                 </PagosProvider>
-              </OrderProvider>
+              </VentasProvider>
             </ProductProvider>
           </ClientProvider>
         </AuthProvider>

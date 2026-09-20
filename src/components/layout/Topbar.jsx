@@ -1,15 +1,16 @@
 import { useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
+import { NotificationIcons } from './NotificationIcons';
 import NotificationDropdown from './NotificationDropdown';
-import logoImg from '../../assets/logo ME variedades.png';
+import logoImg from '../../assets/logo-me-variedades.png';
 
 export default function Topbar({
   breadcrumb = 'Centro de Comando',
   rightActions = null
 }) {
   const { toggleSidebar } = useAuth();
-  const { unreadCount, toggleDropdown, isOpen } = useNotifications();
+  const { unreadCount, toggleDropdown, isOpen, sonidoHabilitado, toggleSonido } = useNotifications();
 
   const fechaFormateada = useMemo(() => {
     const hoy = new Date();
@@ -60,8 +61,19 @@ export default function Topbar({
           <span>{fechaFormateada}</span>
         </div>
 
+        {/* Botón Silenciar / Activar Sonido de Notificaciones */}
+        <button
+          id="btn-toggle-sound"
+          className={`btn-topbar-action btn-sound-toggle ${!sonidoHabilitado ? 'is-muted' : ''}`}
+          onClick={toggleSonido}
+          title={sonidoHabilitado ? 'Silenciar alertas de sonido' : 'Activar alertas de sonido'}
+          aria-label={sonidoHabilitado ? 'Silenciar alertas de sonido' : 'Activar alertas de sonido'}
+        >
+          {sonidoHabilitado ? NotificationIcons.sound_on : NotificationIcons.sound_off}
+        </button>
+
         {/* Campana de Notificaciones con Badge */}
-        <div className="notif-bell-container" style={{ position: 'relative', marginRight: 0 }}>
+        <div className="notif-bell-container" style={{ position: 'relative', zIndex: 510, marginRight: 0 }}>
           <button
             id="btn-notifications"
             className={`btn-topbar-action ${isOpen ? 'active' : ''}`}

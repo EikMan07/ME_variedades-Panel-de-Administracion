@@ -80,22 +80,22 @@ export function getEstadoBadge(prestamo) {
       };
     case 'atrasado':
       return {
-        label: 'Atrasado / Vencido',
+        label: 'Atrasado',
         className: 'badge-prestamo-atrasado',
-        color: '#B23A48'
+        color: '#f43f5e'
       };
     case 'proximo':
       return {
-        label: 'Próximo a Vencer',
+        label: 'Próximo a vencer',
         className: 'badge-prestamo-proximo',
-        color: '#C9A24B'
+        color: '#f59e0b'
       };
     case 'al_dia':
     default:
       return {
-        label: 'Al Día',
+        label: 'Al día',
         className: 'badge-prestamo-aldia',
-        color: '#6E8F6B'
+        color: '#10b981'
       };
   }
 }

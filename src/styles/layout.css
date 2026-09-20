@@ -573,7 +573,7 @@ header.app-header {
   padding: 0.85rem 1.5rem !important;
   position: sticky;
   top: 0;
-  z-index: 40;
+  z-index: 500 !important;
   box-sizing: border-box !important;
 }
 
@@ -831,20 +831,24 @@ header.app-header {
   color: #ffffff !important;
 }
 
-/* Panel Flotante */
+/* Contenedor relativo de la campana */
+.notif-bell-container {
+  position: relative;
+  z-index: 510;
+}
+
+/* Panel Flotante de Notificaciones — Paleta Carbón Cálida Oficial */
 .notif-dropdown {
   position: absolute;
-  top: calc(100% + 12px);
+  top: calc(100% + 8px);
   right: 0;
   width: 390px;
-  max-width: calc(100vw - 32px);
-  background: rgba(22, 18, 20, 0.95) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border: 1px solid rgba(244, 180, 200, 0.25) !important;
-  border-radius: 16px !important;
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7), 0 0 25px rgba(154, 110, 121, 0.2) !important;
-  z-index: 100;
+  max-width: calc(100vw - 20px);
+  background: #12111a !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 20px 45px -5px rgba(0, 0, 0, 0.9), 0 0 25px rgba(0, 0, 0, 0.5) !important;
+  z-index: 1000 !important;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -866,9 +870,10 @@ header.app-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid rgba(244, 180, 200, 0.12);
-  background: rgba(255, 255, 255, 0.02);
+  gap: 1.25rem;
+  padding: 0.95rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.015);
 }
 
 .notif-header-title {
@@ -878,6 +883,8 @@ header.app-header {
   color: var(--color-texto-principal);
   font-weight: 600;
   font-size: 0.95rem;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .notif-title-text {
@@ -896,24 +903,27 @@ header.app-header {
 
 /* Header Actions */
 .btn-notif-header-action {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(244, 180, 200, 0.15);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--color-texto-secundario);
   font-size: 0.76rem;
   font-weight: 500;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.3rem 0.65rem;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
   border-radius: 8px;
   transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .btn-notif-header-action:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
-  border-color: rgba(244, 180, 200, 0.3);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .btn-notif-header-action.btn-danger-action {
@@ -932,7 +942,7 @@ header.app-header {
 .notif-tabs-bar {
   display: flex;
   background: rgba(0, 0, 0, 0.25);
-  border-bottom: 1px solid rgba(244, 180, 200, 0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   padding: 0.35rem 0.65rem;
   gap: 0.5rem;
 }
@@ -960,10 +970,10 @@ header.app-header {
 }
 
 .notif-tab-btn.active {
-  background: rgba(244, 180, 200, 0.15);
+  background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
   font-weight: 600;
-  box-shadow: 0 0 10px rgba(154, 110, 121, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .notif-tab-pill {
@@ -1041,7 +1051,7 @@ header.app-header {
   padding: 0.85rem;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(244, 180, 200, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   transition: all 0.2s ease;
   cursor: pointer;
   position: relative;
@@ -1049,7 +1059,7 @@ header.app-header {
 
 .notif-item-card:hover {
   background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(244, 180, 200, 0.25);
+  border-color: rgba(255, 255, 255, 0.14);
   transform: translateY(-1px);
 }
 
@@ -1198,6 +1208,99 @@ header.app-header {
 .notif-action-link.whatsapp:hover {
   background: rgba(37, 211, 102, 0.22);
   border-color: rgba(37, 211, 102, 0.45);
+}
+
+/* Notificaciones de Cobro en el Dropdown */
+.notif-cobro_atrasado {
+  border-left: 3px solid #ef4444 !important;
+}
+
+.notif-cobro_hoy {
+  border-left: 3px solid #f59e0b !important;
+}
+
+.notif-cobro_manana {
+  border-left: 3px solid #eab308 !important;
+}
+
+.notif-cobro_atrasado .notif-item-icon-box {
+  background: rgba(239, 68, 68, 0.12) !important;
+  color: #ef4444 !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+.notif-cobro_hoy .notif-item-icon-box {
+  background: rgba(245, 158, 11, 0.12) !important;
+  color: #f59e0b !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+.notif-cobro_manana .notif-item-icon-box {
+  background: rgba(234, 179, 8, 0.12) !important;
+  color: #eab308 !important;
+  border-color: rgba(234, 179, 8, 0.3) !important;
+}
+
+.notif-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.notif-pill {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.notif-pill-atrasado,
+.notif-pill-critica {
+  background: rgba(239, 68, 68, 0.18);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.notif-pill-hoy,
+.notif-pill-alta {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.notif-pill-manana,
+.notif-pill-media {
+  background: rgba(234, 179, 8, 0.15);
+  color: #fde047;
+  border: 1px solid rgba(234, 179, 8, 0.35);
+}
+
+.notif-btn-cobro {
+  text-decoration: none !important;
+  font-weight: 600;
+}
+
+/* Botón Silenciar / Activar Sonido en Topbar */
+.btn-sound-toggle {
+  color: #a1a1aa !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-sound-toggle:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.btn-sound-toggle.is-muted {
+  color: #f87171 !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+}
+
+.btn-sound-toggle.is-muted:hover {
+  background: rgba(239, 68, 68, 0.2) !important;
 }
 
 /* Responsividad Móvil */

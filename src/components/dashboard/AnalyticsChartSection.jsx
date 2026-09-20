@@ -3,7 +3,7 @@ import { Chart as ChartJS, registerables } from 'chart.js';
 import { useDashboard } from '../../context/DashboardContext';
 import { useProducts } from '../../context/ProductContext';
 import { useClients } from '../../context/ClientContext';
-import { useOrders } from '../../context/OrderContext';
+import { useVentas } from '../../context/VentasContext';
 
 // Registrar todos los componentes de Chart.js
 ChartJS.register(...registerables);
@@ -13,7 +13,7 @@ export default function AnalyticsChartSection({ pedidos = [], metricas = {} }) {
   const { metrics = {} } = useDashboard?.() || {};
   const { productos = [] } = useProducts?.() || {};
   const { clientes = [] } = useClients?.() || {};
-  const { orders = [] } = useOrders?.() || {};
+  const { orders = [], ventas = [] } = useVentas?.() || {};
 
   const listaProductos = Array.isArray(productos) && productos.length > 0 
     ? productos 
@@ -23,9 +23,11 @@ export default function AnalyticsChartSection({ pedidos = [], metricas = {} }) {
     : (Array.isArray(metrics?.listaClientes) ? metrics.listaClientes : []);
   const listaPedidos = Array.isArray(pedidos) && pedidos.length > 0 
     ? pedidos 
-    : (Array.isArray(orders) && orders.length > 0 
-      ? orders 
-      : (Array.isArray(metrics?.listaPedidos) ? metrics.listaPedidos : []));
+    : (Array.isArray(ventas) && ventas.length > 0
+      ? ventas
+      : (Array.isArray(orders) && orders.length > 0 
+        ? orders 
+        : (Array.isArray(metrics?.listaPedidos) ? metrics.listaPedidos : [])));
 
   // 2. Total de clientes activos (cualquiera no eliminado / activo)
   const totalClientesActivos = listaClientes.filter(c => c.estado !== 'inactivo').length;

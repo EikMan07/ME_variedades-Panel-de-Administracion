@@ -125,11 +125,11 @@ export default function PrestamosTable({
                   {/* Monto Total y Saldo Pendiente */}
                   <td>
                     <div className="pagos-monto-cell">
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                      <div className="prestamo-saldo-row">
                         <span className={`prestamo-saldo-amount ${esLiquidado ? 'saldo-liquidado' : 'saldo-activo'}`}>
                           {formatMoneda(prestamo.saldo_pendiente)}
                         </span>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--color-texto-apagado)' }}>
+                        <span className="prestamo-total-de-label">
                           de {formatMoneda(prestamo.monto_total)}
                         </span>
                       </div>
