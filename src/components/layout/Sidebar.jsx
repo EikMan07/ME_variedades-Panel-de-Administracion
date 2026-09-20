@@ -182,6 +182,21 @@ export default function Sidebar({ onOpenChatbot }) {
                 <span className="links_name">Estado de Cuenta</span>
               </NavLink>
             </li>
+
+            <li className="nav-item">
+              <NavLink
+                to={ROUTES.TIPO_CAMBIO}
+                className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                onClick={handleNavClick}
+                title="Tipo de Cambio"
+              >
+                <svg className="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                  <polyline points="17 6 23 6 23 12"></polyline>
+                </svg>
+                <span className="links_name">Tipo de Cambio</span>
+              </NavLink>
+            </li>
           </ul>
         </nav>
 

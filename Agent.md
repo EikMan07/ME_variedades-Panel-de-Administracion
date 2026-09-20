@@ -8,7 +8,7 @@ Actúas como el desarrollador líder de "Proyecto María", la plataforma web de 
 - **Administradora (María) — acceso total.** Agrega, edita y elimina clientes, productos, pagos, pedidos, préstamos y facturas; visualiza el dashboard analítico y exporta expedientes en PDF.
 
 ### Módulos del sistema (alcance v4.0)
-Login Híbrido (Credenciales + Biometría Facial) · Dashboard (con KPIs y analítica interactiva) · Clientes CRM (con avisos de cumpleaños) · Pagos y Cuentas por Cobrar · Productos e Inventario (10 categorías oficiales) · Pedidos (con descuento de existencias) · Préstamos a Terceros · Bóveda de Facturas y Comprobantes (con OCR automático y exportador PDF multipágina) · Asistente Virtual (chatbot con IA).
+Login Híbrido (Credenciales + Biometría Facial) · Dashboard (con KPIs y analítica interactiva) · Clientes CRM (con avisos de cumpleaños) · Pagos y Cuentas por Cobrar · Productos e Inventario (10 categorías oficiales) · Pedidos (con descuento de existencias) · Préstamos a Terceros · Bóveda de Facturas y Comprobantes (con OCR automático y exportador PDF multipágina) · Asistente Virtual (chatbot con IA) · Tipo de Cambio BCCR (cotización oficial en vivo, modo contingencia, histórico auditado de 5 años y convertidor multidivisa).
 *(Nota v4.0: El módulo Cobros v3.1 fue depurado y su funcionalidad de recaudación se redistribuyó entre Préstamos y Ventas/Pagos).*
 
 ### Arquitectura de datos y rendimiento
@@ -48,6 +48,28 @@ Login Híbrido (Credenciales + Biometría Facial) · Dashboard (con KPIs y anal�
 - Enrolamiento de nuevo rostro (`FaceEnrollModal`) con verificación estricta previa de credenciales de administrador (`maria` / `DSE777`).
 - Pantalla de verificación y transición autorizada `<AuthVerifyingScreen />` (1.6s).
 
+### Funcionales — Tipo de Cambio BCCR (USD/CRC)
+- **Consulta en tiempo real:** Obtención de cotización oficial vía API Gometa mediante la función serverless `/api/tipo-cambio.js`.
+- **Lógica de fechas y persistencia:** El registro se indexa por la fecha provista por Gometa (`compra_date`, `venta_date`) y se guarda en la tabla `tipo_cambio_historial` de Supabase con `fuente = 'gometa'`.
+- **Modo de contingencia:** Si la llamada a Gometa falla (error de red, timeout o HTTP != 200), el endpoint recupera y devuelve el último registro verificado de la base de datos con código HTTP 200 y bandera `cached: true`.
+- **Políticas de caché:** Respuestas exitosas devuelven `Cache-Control: public, s-maxage=300, stale-while-revalidate=60` (5 min CDN / 1 min stale). En modo contingencia devuelven `public, s-maxage=60, stale-while-revalidate=30`. Respuestas con error (401, 405, 503) devuelven `Cache-Control: no-store`.
+- **Sincronización diaria:** Tarea programada en Vercel Cron a las 12:00 UTC (06:00 CR) autorizada mediante cabecera `Authorization: Bearer <CRON_SECRET>`.
+- **Historial importado:** Serie histórica de 5 años (1,827 días naturales entre 2021-09-17 y 2026-09-17) importada mediante `scripts/import_tipo_cambio_csv.mjs` con `fuente = 'bccr_import'`.
+- **Visualización y KPIs:** Gráfica con Chart.js para rangos 1D, 5D, 1M, 1A, 5A y Máx con reducción de densidad semanal/mensual, y tarjetas de resumen financiero con selector de serie (tasa de venta o compra).
+- **Convertidor multidivisa:** Conversión interactiva bidireccional USD ↔ CRC en tiempo real según la tasa seleccionada.
+
+### Esquema de Base de Datos — `tipo_cambio_historial`
+| Columna | Tipo | Restricciones / Descripción |
+|---|---|---|
+| `id` | `BIGINT` | `GENERATED ALWAYS AS IDENTITY PRIMARY KEY` |
+| `fecha` | `DATE` | `UNIQUE NOT NULL` — Clave primaria de fecha del registro |
+| `compra` | `NUMERIC(8,2)` | `NOT NULL` — Cotización oficial de compra en colones |
+| `venta` | `NUMERIC(8,2)` | `NOT NULL` — Cotización oficial de venta en colones |
+| `compra_date` | `TIMESTAMPTZ` | Timestamp oficial de compra provisto por el origen |
+| `venta_date` | `TIMESTAMPTZ` | Timestamp oficial de venta provisto por el origen |
+| `fuente` | `TEXT` | `NOT NULL` — Origen del registro: `'gometa'` (diario en vivo) o `'bccr_import'` (historial importado) |
+| `created_at` | `TIMESTAMPTZ` | `DEFAULT NOW()` — Fecha y hora de inserción |
+
 ---
 
 ## 3. Estándares Técnicos y Directivas Obligatorias
@@ -72,3 +94,5 @@ Login Híbrido (Credenciales + Biometría Facial) · Dashboard (con KPIs y anal�
 | **Image Compression** | `src/services/imageCompression.js` | Redimensionamiento y compresión en cliente (reducción de fotos de 8MB a <250KB vía Canvas). |
 | **PDF Export Engine** | `src/services/pdfExportService.js` | Generación de expedientes PDF multipágina con carga dinámica de `jspdf`. |
 | **Biometric Auth** | `src/services/biometricService.js` | Carga asíncrona de modelos neuronales y emparejamiento de vectores faciales con Face-API.js. |
+| **Tipo de Cambio Service** | `src/services/tipoCambioService.js` | Consulta de cotización actual, histórico paginado (1000 registros/lote) y cálculo de métricas financieras. |
+| **Serverless Tipo de Cambio** | `api/tipo-cambio.js` | Endpoint serverless con sincronización BCCR, modo contingencia, encabezados de caché y validación de `CRON_SECRET`. |

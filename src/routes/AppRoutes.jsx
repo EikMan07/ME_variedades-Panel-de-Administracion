@@ -12,6 +12,7 @@ const VentasPage = lazy(() => import('../pages/VentasPage'));
 const PagosPage = lazy(() => import('../pages/PagosPage'));
 const PrestamosPage = lazy(() => import('../pages/PrestamosPage'));
 const EstadoCuentaPage = lazy(() => import('../pages/EstadoCuentaPage'));
+const TipoCambioPage = lazy(() => import('../pages/TipoCambioPage'));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
 const ForbiddenPage = lazy(() => import('../pages/ForbiddenPage'));
 
@@ -75,6 +76,7 @@ export default function AppRoutes() {
           <Route path={ROUTES.PAGOS} element={<PagosPage />} />
           <Route path={ROUTES.PRESTAMOS} element={<PrestamosPage />} />
           <Route path={ROUTES.ESTADO_CUENTA} element={<EstadoCuentaPage />} />
+          <Route path={ROUTES.TIPO_CAMBIO} element={<TipoCambioPage />} />
         </Route>
 
         {/* Comodín 404 para cualquier ruta inexistente */}

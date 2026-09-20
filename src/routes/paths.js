@@ -11,6 +11,7 @@ export const ROUTES = {
   PAGOS: '/pagos',
   PRESTAMOS: '/prestamos',
   ESTADO_CUENTA: '/estado-cuenta',
+  TIPO_CAMBIO: '/tipo-de-cambio',
   FORBIDDEN: '/403',
   NOT_FOUND: '/404',
 };

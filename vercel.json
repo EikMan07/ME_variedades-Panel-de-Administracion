@@ -1,8 +1,14 @@
 {
   "version": 2,
+  "crons": [
+    {
+      "path": "/api/tipo-cambio?cron=1",
+      "schedule": "0 12 * * *"
+    }
+  ],
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ],

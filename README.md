@@ -45,6 +45,14 @@ El sistema sustituye por completo los registros manuales en papel por una soluci
   - Cuentas por cobrar y abonos a préstamos con cálculo paramétrico de intereses y liquidación al 100%.
   - **Regla RF-15**: Bloqueo de eliminación de clientes con deudas o pedidos activos.
 
+- **💱 Módulo de Tipo de Cambio BCCR (USD/CRC)**:
+  - Consulta en tiempo real de la cotización oficial del Banco Central de Costa Rica vía API Gometa mediante la función serverless `/api/tipo-cambio.js`.
+  - **Mecanismo de Contingencia Automático**: Si el proveedor externo presenta fallas o indisponibilidad, el endpoint sirve la última cotización verificada guardada en Supabase con indicador `cached: true`.
+  - **Tarea Programada (Cron Job) Diario**: Sincronización automática diaria a las 12:00 UTC (06:00 AM hora de Costa Rica) configurada en `vercel.json` y protegida por `CRON_SECRET`.
+  - **Gráfica Interactiva Multirango**: Visualización con Chart.js para rangos 1D, 5D, 1M, 1A, 5A y Máx, con reducción de densidad semanal/mensual para optimizar el rendimiento.
+  - **Tarjetas de Resumen Financiero (KPIs)**: Indicadores de cotización actual, mínimo, máximo, promedio y variación porcentual con selector dinámico entre tasa de venta y tasa de compra.
+  - **Convertidor de Divisas Bidireccional**: Herramienta interactiva de conversión en tiempo real USD ↔ CRC con selector de tasa y botón swap.
+
 - **✨ Directivas de Diseño**:
   - **Zero Mock Data Policy**: Arranque garantizado en estado limpio (`[]`).
   - **0% Emojis Policy**: Uso exclusivo de iconografía vectorial SVG limpia.
@@ -72,8 +80,11 @@ El sistema sustituye por completo los registros manuales en papel por una soluci
 ```text
 ME-Variedades/
 ├── api/                                         # Serverless Functions (Vercel)
-│   └── chatbot.js                               # Asistente virtual Gemini
+│   ├── chatbot.js                               # Asistente virtual Gemini
+│   └── tipo-cambio.js                           # Sincronización BCCR y contingencia
 ├── public/                                      # Recursos públicos y modelos Face-API
+├── scripts/                                     # Scripts de mantenimiento e importación
+│   └── import_tipo_cambio_csv.mjs               # Importación de historial BCCR
 ├── src/
 │   ├── assets/                                  # Logotipo oficial e imágenes de marca
 │   ├── components/                              # Componentes modulares
@@ -91,8 +102,9 @@ ME-Variedades/
 │   │   └── productos/                           # ProductModal, ProductTable, ProductGrid
 │   ├── context/                                 # Context API Providers (Auth, Client, Product, Order, etc.)
 │   ├── hooks/                                   # Custom hooks (useDebounce, useBiometricAuth, useChatbot)
-│   ├── services/                                # Servicios centralizados (api, imageCompression, receiptOcrService, pdfExportService)
-│   ├── styles/                                  # Hojas de estilo modulares (global.css, dashboard.css, facturas.css, etc.)
+│   ├── pages/                                   # Vistas principales (DashboardPage, TipoCambioPage, etc.)
+│   ├── services/                                # Servicios centralizados (api, tipoCambioService, etc.)
+│   ├── styles/                                  # Hojas de estilo modulares (global.css, tipo-cambio.css, etc.)
 │   ├── App.jsx                                  # Proveedores globales, SpeedInsights y enrutador
 │   └── main.jsx                                 # Punto de entrada de la aplicación
 ├── Documento_Requerimientos_ME_Variedades_V4.html # Especificación formal SRS V4.0 para imprimir/guardar en PDF (Ctrl+P)
@@ -135,16 +147,21 @@ Crea un archivo `.env` o `.env.local` en la raíz del proyecto:
 VITE_SUPABASE_URL=tu_supabase_url
 VITE_SUPABASE_ANON_KEY=tu_supabase_anon_key
 
-# Servidor / Vercel Serverless Function (RF-60: Nunca exponer con prefijo VITE_)
+# Servidor / Vercel Serverless Functions (Nunca exponer con prefijo VITE_)
 GEMINI_API_KEY=tu_clave_de_google_ai_studio
+SUPABASE_URL=tu_supabase_url
+SUPABASE_SERVICE_ROLE_KEY=tu_supabase_service_role_key
+CRON_SECRET=tu_clave_secreta_cron_64_caracteres
 ```
 
-> **Nota de Seguridad e Inteligencia Artificial (RF-60)**:
-> Para el Asistente Virtual Inteligente en producción (Vercel), agrega la variable de entorno **`GEMINI_API_KEY`** directamente en **Vercel Dashboard > Project Settings > Environment Variables**.
-> - Nombre exacto: `GEMINI_API_KEY`
-> - Valor: Clave obtenida desde [Google AI Studio](https://aistudio.google.com/app/apikey)
-> - Entornos recomendados: `Production`, `Preview`, `Development`
-> - La clave es consumida exclusivamente por la Serverless Function `/api/chatbot.js` y jamás se expone al navegador.
+> **Nota de Seguridad de Variables de Servidor**:
+> Las variables sin prefijo `VITE_` se ejecutan exclusivamente en el entorno de Node.js del servidor (Vercel Serverless Functions o middleware local de Vite) y jamás son empaquetadas en el bundle del cliente:
+> - **`GEMINI_API_KEY`**: Consumida por `/api/chatbot.js` para el Asistente Virtual.
+> - **`SUPABASE_URL`**: URL del proyecto Supabase requerida por las funciones del servidor.
+> - **`SUPABASE_SERVICE_ROLE_KEY`**: Clave de servicio con privilegios para escribir directamente en la tabla `tipo_cambio_historial` desde `/api/tipo-cambio.js`.
+> - **`CRON_SECRET`**: Token de autenticación Bearer para validar las solicitudes provenientes de Vercel Cron a `/api/tipo-cambio`.
+>
+> Para producción, configura estas variables en **Vercel Dashboard > Project Settings > Environment Variables**.
 
 ### 4. Iniciar el Servidor de Desarrollo
 
@@ -168,6 +185,37 @@ Para generar y consultar el documento formal de especificación del sistema en f
 1. Abre el archivo `Documento_Requerimientos_ME_Variedades_V4.html` directamente en tu navegador web.
 2. Presiona **Ctrl + P** (o **Cmd + P** en Mac).
 3. Selecciona **"Guardar como PDF"** con márgenes predeterminados. Los estilos tipográficos `@media print` darán como resultado el documento oficial de 16 páginas.
+
+---
+
+## 📅 Sincronización Automática e Importación de Historial
+
+### Cron Job Diario (Vercel Cron)
+- **Horario programado**: Configurado en `vercel.json` con la expresión `0 12 * * *` (todos los días a las 12:00 UTC / 06:00 AM hora de Costa Rica).
+- **Ruta invocada**: `/api/tipo-cambio`
+- **Autenticación**: Vercel Cron envía la cabecera `Authorization: Bearer <CRON_SECRET>`.
+- **Comportamiento**:
+  - Obtiene la cotización del día desde la API externa de Gometa (BCCR).
+  - Almacena o actualiza la fila correspondiente en la tabla `tipo_cambio_historial` con `fuente = 'gometa'`.
+  - En caso de indisponibilidad temporal del proveedor externo, entra en modo contingencia y devuelve la última cotización verificada con `cached: true`.
+  - Aplica políticas de encabezados de caché `Cache-Control: public, s-maxage=300, stale-while-revalidate=60` en respuestas exitosas en vivo, `public, s-maxage=60, stale-while-revalidate=30` en contingencia, y `no-store` en respuestas de error.
+
+### Script de Importación del Historial (`scripts/import_tipo_cambio_csv.mjs`)
+- **Propósito**: Permite importar series históricas oficiales en formato CSV a la tabla `tipo_cambio_historial` de Supabase sin sobreescribir los registros del día guardados por Gometa.
+- **Formato del archivo CSV**:
+  ```csv
+  fecha,compra,venta
+  2021-09-17,624.12,629.80
+  2021-09-18,624.12,629.80
+  ```
+- **Características operativas**:
+  - Inserción por lotes de 100 registros con la cláusula `ON CONFLICT (fecha) DO NOTHING`.
+  - Asigna automáticamente la columna `fuente = 'bccr_import'`.
+  - Validación estricta: si un lote falla, se detiene de inmediato (`throw`) reportando el número exacto de filas escritas hasta ese momento.
+- **Instrucciones de uso**:
+  ```bash
+  node scripts/import_tipo_cambio_csv.mjs <ruta-del-archivo.csv>
+  ```
 
 ---
 

@@ -12,6 +12,28 @@ El formato se basa en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/
 
 ---
 
+## [4.4.0] - 2026-09-19
+
+### ✨ Añadido (Added)
+- **Módulo de Tipo de Cambio BCCR (USD/CRC)**:
+  - **Endpoint Serverless (`/api/tipo-cambio.js`)**: Consulta de cotización oficial del BCCR en tiempo real vía API Gometa, con persistencia diaria en Supabase.
+  - **Mecanismo de Contingencia y Alta Disponibilidad**: Ante fallas de conexión o respuestas no exitosas del proveedor externo, el endpoint sirve automáticamente la última cotización verificada guardada en la base de datos con bandera `cached: true`.
+  - **Políticas de Caché CDN**: Encabezados `Cache-Control: public, s-maxage=300, stale-while-revalidate=60` en respuestas exitosas en vivo, `public, s-maxage=60, stale-while-revalidate=30` en contingencia, y `no-store` estricto en respuestas de error (401, 405, 503).
+  - **Persistencia Histórica en Supabase (`tipo_cambio_historial`)**: Almacenamiento con clave única por fecha y columna `fuente` (`'gometa'` | `'bccr_import'`) para trazabilidad de datos.
+  - **Automatización Diaria (Vercel Cron)**: Configuración en `vercel.json` de tarea programada diaria a las 12:00 UTC (06:00 hora Costa Rica) asegurada mediante token `CRON_SECRET`.
+  - **Carga Histórica Oficial Auditada (5 Años)**: Importación de 1,827 días naturales verificados (período 2021-09-17 a 2026-09-17) con script `scripts/import_tipo_cambio_csv.mjs` bajo la fuente `'bccr_import'`.
+  - **Servicio Cliente Resiliente (`tipoCambioService.js`)**: Paginación transparente por lotes de 1000 registros para superar la limitación de PostgREST en consultas multianuales (`5A` y `Máx`).
+  - **Gráfico Interactivo Multirango**: Visualización con Chart.js de tasas de compra y venta para rangos 1D, 5D, 1M, 1A, 5A y Máx, con reducción de densidad (downsampling) semanal/mensual para optimizar el rendimiento.
+  - **Tarjetas de Resumen Financiero (KPIs)**: Indicadores de cotización actual, mínimo, máximo, promedio y variación porcentual con selector dinámico entre tasa de venta y tasa de compra.
+  - **Convertidor de Divisas Bidireccional**: Herramienta de conversión en tiempo real USD ↔ CRC con selector de tasa (venta/compra) y botón de intercambio de dirección.
+  - **Navegación y Rutas**: Integración en el panel administrativo mediante `src/routes/paths.js`, `AppRoutes.jsx` y `Sidebar.jsx` (grupo "CONSULTAS / REPORTES" con icono SVG dedicado).
+
+### 🔒 Seguridad y Configuración
+- **Gestión Estricta de Secretos de Servidor**: Variables `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` y `CRON_SECRET` leídas exclusivamente en el entorno del servidor sin prefijo `VITE_` ni exposición al bundle cliente.
+- **Protección de Datos en Git**: Reglas en `.gitignore` limitando exclusión de archivos CSV a `scratch/*.csv`, manteniendo ignorados `.env` y `.env.*.local` y rastreado `.env.example`.
+
+---
+
 ## [4.3.0] - 2026-09-06
 
 ### 🧹 Limpieza y Refactorización Arquitectónica (Clean Architecture)
