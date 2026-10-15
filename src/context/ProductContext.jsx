@@ -4,7 +4,18 @@ import { api } from '../services/api';
 const ProductContext = createContext(null);
 
 export function ProductProvider({ children }) {
-  const [productos, setProductos] = useState([]);
+  const [productos, setProductos] = useState(() => {
+    try {
+      const guardados = localStorage.getItem('me_productos_data');
+      if (guardados && guardados !== '[]' && guardados !== 'null') {
+        const parsed = JSON.parse(guardados);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } else {
+        localStorage.removeItem('me_productos_data');
+      }
+    } catch { /* ignorar */ }
+    return [];
+  });
   const [isLoading, setIsLoading] = useState(true);
 
   // Carga inicial desde Supabase
@@ -16,12 +27,14 @@ export function ProductProvider({ children }) {
       setProductos(prods);
       if (prods.length > 0) {
         localStorage.setItem('me_productos_data', JSON.stringify(prods));
+      } else {
+        localStorage.removeItem('me_productos_data');
       }
     } catch (err) {
       console.warn('⚠️ Error al consultar productos en Supabase, intentando respaldo local:', err);
       try {
         const guardados = localStorage.getItem('me_productos_data');
-        if (guardados) {
+        if (guardados && guardados !== '[]' && guardados !== 'null') {
           const parsed = JSON.parse(guardados);
           if (Array.isArray(parsed) && parsed.length > 0) setProductos(parsed);
         }

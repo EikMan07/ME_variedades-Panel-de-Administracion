@@ -48,7 +48,7 @@ export function DashboardProvider({ children }) {
         conectada: Boolean(estado?.conectada),
         faltanVariables: Boolean(estado?.faltanVariables),
         error: estado?.error || null,
-        totalClientes: estado?.totalClientes ?? (clientes?.length || 0),
+        totalClientes: Math.max(Number(estado?.totalClientes) || 0, clientes?.length || 0),
         verificando: false
       });
       return estado;
@@ -113,7 +113,7 @@ export function DashboardProvider({ children }) {
   useEffect(() => {
     if (Array.isArray(clientes) && clientes.length > 0) {
       setMetrics(prev => {
-        const nuevoTotal = (prev.totalClientes > 0) ? prev.totalClientes : clientes.length;
+        const nuevoTotal = Math.max(Number(prev.totalClientes) || 0, clientes.length);
         const nuevaLista = (prev.listaClientes && prev.listaClientes.length > 0) ? prev.listaClientes : clientes;
         const mesActual = new Date().getMonth() + 1;
         const cumpleaneros = (prev.cumpleanerosDelMes && prev.cumpleanerosDelMes.length > 0)

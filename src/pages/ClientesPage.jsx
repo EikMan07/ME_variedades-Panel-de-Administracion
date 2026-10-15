@@ -9,7 +9,7 @@ import { useClients } from '../context/ClientContext';
 import { useToast } from '../components/common/Toast';
 
 export default function ClientesPage() {
-  const { clientes, eliminarCliente, puedeEliminarse } = useClients();
+  const { clientes, isLoading, eliminarCliente, puedeEliminarse } = useClients();
   const { showToast } = useToast();
 
   const [busqueda, setBusqueda] = useState('');
@@ -149,13 +149,13 @@ export default function ClientesPage() {
             <div className="summary-chip">
               <span className="chip-label">Total Clientes</span>
               <span className="chip-val" id="chip-total-clientes">
-                {clientes.length}
+                {isLoading && clientes.length === 0 ? '...' : clientes.length}
               </span>
             </div>
             <div className="summary-chip chip-gold">
               <span className="chip-label">Cumpleañeros este Mes</span>
               <span className="chip-val" id="chip-cumple-mes">
-                {cumpleanerosEsteMes}
+                {isLoading && clientes.length === 0 ? '...' : cumpleanerosEsteMes}
               </span>
             </div>
           </div>
@@ -175,6 +175,7 @@ export default function ClientesPage() {
         {/* Tabla de Clientes */}
         <ClientTable
           clientes={clientesFiltrados}
+          isLoading={isLoading}
           onEdit={handleEdit}
           onDeleteRequest={handleDeleteRequest}
           onOpenCreate={handleOpenCreate}

@@ -4,10 +4,20 @@ import { api } from '../services/api';
 const ClientContext = createContext(null);
 
 export function ClientProvider({ children }) {
-  const [clientes, setClientes] = useState([]);
+  // Inicialización limpia: si hay caché previa válida con datos (>0), arranca con ella provisionalmente
+  const [clientes, setClientes] = useState(() => {
+    try {
+      const guardados = localStorage.getItem('me_clientes_data');
+      if (guardados && guardados !== '[]' && guardados !== 'null') {
+        const parsed = JSON.parse(guardados);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch { /* ignorar */ }
+    return [];
+  });
   const [isLoading, setIsLoading] = useState(true);
 
-  // Carga inicial y reactiva desde Supabase
+  // Carga inicial y reactiva desde Supabase con prioridad absoluta
   const cargarClientes = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -16,13 +26,15 @@ export function ClientProvider({ children }) {
       setClientes(clientesValidos);
       if (clientesValidos.length > 0) {
         localStorage.setItem('me_clientes_data', JSON.stringify(clientesValidos));
+      } else {
+        localStorage.removeItem('me_clientes_data');
       }
     } catch (err) {
       console.error('❌ Error al cargar clientes desde Supabase:', err);
-      // Solo en caso de error de red o bloqueo cargar respaldo previo
+      // Solo en caso de error de red o bloqueo cargar respaldo previo si es válido
       try {
         const guardados = localStorage.getItem('me_clientes_data');
-        if (guardados) {
+        if (guardados && guardados !== '[]' && guardados !== 'null') {
           const parsed = JSON.parse(guardados);
           if (Array.isArray(parsed) && parsed.length > 0) setClientes(parsed);
         }

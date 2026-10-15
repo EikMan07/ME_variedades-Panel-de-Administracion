@@ -45,7 +45,18 @@ function validarPago(datos) {
 }
 
 export function PagosProvider({ children }) {
-  const [pagos, setPagos] = useState([]);
+  const [pagos, setPagos] = useState(() => {
+    try {
+      const guardados = localStorage.getItem('me_pagos_data');
+      if (guardados && guardados !== '[]' && guardados !== 'null') {
+        const parsed = JSON.parse(guardados);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } else {
+        localStorage.removeItem('me_pagos_data');
+      }
+    } catch { /* ignorar */ }
+    return [];
+  });
   const [isLoading, setIsLoading] = useState(true);
 
   // Carga inicial desde Supabase
@@ -53,15 +64,20 @@ export function PagosProvider({ children }) {
     try {
       setIsLoading(true);
       const datosRemotos = await api.getPagos();
-      setPagos(Array.isArray(datosRemotos) ? datosRemotos : []);
-      localStorage.setItem('me_pagos_data', JSON.stringify(datosRemotos || []));
+      const lista = Array.isArray(datosRemotos) ? datosRemotos : [];
+      setPagos(lista);
+      if (lista.length > 0) {
+        localStorage.setItem('me_pagos_data', JSON.stringify(lista));
+      } else {
+        localStorage.removeItem('me_pagos_data');
+      }
     } catch (err) {
       console.error('❌ Error al cargar pagos desde Supabase:', err);
       try {
         const guardados = localStorage.getItem('me_pagos_data');
-        if (guardados) {
+        if (guardados && guardados !== '[]' && guardados !== 'null') {
           const parsed = JSON.parse(guardados);
-          if (Array.isArray(parsed)) setPagos(parsed);
+          if (Array.isArray(parsed) && parsed.length > 0) setPagos(parsed);
         }
       } catch { /* ignorar */ }
     } finally {

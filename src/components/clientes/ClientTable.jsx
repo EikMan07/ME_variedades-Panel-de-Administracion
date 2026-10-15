@@ -2,16 +2,30 @@ import { useClients } from '../../context/ClientContext';
 
 export default function ClientTable({
   clientes,
+  isLoading,
   onEdit,
   onDeleteRequest,
   onOpenCreate
 }) {
-  const { puedeEliminarse } = useClients();
+  const { puedeEliminarse, isLoading: contextLoading } = useClients();
+  const cargando = typeof isLoading === 'boolean' ? isLoading : contextLoading;
 
   const hoy = new Date();
   const mesActual = hoy.getMonth() + 1;
   const diaActual = hoy.getDate();
   const nombresMeses = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+  if (cargando && clientes.length === 0) {
+    return (
+      <section className="card-glass table-container-card">
+        <div id="clientes-loading-state" className="empty-state-card" style={{ padding: '3rem 1.5rem', textAlign: 'center' }}>
+          <span className="status-indicator-dot checking" style={{ width: 14, height: 14, display: 'inline-block' }} />
+          <h3 style={{ marginTop: '0.75rem' }}>Sincronizando Directorio de Clientes...</h3>
+          <p style={{ color: 'var(--text-secondary, #94a3b8)' }}>Consultando datos en vivo desde Supabase...</p>
+        </div>
+      </section>
+    );
+  }
 
   if (clientes.length === 0) {
     return (

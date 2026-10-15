@@ -3,7 +3,7 @@ import { useDashboard } from '../../context/DashboardContext';
 import { generarLinkWhatsApp } from '../../utils/utils';
 
 export default function BirthdayCard() {
-  const { metrics = {} } = useDashboard?.() || {};
+  const { metrics = {}, isLoading } = useDashboard?.() || {};
 
   const { cumpleanerosMes, diaActual, mesNombre } = useMemo(() => {
     const hoy = new Date();
@@ -45,12 +45,17 @@ export default function BirthdayCard() {
           </div>
         </div>
         <span className="badge-count gold-badge-count" id="birthday-count-badge" style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
-          {cumpleanerosMes.length} este mes
+          {isLoading && cumpleanerosMes.length === 0 ? '...' : `${cumpleanerosMes.length} este mes`}
         </span>
       </div>
 
       <div className="birthday-list-container" id="birthday-list">
-        {cumpleanerosMes.length === 0 ? (
+        {isLoading && cumpleanerosMes.length === 0 ? (
+          <div className="loading-state">
+            <span className="status-indicator-dot checking" />
+            <span>Sincronizando cumpleaños con Supabase...</span>
+          </div>
+        ) : cumpleanerosMes.length === 0 ? (
           <div className="loading-state">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="10"></circle>

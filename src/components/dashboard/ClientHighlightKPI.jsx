@@ -3,8 +3,14 @@ import { useDashboard } from '../../context/DashboardContext';
 import { useClients } from '../../context/ClientContext';
 
 export default function ClientHighlightKPI() {
-  const { metrics = {}, conexion = {}, recargarMetricas, isLoading } = useDashboard?.() || {};
-  const { clientes = [] } = useClients?.() || {};
+  const { metrics = {}, conexion = {}, recargarMetricas, isLoading: isDashboardLoading } = useDashboard?.() || {};
+  const { clientes = [], isLoading: isClientsLoading } = useClients?.() || {};
+
+  const [reintentando, setReintentando] = useState(false);
+  const { conectada, error, verificando } = conexion;
+
+  // Estado de carga global de clientes y conexión
+  const enCarga = verificando || isDashboardLoading || isClientsLoading || reintentando;
 
   // Resolución multicanal y reactiva del total de clientes registrados
   const totalClientes =
@@ -16,11 +22,7 @@ export default function ClientHighlightKPI() {
           ? metrics.listaClientes.length
           : (conexion?.totalClientes && conexion.totalClientes > 0)
             ? conexion.totalClientes
-            : 0;
-
-  const [reintentando, setReintentando] = useState(false);
-
-  const { conectada, faltanVariables, error, verificando } = conexion;
+            : null;
 
   const handleRetry = async (e) => {
     e?.stopPropagation?.();
@@ -34,27 +36,31 @@ export default function ClientHighlightKPI() {
     }
   };
 
-  // Determinación reactiva del estado y diseño
-  let statusClass = 'connected';
-  let dotClass = 'connected';
-  let statusText = 'Base de datos activa (Sincronizada)';
+  // Determinación reactiva estricta del estado y diseño
+  let statusClass = 'checking';
+  let dotClass = 'checking';
+  let statusText = 'Sincronizando con Supabase...';
   let showErrorRetry = false;
 
-  if (verificando || (isLoading && !conectada && !error && !faltanVariables)) {
+  if (enCarga) {
     statusClass = 'checking';
     dotClass = 'checking';
-    statusText = 'Verificando base de datos...';
-  } else if (faltanVariables) {
-    statusClass = 'warning';
-    dotClass = 'warning';
-    statusText = 'Faltan variables VITE_SUPABASE en Vercel';
-    showErrorRetry = true;
+    statusText = 'Sincronizando con Supabase...';
   } else if (!conectada || error) {
     statusClass = 'error';
     dotClass = 'error';
-    statusText = 'Error de conexión / Permisos RLS';
+    statusText = error ? `Error: ${error}` : 'Error de conexión / Permisos RLS';
     showErrorRetry = true;
+  } else if (conectada) {
+    statusClass = 'connected';
+    dotClass = 'connected';
+    statusText = 'Base de datos activa (Sincronizada)';
   }
+
+  // Valor a mostrar: nunca mostrar 0 engañoso si está cargando y no tenemos conteo firme
+  const valorDisplay = enCarga
+    ? (totalClientes !== null && totalClientes > 0 ? totalClientes : '...')
+    : (totalClientes ?? 0);
 
   return (
     <article className="client-highlight-card" id="kpi-clientes-destacado" aria-label="Total de Clientes Registrados">
@@ -69,7 +75,7 @@ export default function ClientHighlightKPI() {
         </div>
         <div className="client-kpi-data">
           <span className="client-kpi-label">Total Clientes</span>
-          <h2 className="client-kpi-value">{totalClientes}</h2>
+          <h2 className="client-kpi-value">{valorDisplay}</h2>
           <div className="client-kpi-status-container">
             <span className={`client-kpi-status ${statusClass}`} title={error || statusText}>
               <span className={`status-indicator-dot ${dotClass}`} />

@@ -108,7 +108,18 @@ function validarPrestamo(datos) {
 export function PrestamosProvider({ children }) {
   const { clientes, actualizarCliente } = useClients();
 
-  const [prestamos, setPrestamos] = useState([]);
+  const [prestamos, setPrestamos] = useState(() => {
+    try {
+      const guardados = localStorage.getItem('me_prestamos_data');
+      if (guardados && guardados !== '[]' && guardados !== 'null') {
+        const parsed = JSON.parse(guardados);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } else {
+        localStorage.removeItem('me_prestamos_data');
+      }
+    } catch { /* ignorar */ }
+    return [];
+  });
   const [isLoading, setIsLoading] = useState(true);
 
   // Carga inicial desde Supabase
@@ -116,15 +127,20 @@ export function PrestamosProvider({ children }) {
     try {
       setIsLoading(true);
       const datosRemotos = await api.getPrestamos();
-      setPrestamos(Array.isArray(datosRemotos) ? datosRemotos : []);
-      localStorage.setItem('me_prestamos_data', JSON.stringify(datosRemotos || []));
+      const lista = Array.isArray(datosRemotos) ? datosRemotos : [];
+      setPrestamos(lista);
+      if (lista.length > 0) {
+        localStorage.setItem('me_prestamos_data', JSON.stringify(lista));
+      } else {
+        localStorage.removeItem('me_prestamos_data');
+      }
     } catch (err) {
       console.error('❌ Error al cargar préstamos desde Supabase:', err);
       try {
         const guardados = localStorage.getItem('me_prestamos_data');
-        if (guardados) {
+        if (guardados && guardados !== '[]' && guardados !== 'null') {
           const parsed = JSON.parse(guardados);
-          if (Array.isArray(parsed)) setPrestamos(parsed);
+          if (Array.isArray(parsed) && parsed.length > 0) setPrestamos(parsed);
         }
       } catch { /* ignorar */ }
     } finally {

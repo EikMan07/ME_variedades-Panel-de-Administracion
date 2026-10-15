@@ -11,7 +11,18 @@ export function VentasProvider({ children }) {
   const { productos, ajustarStock, cargarProductos } = useProducts();
   const { showToast } = useToast();
 
-  const [ventas, setVentas] = useState([]);
+  const [ventas, setVentas] = useState(() => {
+    try {
+      const rawLocal = localStorage.getItem(STORAGE_KEY_VENTAS);
+      if (rawLocal && rawLocal !== '[]' && rawLocal !== 'null') {
+        const parsed = JSON.parse(rawLocal);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } else {
+        localStorage.removeItem(STORAGE_KEY_VENTAS);
+      }
+    } catch { /* ignorar */ }
+    return [];
+  });
   const [isLoading, setIsLoading] = useState(true);
 
   // Carga inicial sincronizada exclusivamente desde Supabase
@@ -19,13 +30,21 @@ export function VentasProvider({ children }) {
     try {
       setIsLoading(true);
       const datosRemotos = await api.getPedidos();
-      setVentas(Array.isArray(datosRemotos) ? datosRemotos : []);
-      localStorage.setItem(STORAGE_KEY_VENTAS, JSON.stringify(datosRemotos || []));
+      const lista = Array.isArray(datosRemotos) ? datosRemotos : [];
+      setVentas(lista);
+      if (lista.length > 0) {
+        localStorage.setItem(STORAGE_KEY_VENTAS, JSON.stringify(lista));
+      } else {
+        localStorage.removeItem(STORAGE_KEY_VENTAS);
+      }
     } catch (err) {
       console.error('❌ Error al cargar ventas desde Supabase:', err);
       try {
         const rawLocal = localStorage.getItem(STORAGE_KEY_VENTAS);
-        if (rawLocal) setVentas(JSON.parse(rawLocal));
+        if (rawLocal && rawLocal !== '[]' && rawLocal !== 'null') {
+          const parsed = JSON.parse(rawLocal);
+          if (Array.isArray(parsed) && parsed.length > 0) setVentas(parsed);
+        }
       } catch { /* ignorar */ }
     } finally {
       setIsLoading(false);
