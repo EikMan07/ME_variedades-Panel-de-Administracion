@@ -1,9 +1,23 @@
 import { useState } from 'react';
 import { useDashboard } from '../../context/DashboardContext';
+import { useClients } from '../../context/ClientContext';
 
 export default function ClientHighlightKPI() {
   const { metrics = {}, conexion = {}, recargarMetricas, isLoading } = useDashboard?.() || {};
-  const totalClientes = metrics?.totalClientes ?? 0;
+  const { clientes = [] } = useClients?.() || {};
+
+  // Resolución multicanal y reactiva del total de clientes registrados
+  const totalClientes =
+    (metrics?.totalClientes && metrics.totalClientes > 0)
+      ? metrics.totalClientes
+      : (clientes && clientes.length > 0)
+        ? clientes.length
+        : (metrics?.listaClientes && metrics.listaClientes.length > 0)
+          ? metrics.listaClientes.length
+          : (conexion?.totalClientes && conexion.totalClientes > 0)
+            ? conexion.totalClientes
+            : 0;
+
   const [reintentando, setReintentando] = useState(false);
 
   const { conectada, faltanVariables, error, verificando } = conexion;

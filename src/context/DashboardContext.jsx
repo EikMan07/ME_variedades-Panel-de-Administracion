@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { api } from '../services/api';
 import { supabase, verificarEstadoConexionSupabase } from '../services/supabase';
+import { useClients } from './ClientContext';
 
 const DashboardContext = createContext(null);
 
@@ -21,12 +22,20 @@ const initialMetrics = {
 };
 
 export function DashboardProvider({ children }) {
-  const [metrics, setMetrics] = useState(initialMetrics);
+  const { clientes = [] } = useClients?.() || {};
+
+  const [metrics, setMetrics] = useState(() => ({
+    ...initialMetrics,
+    totalClientes: Array.isArray(clientes) ? clientes.length : 0,
+    listaClientes: Array.isArray(clientes) ? clientes : []
+  }));
+
   const [isLoading, setIsLoading] = useState(true);
   const [conexion, setConexion] = useState({
     conectada: false,
     faltanVariables: false,
     error: null,
+    totalClientes: Array.isArray(clientes) ? clientes.length : 0,
     verificando: true
   });
 
@@ -39,6 +48,7 @@ export function DashboardProvider({ children }) {
         conectada: Boolean(estado?.conectada),
         faltanVariables: Boolean(estado?.faltanVariables),
         error: estado?.error || null,
+        totalClientes: estado?.totalClientes ?? (clientes?.length || 0),
         verificando: false
       });
       return estado;
@@ -47,14 +57,15 @@ export function DashboardProvider({ children }) {
         conectada: false,
         faltanVariables: false,
         error: err.message || 'Error de red con Supabase',
+        totalClientes: clientes?.length || 0,
         verificando: false
       };
       setConexion(errObj);
       return errObj;
     }
-  }, []);
+  }, [clientes]);
 
-  // Carga de métricas en vivo desde Supabase
+  // Carga de métricas en vivo desde Supabase con resiliencia cruzada
   const cargarMetricas = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -64,20 +75,60 @@ export function DashboardProvider({ children }) {
       ]);
 
       if (datos.status === 'fulfilled' && datos.value) {
-        setMetrics(datos.value);
+        const val = datos.value;
+        const total = (val.totalClientes && val.totalClientes > 0)
+          ? val.totalClientes
+          : (clientes && clientes.length > 0 ? clientes.length : 0);
+        const lista = (val.listaClientes && val.listaClientes.length > 0)
+          ? val.listaClientes
+          : (clientes || []);
+
+        setMetrics({
+          ...val,
+          totalClientes: total,
+          listaClientes: lista
+        });
       } else if (datos.status === 'rejected') {
         console.error('❌ Error al cargar métricas del Dashboard:', datos.reason);
+        if (clientes && clientes.length > 0) {
+          setMetrics(prev => ({
+            ...prev,
+            totalClientes: clientes.length,
+            listaClientes: clientes
+          }));
+        }
       }
     } catch (err) {
       console.error('❌ Error general al cargar métricas del Dashboard:', err);
     } finally {
       setIsLoading(false);
     }
-  }, [verificarConexion]);
+  }, [verificarConexion, clientes]);
 
   useEffect(() => {
     cargarMetricas();
   }, [cargarMetricas]);
+
+  // Sincronización reactiva inmediata cuando ClientContext actualiza sus datos
+  useEffect(() => {
+    if (Array.isArray(clientes) && clientes.length > 0) {
+      setMetrics(prev => {
+        const nuevoTotal = (prev.totalClientes > 0) ? prev.totalClientes : clientes.length;
+        const nuevaLista = (prev.listaClientes && prev.listaClientes.length > 0) ? prev.listaClientes : clientes;
+        const mesActual = new Date().getMonth() + 1;
+        const cumpleaneros = (prev.cumpleanerosDelMes && prev.cumpleanerosDelMes.length > 0)
+          ? prev.cumpleanerosDelMes
+          : nuevaLista.filter(c => Number(c.mes_cumpleanos || c.mes_cumple) === mesActual);
+
+        return {
+          ...prev,
+          totalClientes: nuevoTotal,
+          listaClientes: nuevaLista,
+          cumpleanerosDelMes: cumpleaneros
+        };
+      });
+    }
+  }, [clientes]);
 
   // Sincronización en tiempo real con todas las tablas operativas
   useEffect(() => {

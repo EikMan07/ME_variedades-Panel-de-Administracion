@@ -1263,15 +1263,34 @@ export async function getDashboardMetrics() {
   console.log('📊 Calculando métricas del Dashboard desde Supabase...');
 
   try {
-    // 1. Conteo total de clientes y lista de clientes
-    const { count: totalClientes, data: listaClientes, error: errClientes } = await supabase
+    // 1. Conteo total de clientes y lista de clientes (ordenado por ID con fallback seguro)
+    let listaClientes = [];
+    let conteoClientes = null;
+
+    const { count: countCli, data: dataCli, error: errClientes } = await supabase
       .from('clientes')
       .select('*', { count: 'exact' })
-      .order('created_at', { ascending: false });
+      .order('id', { ascending: true });
 
     if (errClientes) {
-      console.warn('⚠️ Error al consultar clientes en getDashboardMetrics:', errClientes.message);
+      console.warn('⚠️ Error en consulta directa de clientes en getDashboardMetrics, usando getClientes:', errClientes.message);
+      try {
+        listaClientes = await getClientes();
+        conteoClientes = listaClientes.length;
+      } catch (errFallback) {
+        console.error('❌ Error en fallback getClientes:', errFallback);
+        listaClientes = [];
+        conteoClientes = 0;
+      }
+    } else {
+      listaClientes = dataCli || [];
+      conteoClientes = typeof countCli === 'number' && countCli > 0 ? countCli : listaClientes.length;
     }
+
+    const clientesNormalizados = (listaClientes || []).map(normalizarCliente);
+    const finalTotalClientes = typeof conteoClientes === 'number' && conteoClientes > 0 
+      ? conteoClientes 
+      : clientesNormalizados.length;
 
     // 2. Pedidos activos y lista de pedidos (con fallback a consulta plana si falla el join)
     let listaPedidos = [];
@@ -1349,11 +1368,22 @@ export async function getDashboardMetrics() {
 
     // 6. Cumpleañeros del mes actual
     const mesActual = new Date().getMonth() + 1; // 1 a 12
-    const { data: cumpleaneros } = await supabase
-      .from('clientes')
-      .select('*')
-      .eq('mes_cumpleanos', mesActual)
-      .order('dia_cumpleanos', { ascending: true });
+    let cumpleaneros = [];
+    try {
+      const { data: resCumple, error: errCumple } = await supabase
+        .from('clientes')
+        .select('*')
+        .eq('mes_cumpleanos', mesActual)
+        .order('dia_cumpleanos', { ascending: true });
+
+      if (!errCumple && Array.isArray(resCumple) && resCumple.length > 0) {
+        cumpleaneros = resCumple;
+      } else {
+        cumpleaneros = clientesNormalizados.filter(c => Number(c.mes_cumpleanos || c.mes_cumple) === mesActual);
+      }
+    } catch {
+      cumpleaneros = clientesNormalizados.filter(c => Number(c.mes_cumpleanos || c.mes_cumple) === mesActual);
+    }
 
     // Cálculos agregados
     const saldoCuentasCobrar = (listaPagos || []).reduce(
@@ -1384,10 +1414,8 @@ export async function getDashboardMetrics() {
       p => p.estado === 'Activo' || p.estado === 'Pendiente' || p.estado === 'en_proceso' || p.estado === 'activo'
     ).length;
 
-    const clientesNormalizados = (listaClientes || []).map(normalizarCliente);
-
     return {
-      totalClientes: typeof totalClientes === 'number' ? totalClientes : clientesNormalizados.length,
+      totalClientes: finalTotalClientes,
       pedidosActivos: pedidosPendientesCount > 0 ? pedidosPendientesCount : (listaPedidos || []).length,
       cuentasPorCobrarCount: cuentasPorCobrarCount,
       cuentasPorCobrar: cuentasPorCobrarCount,
@@ -1398,7 +1426,7 @@ export async function getDashboardMetrics() {
       saldoPrestamosPorRecuperar: saldoPrestamosCobrar,
       totalStockUnidades: totalStockUnidades,
       valorInventario: valorInventario,
-      cumpleanerosDelMes: (cumpleaneros || clientesNormalizados.filter(c => Number(c.mes_cumpleanos) === mesActual)).map(normalizarCliente),
+      cumpleanerosDelMes: (cumpleaneros || []).map(normalizarCliente),
       listaClientes: clientesNormalizados,
       listaPedidos: (listaPedidos || []).map(normalizarPedido),
       listaPagos: (listaPagos || []).map(normalizarPago),
