@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { api } from '../services/api';
-import { supabase } from '../services/supabase';
+import { supabase, verificarEstadoConexionSupabase } from '../services/supabase';
 
 const DashboardContext = createContext(null);
 
@@ -23,21 +23,57 @@ const initialMetrics = {
 export function DashboardProvider({ children }) {
   const [metrics, setMetrics] = useState(initialMetrics);
   const [isLoading, setIsLoading] = useState(true);
+  const [conexion, setConexion] = useState({
+    conectada: false,
+    faltanVariables: false,
+    error: null,
+    verificando: true
+  });
+
+  // Verificación real del estado de conexión con Supabase
+  const verificarConexion = useCallback(async () => {
+    setConexion(prev => ({ ...prev, verificando: true }));
+    try {
+      const estado = await verificarEstadoConexionSupabase();
+      setConexion({
+        conectada: Boolean(estado?.conectada),
+        faltanVariables: Boolean(estado?.faltanVariables),
+        error: estado?.error || null,
+        verificando: false
+      });
+      return estado;
+    } catch (err) {
+      const errObj = {
+        conectada: false,
+        faltanVariables: false,
+        error: err.message || 'Error de red con Supabase',
+        verificando: false
+      };
+      setConexion(errObj);
+      return errObj;
+    }
+  }, []);
 
   // Carga de métricas en vivo desde Supabase
   const cargarMetricas = useCallback(async () => {
     try {
       setIsLoading(true);
-      const datos = await api.getDashboardMetrics();
-      if (datos) {
-        setMetrics(datos);
+      const [estadoConexion, datos] = await Promise.allSettled([
+        verificarConexion(),
+        api.getDashboardMetrics()
+      ]);
+
+      if (datos.status === 'fulfilled' && datos.value) {
+        setMetrics(datos.value);
+      } else if (datos.status === 'rejected') {
+        console.error('❌ Error al cargar métricas del Dashboard:', datos.reason);
       }
     } catch (err) {
-      console.error('❌ Error al cargar métricas del Dashboard:', err);
+      console.error('❌ Error general al cargar métricas del Dashboard:', err);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [verificarConexion]);
 
   useEffect(() => {
     cargarMetricas();
@@ -64,6 +100,8 @@ export function DashboardProvider({ children }) {
       value={{
         metrics,
         isLoading,
+        conexion,
+        verificarConexion,
         recargarMetricas: cargarMetricas
       }}
     >

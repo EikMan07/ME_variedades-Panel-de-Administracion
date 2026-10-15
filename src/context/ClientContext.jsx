@@ -12,16 +12,19 @@ export function ClientProvider({ children }) {
     try {
       setIsLoading(true);
       const datosRemotos = await api.getClientes();
-      setClientes(Array.isArray(datosRemotos) ? datosRemotos : []);
-      localStorage.setItem('me_clientes_data', JSON.stringify(datosRemotos || []));
+      const clientesValidos = Array.isArray(datosRemotos) ? datosRemotos : [];
+      setClientes(clientesValidos);
+      if (clientesValidos.length > 0) {
+        localStorage.setItem('me_clientes_data', JSON.stringify(clientesValidos));
+      }
     } catch (err) {
       console.error('❌ Error al cargar clientes desde Supabase:', err);
-      // Solo en caso de error de red cargar respaldo
+      // Solo en caso de error de red o bloqueo cargar respaldo previo
       try {
         const guardados = localStorage.getItem('me_clientes_data');
         if (guardados) {
           const parsed = JSON.parse(guardados);
-          if (Array.isArray(parsed)) setClientes(parsed);
+          if (Array.isArray(parsed) && parsed.length > 0) setClientes(parsed);
         }
       } catch { /* ignorar */ }
     } finally {

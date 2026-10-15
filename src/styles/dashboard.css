@@ -296,21 +296,109 @@
   font-family: 'Montserrat', sans-serif;
 }
 
+.client-kpi-status-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.15rem;
+}
+
 .client-kpi-status {
-  font-size: 0.74rem;
-  color: #34d399;
+  font-size: 0.73rem;
   display: flex;
   align-items: center;
   gap: 0.4rem;
   font-weight: 500;
+  transition: color var(--transition-normal);
+  line-height: 1.2;
+}
+
+.client-kpi-status.connected {
+  color: #34d399;
+}
+
+.client-kpi-status.warning {
+  color: #fbbf24;
+}
+
+.client-kpi-status.error {
+  color: #f87171;
+}
+
+.client-kpi-status.checking {
+  color: #94a3b8;
 }
 
 .status-indicator-dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
+  flex-shrink: 0;
+  transition: all var(--transition-normal);
+}
+
+.status-indicator-dot.connected {
   background: #34d399;
-  box-shadow: 0 0 6px #34d399;
+  box-shadow: 0 0 7px #34d399;
+}
+
+.status-indicator-dot.warning {
+  background: #f59e0b;
+  box-shadow: 0 0 7px #f59e0b;
+}
+
+.status-indicator-dot.error {
+  background: #ef4444;
+  box-shadow: 0 0 7px #ef4444;
+}
+
+.status-indicator-dot.checking {
+  background: #94a3b8;
+  box-shadow: 0 0 6px #94a3b8;
+  animation: pulse-dot-kpi 1.2s infinite ease-in-out;
+}
+
+@keyframes pulse-dot-kpi {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.client-kpi-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+  border-radius: 6px;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  outline: none;
+}
+
+.client-kpi-retry-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.6);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.client-kpi-retry-btn:active {
+  transform: translateY(0);
+}
+
+.client-kpi-retry-btn.spinning svg {
+  animation: spin-retry-kpi 0.8s linear infinite;
+}
+
+@keyframes spin-retry-kpi {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* ========================================================

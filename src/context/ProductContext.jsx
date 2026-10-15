@@ -12,15 +12,18 @@ export function ProductProvider({ children }) {
     try {
       setIsLoading(true);
       const datosRemotos = await api.getProductos();
-      setProductos(Array.isArray(datosRemotos) ? datosRemotos : []);
-      localStorage.setItem('me_productos_data', JSON.stringify(datosRemotos || []));
+      const prods = Array.isArray(datosRemotos) ? datosRemotos : [];
+      setProductos(prods);
+      if (prods.length > 0) {
+        localStorage.setItem('me_productos_data', JSON.stringify(prods));
+      }
     } catch (err) {
-      console.warn('Usando productos de caché local:', err);
+      console.warn('⚠️ Error al consultar productos en Supabase, intentando respaldo local:', err);
       try {
         const guardados = localStorage.getItem('me_productos_data');
         if (guardados) {
           const parsed = JSON.parse(guardados);
-          if (Array.isArray(parsed)) setProductos(parsed);
+          if (Array.isArray(parsed) && parsed.length > 0) setProductos(parsed);
         }
       } catch { /* ignorar */ }
     } finally {
@@ -33,7 +36,9 @@ export function ProductProvider({ children }) {
   }, [cargarProductos]);
 
   useEffect(() => {
-    localStorage.setItem('me_productos_data', JSON.stringify(productos));
+    if (Array.isArray(productos) && productos.length > 0) {
+      localStorage.setItem('me_productos_data', JSON.stringify(productos));
+    }
   }, [productos]);
 
   // Validación de producto

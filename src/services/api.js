@@ -1,5 +1,7 @@
-import { supabase, SUPABASE_URL, SUPABASE_KEY } from './supabase.js';
+import { supabase, SUPABASE_URL, SUPABASE_KEY, verificarEstadoConexionSupabase } from './supabase.js';
 import { comprimirImagen } from './imageCompression.js';
+
+export { verificarEstadoConexionSupabase };
 
 /**
  * SERVICIO CENTRALIZADO DE API (SUPABASE CLIENT & CRUD)
@@ -63,6 +65,7 @@ export function normalizarCliente(c) {
     id: Number(c.id),
     nombre_completo: c.nombre_completo || c.nombre || '',
     telefono: c.telefono || '',
+    fecha_nacimiento: c.fecha_nacimiento || null,
     dia_cumple: dia,
     dia_cumpleanos: dia,
     mes_cumple: mesNum,
@@ -117,6 +120,7 @@ export async function createCliente(clienteData) {
   const payload = {
     nombre_completo: String(clienteData.nombre_completo || clienteData.nombre || '').trim(),
     telefono: String(clienteData.telefono || '').trim(),
+    fecha_nacimiento: clienteData.fecha_nacimiento || null,
     dia_cumpleanos: !isNaN(dia) && dia > 0 && dia <= 31 ? dia : null,
     mes_cumpleanos: !isNaN(mes) && mes > 0 && mes <= 12 ? mes : null,
     estado_cuenta: normalizarEstadoParaSupabase(clienteData.estado_cuenta),
@@ -168,6 +172,10 @@ export async function updateCliente(id, clienteData) {
     mes_cumpleanos: !isNaN(mes) && mes > 0 && mes <= 12 ? mes : null,
     estado_cuenta: normalizarEstadoParaSupabase(clienteData.estado_cuenta),
   };
+
+  if (clienteData.fecha_nacimiento !== undefined) {
+    payload.fecha_nacimiento = clienteData.fecha_nacimiento || null;
+  }
 
   const numId = Number(id);
   if (isNaN(numId) || numId <= 0) {
@@ -1256,13 +1264,18 @@ export async function getDashboardMetrics() {
 
   try {
     // 1. Conteo total de clientes y lista de clientes
-    const { count: totalClientes, data: listaClientes } = await supabase
+    const { count: totalClientes, data: listaClientes, error: errClientes } = await supabase
       .from('clientes')
       .select('*', { count: 'exact' })
       .order('created_at', { ascending: false });
 
-    // 2. Pedidos activos y lista de pedidos
-    const { data: listaPedidos } = await supabase
+    if (errClientes) {
+      console.warn('⚠️ Error al consultar clientes en getDashboardMetrics:', errClientes.message);
+    }
+
+    // 2. Pedidos activos y lista de pedidos (con fallback a consulta plana si falla el join)
+    let listaPedidos = [];
+    const { data: pedidosJoin, error: errPedidos } = await supabase
       .from('pedidos')
       .select(`
         *,
@@ -1271,8 +1284,20 @@ export async function getDashboardMetrics() {
       `)
       .order('created_at', { ascending: false });
 
-    // 3. Cuentas por cobrar y pagos
-    const { data: listaPagos } = await supabase
+    if (errPedidos) {
+      console.warn('⚠️ Join en pedidos no disponible, intentando consulta directa:', errPedidos.message);
+      const { data: pedidosPlano } = await supabase
+        .from('pedidos')
+        .select('*')
+        .order('created_at', { ascending: false });
+      listaPedidos = pedidosPlano || [];
+    } else {
+      listaPedidos = pedidosJoin || [];
+    }
+
+    // 3. Cuentas por cobrar y pagos (con fallback a consulta plana si falla el join)
+    let listaPagos = [];
+    const { data: pagosJoin, error: errPagos } = await supabase
       .from('pagos')
       .select(`
         *,
@@ -1280,8 +1305,20 @@ export async function getDashboardMetrics() {
       `)
       .order('created_at', { ascending: false });
 
-    // 4. Préstamos activos y saldo por recuperar
-    const { data: listaPrestamos } = await supabase
+    if (errPagos) {
+      console.warn('⚠️ Join en pagos no disponible, intentando consulta directa:', errPagos.message);
+      const { data: pagosPlano } = await supabase
+        .from('pagos')
+        .select('*')
+        .order('created_at', { ascending: false });
+      listaPagos = pagosPlano || [];
+    } else {
+      listaPagos = pagosJoin || [];
+    }
+
+    // 4. Préstamos activos y saldo por recuperar (con fallback a consulta plana)
+    let listaPrestamos = [];
+    const { data: prestamosJoin, error: errPrestamos } = await supabase
       .from('prestamos')
       .select(`
         *,
@@ -1289,11 +1326,26 @@ export async function getDashboardMetrics() {
       `)
       .order('created_at', { ascending: false });
 
+    if (errPrestamos) {
+      console.warn('⚠️ Join en préstamos no disponible, intentando consulta directa:', errPrestamos.message);
+      const { data: prestamosPlano } = await supabase
+        .from('prestamos')
+        .select('*')
+        .order('created_at', { ascending: false });
+      listaPrestamos = prestamosPlano || [];
+    } else {
+      listaPrestamos = prestamosJoin || [];
+    }
+
     // 5. Total de unidades en stock y catálogo de productos
-    const { data: listaProductos } = await supabase
+    const { data: listaProductos, error: errProductos } = await supabase
       .from('productos')
       .select('*')
       .order('id', { ascending: true });
+
+    if (errProductos) {
+      console.warn('⚠️ Error al consultar productos en getDashboardMetrics:', errProductos.message);
+    }
 
     // 6. Cumpleañeros del mes actual
     const mesActual = new Date().getMonth() + 1; // 1 a 12
@@ -1332,8 +1384,10 @@ export async function getDashboardMetrics() {
       p => p.estado === 'Activo' || p.estado === 'Pendiente' || p.estado === 'en_proceso' || p.estado === 'activo'
     ).length;
 
+    const clientesNormalizados = (listaClientes || []).map(normalizarCliente);
+
     return {
-      totalClientes: totalClientes !== null && totalClientes !== undefined ? totalClientes : (listaClientes || []).length,
+      totalClientes: typeof totalClientes === 'number' ? totalClientes : clientesNormalizados.length,
       pedidosActivos: pedidosPendientesCount > 0 ? pedidosPendientesCount : (listaPedidos || []).length,
       cuentasPorCobrarCount: cuentasPorCobrarCount,
       cuentasPorCobrar: cuentasPorCobrarCount,
@@ -1344,8 +1398,8 @@ export async function getDashboardMetrics() {
       saldoPrestamosPorRecuperar: saldoPrestamosCobrar,
       totalStockUnidades: totalStockUnidades,
       valorInventario: valorInventario,
-      cumpleanerosDelMes: cumpleaneros || (listaClientes || []).filter(c => Number(c.mes_cumpleanos) === mesActual),
-      listaClientes: listaClientes || [],
+      cumpleanerosDelMes: (cumpleaneros || clientesNormalizados.filter(c => Number(c.mes_cumpleanos) === mesActual)).map(normalizarCliente),
+      listaClientes: clientesNormalizados,
       listaPedidos: (listaPedidos || []).map(normalizarPedido),
       listaPagos: (listaPagos || []).map(normalizarPago),
       listaPrestamos: (listaPrestamos || []).map(normalizarPrestamo),
@@ -1359,6 +1413,8 @@ export async function getDashboardMetrics() {
 
 // Exportación unificada
 export const api = {
+  // Diagnóstico
+  verificarEstadoConexionSupabase,
   // Clientes
   getClientes,
   createCliente,
