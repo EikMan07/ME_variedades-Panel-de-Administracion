@@ -313,3 +313,171 @@
   color: var(--color-texto-apagado, #94a3b8);
 }
 
+/* ========================================================
+   4. ESTILOS BASE REUTILIZABLES (TARJETAS, BOTONES Y TABLAS)
+   ======================================================== */
+.card {
+  background: var(--bg-card, #1c1719);
+  backdrop-filter: var(--blur-glass, blur(12px));
+  -webkit-backdrop-filter: var(--blur-glass, blur(12px));
+  border: var(--border-card, 1px solid rgba(244, 180, 200, 0.12));
+  border-radius: var(--radius-card, 16px);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-card, 0 4px 20px -2px rgba(0, 0, 0, 0.4));
+  transition: all var(--transition-normal, 0.25s ease);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 42px;
+  padding: 0 1.25rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #7a3c4d, #4e2632);
+  border: 1px solid rgba(244, 180, 200, 0.25);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #8f465a, #5c2d3b);
+  border-color: rgba(244, 180, 200, 0.45);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #d1c5c7;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(244, 180, 200, 0.3);
+  color: #ffffff;
+}
+
+.table-container,
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-card, 16px);
+}
+
+.table-container table,
+.table-responsive table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* ========================================================
+   5. RESPONSIVE COMPONENTES (MÓVILES Y TABLETS)
+   ======================================================== */
+@media (max-width: 640px) {
+  /* Tarjetas y Paneles con padding reducido a 0.75rem y radio 10px */
+  .card,
+  .glass-card,
+  .glass-panel {
+    padding: 0.75rem !important;
+    border-radius: 10px !important;
+  }
+
+  /* Botones globales con altura ergonómica táctil de 38px */
+  .btn,
+  .btn-primary,
+  .btn-secondary,
+  .btn-gradient-electric,
+  .btn-glass {
+    height: 38px !important;
+    min-height: 38px !important;
+    font-size: 0.84rem !important;
+    padding: 0 0.85rem !important;
+    border-radius: 8px !important;
+  }
+
+  /* Tablas responsivas con scroll horizontal suave y celdas compactas */
+  .table-container,
+  .table-responsive,
+  .glass-table-container {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    border-radius: 10px !important;
+  }
+
+  .table-container th,
+  .table-container td,
+  .table-responsive th,
+  .table-responsive td,
+  table th,
+  table td {
+    padding: 0.5rem 0.65rem !important;
+    font-size: 0.8rem !important;
+    white-space: nowrap;
+  }
+
+  /* Modales generales con ancho 96vw, máx 90vh y sticky footer */
+  .glass-modal,
+  .modal-card {
+    width: 96vw !important;
+    max-width: 96vw !important;
+    max-height: 90vh !important;
+    border-radius: 12px !important;
+  }
+
+  .modal-footer {
+    position: sticky !important;
+    bottom: 0 !important;
+    background: #161114 !important;
+    z-index: 10 !important;
+    padding: 0.65rem 1rem !important;
+    border-top: 1px solid rgba(244, 180, 200, 0.15) !important;
+  }
+
+  .modal-footer button {
+    height: 38px !important;
+    font-size: 0.84rem !important;
+  }
+
+  /* Alertas y banners compactos */
+  .alert-prioritaria,
+  .banner-alerta-prioritaria {
+    padding: 0.75rem 0.85rem !important;
+    border-radius: 10px !important;
+    font-size: 0.8rem !important;
+  }
+
+  .cuota-card-preview {
+    padding: 0.6rem 0.75rem !important;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  .card,
+  .glass-card,
+  .glass-panel {
+    padding: 1rem !important;
+    border-radius: 12px !important;
+  }
+
+  .table-container,
+  .table-responsive {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .glass-modal,
+  .modal-card {
+    max-width: 90vw !important;
+  }
+}
+

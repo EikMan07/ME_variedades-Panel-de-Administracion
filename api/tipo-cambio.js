@@ -7,7 +7,6 @@
  * y provee fallback resiliente a la base de datos si la API externa no responde.
  */
 
-/* global process */
 import { createClient } from '@supabase/supabase-js';
 
 const GOMETA_URL_HTTPS = 'https://apis.gometa.org/tdc/tdc.json';

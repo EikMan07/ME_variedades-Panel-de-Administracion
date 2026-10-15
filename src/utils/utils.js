@@ -516,7 +516,7 @@ export function calcularMoratoriaElemento(item, fechaReferencia = new Date()) {
 
       if (c.pagada === true) return;
 
-      let montoExigible = montoCuota;
+      let montoExigible;
       if (tieneAbonos) {
         if (saldoAbonosRestante >= montoCuota && montoCuota > 0) {
           saldoAbonosRestante -= montoCuota;

@@ -786,12 +786,6 @@
   }
 }
 
-@media (max-width: 600px) {
-  .kpi-grid-4 {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* ========================================================
    SECCIÓN DE ANÁLISIS GRÁFICO (FULL WIDTH INTERACTIVO)
    ======================================================== */
@@ -1444,6 +1438,244 @@
   font-size: 0.72rem;
   color: #71717a;
   font-style: italic;
+}
+
+/* ========================================================
+   FASE 2: RESPONSIVE COMMAND CENTER & DASHBOARD ALTA DENSIDAD
+   (TABLET: 641px - 1023px | MOBILE: <= 640px)
+   ======================================================== */
+
+/* TABLET (641px - 1023px): 3 a 4 Tarjetas KPI por fila */
+@media (min-width: 641px) and (max-width: 1023px) {
+  .dashboard-kpi-grid,
+  .stats-grid,
+  .kpi-grid-4 {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important;
+    gap: 0.75rem !important;
+  }
+
+  .kpi-command-card,
+  .kpi-card,
+  .stat-card {
+    padding: 0.85rem 1rem !important;
+    min-height: auto !important;
+  }
+
+  .kpi-number-value,
+  .kpi-value {
+    font-size: 1.35rem !important;
+  }
+
+  .command-center-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .client-highlight-card {
+    padding: 1rem !important;
+  }
+}
+
+/* MÓVIL (<= 640px): Cuadrícula KPI 2x2, Micro-Métricas e Historial Compacto */
+@media (max-width: 640px) {
+  /* 1. Cuadrícula KPI 2x2 compacta */
+  .dashboard-kpi-grid,
+  .stats-grid,
+  .kpi-grid-4 {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  .kpi-command-card,
+  .kpi-card,
+  .stat-card {
+    padding: 0.65rem !important;
+    min-height: auto !important;
+    border-radius: 12px !important;
+  }
+
+  .kpi-card-top {
+    margin-bottom: 0.35rem !important;
+  }
+
+  .kpi-icon-box {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 8px !important;
+  }
+
+  .kpi-icon-box svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .kpi-badge-pill {
+    font-size: 0.62rem !important;
+    padding: 0.12rem 0.38rem !important;
+  }
+
+  .kpi-label-text,
+  .kpi-label {
+    font-size: 0.72rem !important;
+    margin-bottom: 0.15rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .kpi-number-value,
+  .kpi-value {
+    font-size: 1.1rem !important;
+    line-height: 1.15 !important;
+    margin: 0 0 0.15rem 0 !important;
+  }
+
+  .kpi-status-subtext {
+    font-size: 0.65rem !important;
+  }
+
+  /* 2. Tarjeta Destacada de Clientes */
+  .client-highlight-card {
+    padding: 0.65rem 0.75rem !important;
+    border-radius: 12px !important;
+  }
+
+  .client-kpi-inner {
+    gap: 0.65rem !important;
+  }
+
+  .client-kpi-icon-wrapper {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 8px !important;
+  }
+
+  .client-kpi-icon-wrapper svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .client-kpi-label {
+    font-size: 0.72rem !important;
+  }
+
+  .client-kpi-value {
+    font-size: 1.15rem !important;
+    margin: 0.1rem 0 !important;
+  }
+
+  .client-kpi-status {
+    font-size: 0.68rem !important;
+  }
+
+  /* 3. Contenedores de Gráficos y Tarjetas Glass */
+  .card-glass {
+    padding: 0.75rem !important;
+    border-radius: 12px !important;
+  }
+
+  .card-header {
+    margin-bottom: 0.65rem !important;
+    gap: 0.5rem !important;
+  }
+
+  .analytics-chart-section {
+    padding: 0.75rem !important;
+    gap: 0.65rem !important;
+    border-radius: 12px !important;
+  }
+
+  .chart-canvas-container {
+    height: 195px !important;
+  }
+
+  /* 4. Lista de Actividad Reciente Compacta (Filas de 52px de altura) */
+  .activity-feed {
+    gap: 0.25rem !important;
+  }
+
+  .activity-item-row {
+    height: 52px !important;
+    min-height: 52px !important;
+    max-height: 52px !important;
+    padding: 0.35rem 0 !important;
+    gap: 0.55rem !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+  }
+
+  .activity-icon-badge {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 6px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .activity-icon-badge svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .activity-title {
+    font-size: 0.76rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .activity-time {
+    font-size: 0.66rem !important;
+  }
+
+  /* 5. Widgets de Cumpleaños, Semáforos y Notificaciones */
+  .birthday-command-item {
+    padding: 0.6rem 0.7rem !important;
+    gap: 0.45rem !important;
+    border-radius: 10px !important;
+  }
+
+  .birthday-avatar-circle {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 0.75rem !important;
+  }
+
+  .birthday-client-name {
+    font-size: 0.8rem !important;
+  }
+
+  .btn-birthday-congratulate {
+    padding: 0.35rem 0.6rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  .status-general-card {
+    padding: 0.6rem 0.75rem !important;
+    gap: 0.5rem !important;
+  }
+
+  .status-general-icon {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .status-general-title {
+    font-size: 0.8rem !important;
+  }
+
+  .mini-semaphores-grid {
+    padding: 0.45rem 0.35rem !important;
+  }
+
+  .category-bars-list {
+    gap: 0.6rem !important;
+  }
+
+  .collection-alerts-card {
+    padding: 0.75rem !important;
+  }
+
+  .collection-alerts-body {
+    max-height: 320px !important;
+  }
 }
 
 

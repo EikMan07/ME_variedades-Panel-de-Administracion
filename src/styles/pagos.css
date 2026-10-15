@@ -496,7 +496,7 @@
   line-height: 1.6;
 }
 
-/* Responsividad */
+/* Responsividad Base */
 @media (max-width: 900px) {
   .form-row-2col { grid-template-columns: 1fr; }
   .pagos-kpis-grid { grid-template-columns: repeat(2, 1fr); }
@@ -504,7 +504,6 @@
 }
 
 @media (max-width: 600px) {
-  .pagos-kpis-grid { grid-template-columns: 1fr; }
   .pagos-filters-bar { flex-direction: column; align-items: stretch; }
   .saldo-resumen-box { flex-direction: column; gap: 0.75rem; }
 }
@@ -631,5 +630,245 @@
   color: #ff6b7d !important;
   border: 1px solid rgba(178, 58, 72, 0.5) !important;
   box-shadow: 0 0 10px rgba(178, 58, 72, 0.25);
+}
+
+/* ========================================================
+   FASE 2: RESPONSIVE PAGOS & HISTORIAL CONDENSADO
+   (TABLET: 641px - 1023px | MOBILE: <= 640px)
+   ======================================================== */
+
+/* TABLET (641px - 1023px): Cuadrícula KPI en 3 o 4 columnas */
+@media (min-width: 641px) and (max-width: 1023px) {
+  .pagos-kpis-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important;
+    gap: 0.75rem !important;
+  }
+
+  .kpi-card {
+    padding: 0.85rem 1rem !important;
+  }
+
+  .kpi-value {
+    font-size: 1.35rem !important;
+  }
+
+  .pagos-filters-bar {
+    gap: 0.75rem !important;
+  }
+}
+
+/* MÓVIL (<= 640px): Filas Compactas (64px - 70px) y KPIs 2x2 */
+@media (max-width: 640px) {
+  /* 1. KPIs en Cuadrícula 2x2 compacta */
+  .pagos-kpis-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  .kpi-card {
+    padding: 0.65rem !important;
+    gap: 0.5rem !important;
+    border-radius: 12px !important;
+    min-height: auto !important;
+  }
+
+  .kpi-icon {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 8px !important;
+  }
+
+  .kpi-icon svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .kpi-label {
+    font-size: 0.68rem !important;
+    margin-bottom: 0.1rem !important;
+    letter-spacing: 0.04em !important;
+  }
+
+  .kpi-value {
+    font-size: 1.15rem !important;
+    line-height: 1.15 !important;
+  }
+
+  .kpi-sublabel {
+    font-size: 0.65rem !important;
+  }
+
+  /* 2. Filtros Compactos */
+  .pagos-filters-bar {
+    gap: 0.55rem !important;
+    padding: 0.65rem !important;
+  }
+
+  .pagos-filter-group {
+    min-width: 100% !important;
+  }
+
+  /* 3. Filas de Pagos Condensadas (64px - 70px de alto) */
+  .table-container-card {
+    border-radius: 12px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .data-table,
+  .pagos-data-table {
+    min-width: 580px !important;
+  }
+
+  .data-table tbody tr,
+  .pagos-data-table tbody tr {
+    height: 66px !important;
+    min-height: 64px !important;
+    max-height: 70px !important;
+    box-sizing: border-box !important;
+  }
+
+  .data-table tbody tr td,
+  .pagos-data-table tbody tr td {
+    padding: 0.4rem 0.5rem !important;
+    font-size: 0.8rem !important;
+    vertical-align: middle !important;
+  }
+
+  .data-table thead tr th,
+  .pagos-data-table thead tr th {
+    padding: 0.5rem 0.5rem !important;
+    font-size: 0.7rem !important;
+  }
+
+  /* Cliente a la izquierda con avatar reducido y texto truncado con ellipsis */
+  .pago-cliente-cell {
+    gap: 0.45rem !important;
+    max-width: 140px !important;
+  }
+
+  .pago-avatar {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 0.72rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  .pago-cliente-info {
+    overflow: hidden !important;
+    min-width: 0 !important;
+  }
+
+  .pago-cliente-nombre {
+    font-size: 0.78rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: block !important;
+    max-width: 105px !important;
+  }
+
+  .pago-cliente-tel {
+    font-size: 0.65rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: block !important;
+  }
+
+  .pago-concepto-cell {
+    max-width: 110px !important;
+  }
+
+  .pago-concepto-text {
+    font-size: 0.75rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100px !important;
+    display: block !important;
+  }
+
+  .pago-pedido-tag {
+    font-size: 0.62rem !important;
+    padding: 0 4px !important;
+  }
+
+  /* Monto destacado a la derecha */
+  .pagos-monto-cell {
+    text-align: right !important;
+    align-items: flex-end !important;
+    gap: 0.1rem !important;
+  }
+
+  .monto-principal {
+    font-size: 0.88rem !important;
+    font-weight: 700 !important;
+  }
+
+  .saldo-amount {
+    font-size: 0.92rem !important;
+    font-weight: 800 !important;
+  }
+
+  .progress-bar-wrapper {
+    width: 50px !important;
+    height: 3px !important;
+  }
+
+  .fecha-cell {
+    font-size: 0.72rem !important;
+    white-space: nowrap !important;
+  }
+
+  .estado-badge {
+    font-size: 0.65rem !important;
+    padding: 0.15rem 0.45rem !important;
+  }
+
+  .badge-tipo-pago {
+    font-size: 0.66rem !important;
+    padding: 0.15rem 0.45rem !important;
+  }
+
+  /* Botones de acción 28px x 28px */
+  .action-buttons-group {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.25rem !important;
+    justify-content: flex-end !important;
+  }
+
+  .btn-table-action,
+  .action-buttons-group .btn-table-action {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 6px !important;
+  }
+
+  .btn-table-action svg,
+  .action-buttons-group .btn-table-action svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+
+  /* Modales de Pago */
+  .form-row-2col {
+    grid-template-columns: 1fr !important;
+    gap: 0.65rem !important;
+  }
+
+  .tipo-pago-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.45rem !important;
+  }
 }
 

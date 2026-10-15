@@ -4,7 +4,7 @@ import { useDashboard } from '../../context/DashboardContext';
 export default function AlertsCard() {
   const { metrics = {} } = useDashboard?.() || {};
 
-  const { cobrosStatus, prestamosStatus, stockStatus, hasAlerts, alertList, resumenGeneral } = useMemo(() => {
+  const { cobrosStatus, prestamosStatus, stockStatus, hasAlerts, resumenGeneral } = useMemo(() => {
     const productos = metrics?.listaProductos || [];
     const pagos = metrics?.listaPagos || [];
     const prestamos = metrics?.listaPrestamos || [];

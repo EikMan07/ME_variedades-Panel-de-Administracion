@@ -369,27 +369,174 @@
   color: #ffffff;
 }
 
-/* Responsividad */
-@media (max-width: 992px) {
+/* ========================================================
+   FASE 4: RESPONSIVE LOGIN SIN SCROLL
+   (TABLET: 641px - 1023px | MOBILE: <= 640px)
+   ======================================================== */
+
+/* TABLET (641px - 1023px) */
+@media (min-width: 641px) and (max-width: 1023px) {
   .login-container {
-    flex-direction: column;
-    justify-content: center;
-    gap: 2.5rem;
-    padding: 3rem 1.5rem;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 2rem !important;
+    padding: 2rem 1.5rem !important;
+    min-height: 100vh !important;
   }
 
   .login-welcome {
-    text-align: center;
-    max-width: 100%;
+    text-align: center !important;
+    max-width: 520px !important;
+    align-items: center !important;
   }
 
   .welcome-main {
-    font-size: 2.75rem;
+    font-size: 2.4rem !important;
+    white-space: normal !important;
   }
 
   .login-form-wrapper {
-    max-width: 100%;
-    width: 100%;
-    justify-content: center;
+    max-width: 440px !important;
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .login-card {
+    padding: 2rem 2rem !important;
+  }
+}
+
+/* MÓVIL (<= 640px): 100dvh Sin Scroll, Tarjeta Centrada y Compacta */
+@media (max-width: 640px) {
+  .login-wrapper-page {
+    min-height: 100dvh !important;
+    height: 100dvh !important;
+    padding: 1rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  .login-container {
+    min-height: 100% !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* Ocultar bienvenida extensa para garantizar tarjeta en una sola pantalla sin scroll */
+  .login-welcome,
+  .login-hero-container {
+    display: none !important;
+  }
+
+  .login-form-wrapper {
+    width: 100% !important;
+    max-width: 360px !important;
+    justify-content: center !important;
+  }
+
+  /* Tarjeta de Login Compacta (padding: 1.25rem 1rem; border-radius: 14px;) */
+  .login-card {
+    width: 100% !important;
+    max-width: 360px !important;
+    padding: 1.25rem 1rem !important;
+    border-radius: 14px !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7) !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Logo compacto */
+  .logo-circular {
+    width: 56px !important;
+    height: 56px !important;
+    margin-bottom: 0.85rem !important;
+    box-shadow: 0 0 14px rgba(183, 110, 121, 0.35) !important;
+  }
+
+  .grupo-campo {
+    margin-bottom: 0.75rem !important;
+  }
+
+  .etiqueta {
+    font-size: 0.78rem !important;
+    margin-bottom: 0.3rem !important;
+  }
+
+  /* Inputs de altura: 40px */
+  .input {
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0.45rem 0.85rem !important;
+    font-size: 0.88rem !important;
+    border-radius: 8px !important;
+  }
+
+  .input-contrasena {
+    padding-right: 4.2rem !important;
+  }
+
+  .boton-toggle {
+    font-size: 0.75rem !important;
+    padding: 0.2rem 0.4rem !important;
+  }
+
+  .alerta-error {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.78rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  /* Botón Submit a altura: 42px */
+  .boton-submit {
+    height: 42px !important;
+    min-height: 42px !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.88rem !important;
+    margin-top: 0.35rem !important;
+    border-radius: 8px !important;
+  }
+
+  .divisor-login {
+    margin: 0.75rem 0 !important;
+  }
+
+  .divisor-login span {
+    font-size: 0.68rem !important;
+    padding: 0 0.5rem !important;
+  }
+
+  /* Botón Face ID compacto */
+  .boton-face-id {
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 0.75rem !important;
+    font-size: 0.82rem !important;
+    border-radius: 8px !important;
+    gap: 0.5rem !important;
+  }
+
+  .boton-face-id svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .enroll-link-container {
+    margin-top: 0.65rem !important;
+  }
+
+  .btn-link-enroll {
+    font-size: 0.75rem !important;
   }
 }

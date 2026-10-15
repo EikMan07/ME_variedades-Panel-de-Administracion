@@ -1,4 +1,4 @@
-﻿/* ========================================================
+/* ========================================================
    ESTILOS DE CUSTOM DATEPICKER (DÍA, MES Y AÑO)
    ME VARIEDADES — Dark Glassmorphism & Gold Accent
    Refactorizado para Alto Contraste y Máxima Legibilidad
@@ -339,4 +339,95 @@
 .btn-datepicker-close:hover {
   color: #e5e7eb;
   background: rgba(255, 255, 255, 0.08);
+}
+
+/* ========================================================
+   FASE 3: RESPONSIVE DATEPICKER POPUP
+   (TABLET: 641px - 1023px | MOBILE: <= 640px)
+   ======================================================== */
+
+/* TABLET (641px - 1023px) */
+@media (min-width: 641px) and (max-width: 1023px) {
+  .custom-datepicker-popover {
+    max-width: 310px !important;
+    padding: 0.75rem !important;
+  }
+
+  .datepicker-day-cell {
+    min-height: 32px !important;
+    height: 32px !important;
+  }
+}
+
+/* MÓVIL (<= 640px): Popover dentro de pantalla (max-width: 92vw) y celdas táctiles compactas */
+@media (max-width: 640px) {
+  .custom-datepicker-popover {
+    width: 92vw !important;
+    max-width: 92vw !important;
+    min-width: unset !important;
+    padding: 0.6rem !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    border-radius: 14px !important;
+    box-sizing: border-box !important;
+  }
+
+  .datepicker-header {
+    margin-bottom: 0.45rem !important;
+    padding-bottom: 0.45rem !important;
+  }
+
+  .btn-datepicker-nav {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .btn-datepicker-view-toggle {
+    padding: 0.28rem 0.75rem !important;
+    font-size: 0.8rem !important;
+  }
+
+  .datepicker-weekdays {
+    margin-bottom: 0.25rem !important;
+    gap: 2px !important;
+  }
+
+  .datepicker-weekday-label {
+    font-size: 0.65rem !important;
+  }
+
+  .datepicker-days-grid {
+    gap: 2px !important;
+  }
+
+  .datepicker-day-cell {
+    width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    font-size: 0.78rem !important;
+    border-radius: 6px !important;
+    margin: 0 auto !important;
+  }
+
+  .datepicker-months-grid,
+  .datepicker-years-grid {
+    gap: 0.4rem !important;
+    padding: 0.25rem 0 !important;
+  }
+
+  .btn-datepicker-chip {
+    padding: 0.5rem 0.25rem !important;
+    font-size: 0.78rem !important;
+    border-radius: 8px !important;
+  }
+
+  .datepicker-footer {
+    margin-top: 0.45rem !important;
+    padding-top: 0.45rem !important;
+  }
+
+  .btn-datepicker-action {
+    font-size: 0.75rem !important;
+    padding: 3px 6px !important;
+  }
 }

@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useProducts } from './ProductContext';
-import { useClients } from './ClientContext';
 import { useToast } from '../components/common/Toast';
 import { api } from '../services/api';
 
@@ -10,7 +9,6 @@ const STORAGE_KEY_VENTAS = 'me_variedades_ventas_v4';
 
 export function VentasProvider({ children }) {
   const { productos, ajustarStock, cargarProductos } = useProducts();
-  const { clientes } = useClients();
   const { showToast } = useToast();
 
   const [ventas, setVentas] = useState([]);

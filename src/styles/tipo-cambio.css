@@ -711,74 +711,280 @@
 }
 
 /* ========================================================
-   6. RESPONSIVE MOBILE-FIRST MEDIA QUERIES
+/* ========================================================
+   6. RESPONSIVE MOBILE-FIRST & TABLET MEDIA QUERIES
    ======================================================== */
-@media (max-width: 1024px) {
-  .tipo-cambio-container {
-    padding: 1.25rem 1.25rem 2.5rem 1.25rem;
-    gap: 1.5rem;
-  }
 
-  .tc-summary-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
+/* TABLET (641px - 1023px) */
+@media (min-width: 641px) and (max-width: 1023px) {
   .tipo-cambio-container {
-    padding: 1rem 0.85rem 2rem 0.85rem;
-    gap: 1.25rem;
+    padding: 1.25rem 1.25rem 2.5rem 1.25rem !important;
+    gap: 1.25rem !important;
   }
 
   .tc-rates-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.85rem !important;
+  }
+
+  .tc-rate-card {
+    padding: 1.15rem 1.25rem !important;
   }
 
   .tc-rate-price-val {
-    font-size: 2.25rem;
+    font-size: 2.1rem !important;
+  }
+
+  .tc-summary-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.75rem !important;
   }
 
   .tc-chart-canvas-wrapper {
-    height: 280px;
-  }
-
-  .tc-summary-grid {
-    grid-template-columns: repeat(2, 1fr);
+    height: 260px !important;
   }
 
   .tc-converter-inputs-grid {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-
-  .tc-swap-btn {
-    transform: rotate(90deg);
-  }
-
-  .tc-swap-btn:hover {
-    transform: rotate(270deg) scale(1.08);
-  }
-
-  .tc-rate-ref-note {
-    margin-left: 0;
-    width: 100%;
-    margin-top: 0.5rem;
+    grid-template-columns: 1fr auto 1fr !important;
+    gap: 0.85rem !important;
   }
 }
 
-@media (max-width: 480px) {
+/* MÓVIL (<= 640px): Barra Horizontal Delgada en 2 Columnas */
+@media (max-width: 640px) {
+  .tipo-cambio-container {
+    padding: 0.65rem 0.65rem 2rem 0.65rem !important;
+    gap: 0.85rem !important;
+  }
+
+  .tc-page-header {
+    gap: 0.5rem !important;
+  }
+
+  .tc-header-title-group h1 {
+    font-size: 1.35rem !important;
+  }
+
+  .tc-header-subtitle {
+    font-size: 0.76rem !important;
+    margin-top: 0.15rem !important;
+  }
+
+  .tc-header-actions {
+    width: 100% !important;
+    justify-content: space-between !important;
+    gap: 0.45rem !important;
+  }
+
+  .tc-btn-refresh {
+    padding: 0.42rem 0.85rem !important;
+    font-size: 0.78rem !important;
+  }
+
+  .tc-sync-badge {
+    font-size: 0.72rem !important;
+    padding: 0.28rem 0.65rem !important;
+  }
+
+  .tc-contingency-banner {
+    padding: 0.65rem 0.85rem !important;
+    font-size: 0.78rem !important;
+    gap: 0.5rem !important;
+  }
+
+  /* 1. Recuadros de compra/venta de divisas en barra horizontal delgada en 2 columnas */
+  .tc-rates-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
+  }
+
+  .tc-rate-card {
+    padding: 0.5rem 0.75rem !important;
+    border-radius: 12px !important;
+    min-height: auto !important;
+  }
+
+  .tc-rate-card-top {
+    margin-bottom: 0.2rem !important;
+  }
+
+  .tc-rate-type-tag {
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+  }
+
+  .tc-rate-desc {
+    display: none !important;
+  }
+
+  .tc-rate-badge-bccr {
+    display: none !important;
+  }
+
+  .tc-rate-price-row {
+    margin: 0.15rem 0 0.3rem 0 !important;
+    gap: 0.25rem !important;
+  }
+
+  .tc-rate-currency-sym {
+    font-size: 1.05rem !important;
+  }
+
+  .tc-rate-price-val {
+    font-size: 1.45rem !important;
+    font-weight: 800 !important;
+    line-height: 1.1 !important;
+  }
+
+  .tc-rate-indicator-row {
+    padding-top: 0.25rem !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+  }
+
+  .tc-variation-pill {
+    font-size: 0.66rem !important;
+    padding: 0.12rem 0.4rem !important;
+    gap: 0.2rem !important;
+  }
+
+  .tc-rate-timestamp {
+    display: none !important;
+  }
+
+  /* 2. Tarjetas de Resumen Financiero en 2 Columnas Compactas */
+  .tc-summary-section {
+    gap: 0.55rem !important;
+  }
+
+  .tc-section-title {
+    font-size: 0.95rem !important;
+  }
+
+  .tc-section-subtitle {
+    font-size: 0.72rem !important;
+  }
+
   .tc-summary-grid {
-    grid-template-columns: 1fr;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.45rem !important;
+  }
+
+  .tc-summary-card {
+    padding: 0.55rem 0.65rem !important;
+    border-radius: 8px !important;
+    gap: 0.18rem !important;
+  }
+
+  .tc-summary-label {
+    font-size: 0.66rem !important;
+  }
+
+  .tc-summary-value {
+    font-size: 1.05rem !important;
+  }
+
+  .tc-summary-subtext {
+    font-size: 0.65rem !important;
+  }
+
+  /* 3. Tarjeta de Gráfico Compacta */
+  .tc-chart-card {
+    padding: 0.75rem !important;
+    border-radius: 12px !important;
+  }
+
+  .tc-chart-header {
+    gap: 0.55rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .tc-chart-title-group h2 {
+    font-size: 0.95rem !important;
   }
 
   .tc-range-selector {
-    width: 100%;
-    justify-content: space-between;
+    width: 100% !important;
+    justify-content: space-between !important;
+    padding: 2px !important;
   }
 
   .tc-range-btn {
-    padding: 0.35rem 0.5rem;
-    font-size: 0.75rem;
+    padding: 0.28rem 0.45rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  .tc-chart-canvas-wrapper {
+    height: 200px !important;
+  }
+
+  /* 4. Convertidor de Divisas Compacto */
+  .tc-converter-card {
+    padding: 0.75rem !important;
+    border-radius: 12px !important;
+  }
+
+  .tc-converter-header {
+    gap: 0.5rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .tc-converter-title-group h2 {
+    font-size: 0.95rem !important;
+  }
+
+  .tc-toggle-mode-btn {
+    padding: 0.3rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .tc-converter-inputs-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.45rem !important;
+  }
+
+  .tc-converter-box {
+    padding: 0.65rem 0.75rem !important;
+  }
+
+  .tc-converter-box-header {
+    margin-bottom: 0.25rem !important;
+  }
+
+  .tc-converter-sym {
+    font-size: 1.15rem !important;
+  }
+
+  .tc-converter-input {
+    font-size: 1.25rem !important;
+  }
+
+  .tc-swap-btn-container {
+    margin: 0.15rem 0 !important;
+  }
+
+  .tc-swap-btn {
+    width: 34px !important;
+    height: 34px !important;
+    transform: rotate(90deg) !important;
+  }
+
+  .tc-quick-chips-row {
+    gap: 0.35rem !important;
+    margin-top: 0.75rem !important;
+    padding-top: 0.65rem !important;
+  }
+
+  .tc-chip-btn {
+    padding: 0.25rem 0.55rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  .tc-rate-ref-note {
+    margin-left: 0 !important;
+    width: 100% !important;
+    margin-top: 0.4rem !important;
+    font-size: 0.72rem !important;
   }
 }

@@ -835,70 +835,415 @@
 
 /* 1. MÓVILES (Pantallas pequeñas <= 640px) */
 @media (max-width: 640px) {
-  .modal-card-large {
-    width: 95vw;
-    max-height: 94vh;
-    border-radius: var(--radius-md);
+  /* Cabecera y Filtros Compactos */
+  .category-pills-section {
+    padding: 0.65rem;
+    gap: 0.6rem;
   }
 
-  .modal-form-grid {
-    grid-template-columns: 1fr;
-    gap: 1.15rem;
+  .category-pill,
+  .type-filter-btn,
+  .pill-button {
+    height: 32px;
+    padding: 0 0.75rem;
+    font-size: 0.78rem;
+    gap: 0.35rem;
   }
 
-  .photo-upload-container {
-    width: 100%;
-  }
-
-  .image-preview-box {
-    height: 180px;
-  }
-
-  .form-row-2 {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-
-  .product-modal-footer {
-    flex-direction: column-reverse;
-    gap: 0.65rem;
-  }
-
-  .product-modal-footer .btn-primary-action,
-  .product-modal-footer .btn-secondary-action {
-    width: 100%;
-    justify-content: center;
-    min-height: 44px;
+  .category-pill .pill-count,
+  .type-filter-btn .badge-count {
+    min-width: 18px;
+    height: 18px;
+    font-size: 0.68rem;
+    padding: 0 4px;
   }
 
   .filters-bar-secondary {
+    display: flex;
     flex-direction: column;
     align-items: stretch;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
   }
 
   .filter-search-box {
     max-width: 100%;
+    padding: 0.35rem 0.65rem;
+    gap: 0.45rem;
   }
 
   .stock-filter-group {
+    display: flex;
+    align-items: center;
     justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .filter-label-inline {
+    font-size: 0.76rem;
+    white-space: nowrap;
+  }
+
+  .select-compact {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.78rem;
+    height: 34px;
+    flex: 1;
+    max-width: 220px;
+  }
+
+  .btn-view-toggle {
+    padding: 0.35rem 0.6rem;
+  }
+
+  /* Transformación de Tarjetas a Filas de Alta Densidad */
+  .products-grid-view {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0 0.35rem;
+  }
+
+  .product-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    min-height: 72px;
+    padding: 0.5rem 0.65rem;
+    gap: 0.65rem;
+    border-radius: 12px;
+    transition: background-color var(--transition-fast), border-color var(--transition-fast);
+  }
+
+  .product-card:hover {
+    transform: none;
+    border-color: rgba(255, 255, 255, 0.16);
+    box-shadow: var(--shadow-card);
+  }
+
+  .product-image-box {
+    width: 58px;
+    height: 58px;
+    min-width: 58px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .product-card:hover .product-img {
+    transform: none;
+  }
+
+  .product-stock-badge-overlay {
+    display: none;
+  }
+
+  .product-img-placeholder {
+    gap: 0;
+  }
+
+  .product-img-placeholder svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .product-img-placeholder span {
+    display: none;
+  }
+
+  .product-card-body {
+    padding: 0;
+    gap: 0.2rem;
+    flex: 1;
+    min-width: 0;
+    justify-content: center;
+  }
+
+  .product-tags-row {
+    gap: 0.25rem;
+  }
+
+  .tag-category,
+  .tag-gender {
+    font-size: 0.6rem;
+    padding: 1px 5px;
+    line-height: 1.2;
+  }
+
+  .product-title {
+    font-size: 0.88rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  .product-price-box {
+    margin-top: 0;
+    line-height: 1.2;
+  }
+
+  .product-price {
+    font-size: 0.95rem;
+  }
+
+  /* Controles y Botones Compactos a la Derecha */
+  .stock-control-panel {
+    padding: 0.15rem 0.3rem;
+    gap: 0.3rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    margin-top: 0.1rem;
+  }
+
+  .stock-label {
+    display: none;
+  }
+
+  .stock-number {
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  .stock-quick-btns {
+    gap: 0.25rem;
+  }
+
+  .btn-stock-adjust {
+    width: 26px;
+    height: 26px;
+    font-size: 0.85rem;
+    border-radius: 6px;
+  }
+
+  .product-card-footer {
+    padding: 0;
+    border-top: none;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 0.3rem;
+    flex-shrink: 0;
+  }
+
+  .product-card-footer .client-id-text {
+    font-size: 0.65rem;
+    color: var(--color-texto-apagado);
+    white-space: nowrap;
+  }
+
+  .product-card-footer .action-buttons-group {
+    display: flex;
+    gap: 0.3rem;
+    align-items: center;
+  }
+
+  .product-card-footer .btn-table-action {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+  }
+
+  .product-card-footer .btn-table-action svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Modal de Producto con Botones Fijos (Sticky Footer) */
+  .modal-card-large {
+    width: 96vw !important;
+    max-height: 90vh !important;
+    overflow-y: auto;
+    border-radius: var(--radius-md);
+  }
+
+  .modal-card-large .modal-body {
+    padding: 0 !important;
+    overflow-y: visible !important;
+  }
+
+  .modal-card-large .modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 11;
+    background: #1a1718;
+    padding: 0.85rem 1rem;
+  }
+
+  .product-modal-body,
+  .modal-product-grid,
+  .modal-form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+    padding: 0.85rem 1rem !important;
+  }
+
+  .photo-upload-container,
+  .product-photo-section {
+    width: 100%;
+    gap: 0.65rem;
+  }
+
+  .image-preview-box,
+  .product-photo-dropzone {
+    height: 130px !important;
+    padding: 0.65rem;
+    border-radius: 10px;
+  }
+
+  .image-placeholder-content {
+    padding: 0.5rem;
+    gap: 0.35rem;
+    font-size: 0.74rem;
+  }
+
+  .image-placeholder-content svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .photo-actions-row,
+  .product-photo-actions {
+    gap: 0.5rem !important;
+  }
+
+  .btn-photo-action,
+  .btn-upload-action {
+    height: 36px !important;
+    min-height: 36px;
+    font-size: 0.8rem;
+    border-radius: 8px;
+  }
+
+  .btn-camera-snap {
+    min-height: 38px;
+    font-size: 0.82rem;
+  }
+
+  .btn-camera-tool {
+    min-height: 32px;
+    font-size: 0.75rem;
+  }
+
+  .fields-column,
+  .product-form-fields {
+    gap: 0.65rem;
+  }
+
+  .fields-column .form-group,
+  .form-group-modal {
+    gap: 0.25rem;
+  }
+
+  .fields-column .form-label,
+  .form-group-modal label,
+  .form-group-modal .form-label {
+    font-size: 0.8rem !important;
+  }
+
+  .product-form-fields input,
+  .product-form-fields select,
+  .fields-column .input-form,
+  .fields-column .select-form {
+    height: 38px !important;
+    font-size: 0.84rem !important;
+    padding: 0 0.75rem !important;
+    border-radius: 8px !important;
+  }
+
+  .form-row-2,
+  .product-pricing-row {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
+  }
+
+  .product-modal-footer {
+    position: sticky;
+    bottom: 0;
+    background: #161114;
+    z-index: 10;
+    display: flex;
+    flex-direction: row !important;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 0.65rem 1rem;
+    margin-top: 0.5rem;
+    border-top: 1px solid rgba(244, 180, 200, 0.15);
+  }
+
+  .product-modal-footer button,
+  .product-modal-footer .btn-primary-action,
+  .product-modal-footer .btn-secondary-action {
+    height: 38px !important;
+    min-height: 38px !important;
+    flex: 1 !important;
+    width: auto !important;
+    font-size: 0.84rem !important;
+    padding: 0 0.75rem !important;
   }
 }
 
 /* 2. TABLETS (641px a 1023px) */
 @media (min-width: 641px) and (max-width: 1023px) {
+  .category-pills-section {
+    padding: 0.85rem 1rem;
+    gap: 0.85rem;
+  }
+
+  .products-grid-view {
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 0.85rem;
+  }
+
+  .product-card {
+    border-radius: var(--radius-sm);
+  }
+
+  .product-image-box {
+    height: 125px;
+  }
+
+  .product-card-body {
+    padding: 0.75rem;
+    gap: 0.45rem;
+  }
+
+  .product-title {
+    font-size: 0.92rem;
+  }
+
+  .product-price {
+    font-size: 1.05rem;
+  }
+
+  .stock-control-panel {
+    padding: 0.35rem 0.5rem;
+  }
+
+  .product-card-footer {
+    padding: 0.6rem 0.75rem;
+  }
+
   .modal-card-large {
     max-width: 700px;
     width: 92vw;
   }
 
+  .product-modal-body,
+  .modal-product-grid,
   .modal-form-grid {
-    grid-template-columns: 220px 1fr;
-    gap: 1.25rem;
+    grid-template-columns: 220px 1fr !important;
+    gap: 1.25rem !important;
+    padding: 1.25rem 1.5rem !important;
   }
 
-  .image-preview-box {
-    height: 175px;
+  .image-preview-box,
+  .product-photo-dropzone {
+    height: 175px !important;
   }
 }
 

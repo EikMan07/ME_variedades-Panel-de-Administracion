@@ -867,7 +867,7 @@ export default function ModalRegistrarVenta({ isOpen, onClose, ventaToEdit = nul
           )}
 
           {/* 7. ACCIONES DEL MODAL */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="modal-actions-footer" style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
             <button
               type="button"
               onClick={onClose}

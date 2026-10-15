@@ -307,29 +307,98 @@
 }
 
 /* ===================================================
-   RESPONSIVE MOBILE-FIRST: ENROLAMIENTO FACIAL
+   RESPONSIVE TABLET: BIOMETRÍA (641px - 1023px)
+   =================================================== */
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  .modal-face-card,
+  .modal-card.modal-face-enroll {
+    max-width: 460px !important;
+    width: 90% !important;
+  }
+
+  .camera-scanner-wrapper {
+    max-height: 260px !important;
+  }
+
+  .auth-security-badge {
+    width: 76px !important;
+    height: 76px !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .modal-face-enroll .modal-footer button,
+  .modal-card.modal-face-card .modal-footer button {
+    height: 40px !important;
+    font-size: 0.85rem !important;
+  }
+}
+
+/* ===================================================
+   RESPONSIVE MOBILE: BIOMETRÍA (<= 640px)
    =================================================== */
 
 @media (max-width: 640px) {
-  .modal-face-card,
-  .modal-card.modal-face-enroll {
-    width: 94% !important;
-    max-width: 94% !important;
-    max-height: 88vh !important;
-    margin: auto !important;
-    overflow-y: auto !important;
+  .auth-verifying-fullscreen {
+    padding: 1rem !important;
   }
 
-  .modal-face-enroll .modal-body {
-    padding: 1rem 0.85rem !important;
+  .auth-security-badge {
+    width: 64px !important;
+    height: 64px !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .auth-circular-spinner {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .auth-success-check {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .auth-verifying-labels h3 {
+    font-size: 1.25rem !important;
+    margin-bottom: 0.35rem !important;
+  }
+
+  .auth-verifying-labels p {
+    font-size: 0.82rem !important;
+    line-height: 1.4 !important;
+  }
+
+  .modal-face-card,
+  .modal-card.modal-face-enroll,
+  .modal-card.modal-face-card {
+    width: calc(100% - 20px) !important;
+    max-width: 360px !important;
+    max-height: 90dvh !important;
+    margin: auto !important;
+    overflow-y: auto !important;
+    border-radius: 14px !important;
+  }
+
+  .modal-face-enroll .modal-body,
+  .modal-card.modal-face-card .modal-body,
+  .face-scanner-body {
+    padding: 1rem !important;
+    gap: 0.75rem !important;
+  }
+
+  .modal-face-enroll .modal-header,
+  .modal-card.modal-face-card .modal-header {
+    padding: 0.75rem 1rem !important;
   }
 
   /* Formulario en 1 columna vertical */
   .face-enroll-auth-grid {
     display: flex !important;
     flex-direction: column !important;
-    gap: 0.85rem !important;
+    gap: 0.65rem !important;
     width: 100% !important;
+    margin-bottom: 0.25rem !important;
   }
 
   .modal-face-enroll .form-group-modal,
@@ -338,42 +407,53 @@
   }
 
   .modal-face-enroll input {
-    height: 42px !important;
-    font-size: 0.88rem !important;
+    height: 38px !important;
+    font-size: 0.84rem !important;
   }
 
-  /* Visor de cámara adaptable */
+  /* Visor de cámara y escáner compacto */
   .camera-scanner-wrapper,
   .face-camera-container,
   .face-camera-video {
     width: 100% !important;
-    max-height: 240px !important;
-    border-radius: 12px !important;
+    max-height: 190px !important;
+    border-radius: 10px !important;
   }
 
   .face-oval-guide {
-    width: 140px !important;
-    height: 180px !important;
+    width: 110px !important;
+    height: 140px !important;
   }
 
-  /* Footer de botones en mobile */
+  .scanner-feedback-box {
+    padding: 0.55rem 0.75rem !important;
+    font-size: 0.78rem !important;
+    gap: 0.5rem !important;
+  }
+
+  /* Footer de botones con altura ergonómica táctil de 38px */
   .modal-face-enroll .modal-footer,
   .modal-card.modal-face-card .modal-footer {
     display: grid !important;
     grid-template-columns: 1fr 1.6fr !important;
-    gap: 0.65rem !important;
-    padding: 0.85rem 1rem !important;
+    gap: 0.5rem !important;
+    padding: 0.75rem 1rem !important;
   }
 
   .modal-face-enroll .modal-footer button,
-  .modal-card.modal-face-card .modal-footer button {
-    height: 42px !important;
+  .modal-card.modal-face-card .modal-footer button,
+  .btn-confirm-biometric,
+  .btn-cancel {
+    height: 38px !important;
+    min-height: 38px !important;
     padding: 0 0.5rem !important;
     font-size: 0.82rem !important;
+    border-radius: 8px !important;
     white-space: nowrap !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
   }
 }
+
 

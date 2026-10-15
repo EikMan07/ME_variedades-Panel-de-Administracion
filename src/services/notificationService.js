@@ -1,17 +1,144 @@
 /**
  * Servicio de Notificaciones y Alertas Inteligentes
- * Plataforma ME Variedades
- * Iconografía 100% SVG Vectorial - Sin Emojis
+ * Plataforma ME Variedades — Soporte en Tiempo Real y WhatsApp (CallMeBot)
  */
 
-// Modo 100% Silencioso (Sin reproducción de sonidos)
-export function playNotificationSound() {
-  // Función inerte: todos los efectos de audio han sido suprimidos
-}
-
+import { supabase } from './supabase.js';
 import { obtenerNotificacionesCobro } from './cobroNotificationService.js';
 
-// Generador de alertas inteligentes a partir de datos reales de Supabase
+// Modo 100% Silencioso o compatible con sonido web audio
+export function playNotificationSound() {
+  try {
+    const audio = new Audio('/sounds/campanita-dos-tonos.wav');
+    audio.volume = 0.4;
+    audio.play().catch(() => {});
+  } catch {
+    // Silencio si no hay contexto de audio disponible
+  }
+}
+
+/**
+ * Consulta la tabla persistente `notificaciones` en Supabase
+ */
+export async function obtenerNotificacionesRemotas() {
+  try {
+    const { data, error } = await supabase
+      .from('notificaciones')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(60);
+
+    if (error) {
+      console.warn('Advertencia al consultar notificaciones en Supabase:', error.message);
+      return [];
+    }
+
+    return (data || []).map((n) => ({
+      id: `remote-${n.id}`,
+      dbId: n.id,
+      tipo: n.tipo,
+      titulo: n.titulo,
+      mensaje: n.mensaje,
+      leida: Boolean(n.leida),
+      metadata: n.metadata || {},
+      created_at: n.created_at,
+      linkWhatsApp: n.metadata?.link_whatsapp,
+      telefono: n.metadata?.telefono,
+      clienteNombre: n.metadata?.cliente_nombre,
+      prioridad: n.tipo === 'stock_agotado' ? 'critica' : (n.tipo === 'stock_bajo' ? 'alta' : 'media'),
+      etiqueta: n.tipo === 'cumpleanos' ? 'Cumpleaños' : (n.tipo === 'venta' ? 'Venta' : (n.tipo === 'pago' ? 'Abono' : 'Sistema')),
+      accion: n.metadata?.link_whatsapp ? 'whatsapp' : (n.tipo === 'stock_bajo' ? 'inventario' : 'general'),
+      link: n.tipo.startsWith('stock') ? '/productos' : (n.tipo === 'venta' ? '/ventas' : (n.tipo === 'pago' ? '/pagos' : '/clientes')),
+    }));
+  } catch (err) {
+    console.error('Error en obtenerNotificacionesRemotas:', err);
+    return [];
+  }
+}
+
+/**
+ * Marca una notificación como leída en Supabase
+ */
+export async function marcarNotificacionLeidaRemota(dbId) {
+  if (!dbId) return;
+  try {
+    await supabase
+      .from('notificaciones')
+      .update({ leida: true })
+      .eq('id', dbId);
+  } catch (err) {
+    console.error('Error al marcar leída en Supabase:', err);
+  }
+}
+
+/**
+ * Marca todas las notificaciones como leídas en Supabase
+ */
+export async function marcarTodasLeidasRemotas() {
+  try {
+    await supabase
+      .from('notificaciones')
+      .update({ leida: true })
+      .eq('leida', false);
+  } catch (err) {
+    console.error('Error al marcar todas leídas en Supabase:', err);
+  }
+}
+
+/**
+ * Elimina una notificación específica de Supabase
+ */
+export async function eliminarNotificacionRemota(dbId) {
+  if (!dbId) return;
+  try {
+    await supabase
+      .from('notificaciones')
+      .delete()
+      .eq('id', dbId);
+  } catch (err) {
+    console.error('Error al eliminar notificación en Supabase:', err);
+  }
+}
+
+/**
+ * Elimina todas las notificaciones archivadas (leídas) de Supabase
+ */
+export async function vaciarHistorialRemoto() {
+  try {
+    await supabase
+      .from('notificaciones')
+      .delete()
+      .eq('leida', true);
+  } catch (err) {
+    console.error('Error al vaciar historial en Supabase:', err);
+  }
+}
+
+/**
+ * Dispara una alerta hacia el endpoint serverless /api/whatsapp-notify (CallMeBot)
+ */
+export async function enviarAlertaWhatsAppAdmin({ titulo, mensaje, tipo = 'prueba' }) {
+  try {
+    const res = await fetch('/api/whatsapp-notify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ titulo, mensaje, tipo }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.details || data.error || 'Error al despachar alerta a WhatsApp.');
+    }
+    return data;
+  } catch (err) {
+    console.error('Fallo al enviar alerta a WhatsApp:', err);
+    throw err;
+  }
+}
+
+// Generador de alertas inteligentes a partir de datos vivos en memoria
 export function generarNotificaciones({ clientes = [], productos = [], pagos = [], prestamos = [], pedidos = [] }) {
   const notificaciones = [];
   const hoy = new Date();
@@ -25,6 +152,10 @@ export function generarNotificaciones({ clientes = [], productos = [], pagos = [
     const nombre = c.nombre_completo || c.nombre || 'Cliente';
 
     if (diaC === diaActual && mesC === mesActual) {
+      const telLimpio = (c.telefono || '').replace(/\D/g, '');
+      const telConPais = telLimpio.length === 8 ? `506${telLimpio}` : telLimpio;
+      const linkDirecto = `https://wa.me/${telConPais}?text=${encodeURIComponent(`¡Hola ${nombre}! En ME Variedades te deseamos un muy feliz cumpleaños 🎉🎂 Esperamos que pases un día maravilloso.`)}`;
+
       notificaciones.push({
         id: `cumple-${c.id}`,
         tipo: 'cumpleanos',
@@ -35,6 +166,7 @@ export function generarNotificaciones({ clientes = [], productos = [], pagos = [
         etiqueta: 'Hoy',
         prioridad: 'alta',
         accion: 'whatsapp',
+        linkWhatsApp: linkDirecto,
         link: '/clientes'
       });
     }
@@ -71,7 +203,6 @@ export function generarNotificaciones({ clientes = [], productos = [], pagos = [
   });
 
   // 3. Notificaciones de Cobro (Préstamos, Ventas a Crédito y Cuentas por Cobrar)
-  // Consumo estricto de la misma fuente de verdad (cobroNotificationService)
   const cobrosNotifs = obtenerNotificacionesCobro({ prestamos, pedidos, pagos });
   cobrosNotifs.forEach((cn) => {
     notificaciones.push({

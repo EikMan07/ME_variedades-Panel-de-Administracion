@@ -9,14 +9,37 @@
   box-sizing: border-box;
 }
 
-body, html {
+body, html, #root, .app-layout {
   width: 100%;
+  max-width: 100%;
   min-height: 100%;
   font-family: 'Poppins', 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background-color: var(--color-fondo-oscuro);
   color: var(--color-texto-principal);
   overflow-x: hidden;
   line-height: 1.5;
+}
+
+/* Tipografía y encabezados base */
+h1, .page-title, .page-main-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--color-texto-principal);
+}
+
+h2, .section-heading, .modal-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-texto-principal);
+}
+
+h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-texto-principal);
 }
 
 body.dashboard-body {
@@ -773,6 +796,165 @@ textarea::placeholder {
   border-radius: 12px;
   font-size: 0.9rem;
   font-weight: 600;
+}
+
+/* ========================================================
+   RESPONSIVE GLOBAL — MÓVILES (<= 640px)
+   ======================================================== */
+@media (max-width: 640px) {
+  /* Prevención de desbordamiento horizontal */
+  html, body, #root, .app-layout, .app-main-wrapper {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+
+  /* Reducción de títulos en un 15-20% para que no ocupen dos líneas */
+  h1, .page-title, .page-main-heading {
+    font-size: 1.25rem !important;
+    line-height: 1.2 !important;
+  }
+
+  h2, .section-heading, .modal-title {
+    font-size: 1.05rem !important;
+    line-height: 1.25 !important;
+  }
+
+  h3 {
+    font-size: 0.95rem !important;
+  }
+
+  p.page-sub-heading,
+  .page-subtitle,
+  .modal-subtitle {
+    font-size: 0.74rem !important;
+    line-height: 1.35 !important;
+  }
+
+  /* Reducción de márgenes y paddings contenedores a 0.65rem - 0.85rem */
+  .dashboard-content,
+  .main-content,
+  .app-content {
+    padding: 0.65rem !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .card-glass,
+  .filters-card,
+  .table-container-card,
+  .empty-state-card {
+    padding: 0.75rem !important;
+    border-radius: 10px !important;
+  }
+
+  /* Botones de acción principales táctiles y compactos */
+  .btn-primary-action,
+  .btn-new-item,
+  .btn-secondary-action,
+  .btn-danger-action,
+  .header-actions .btn-primary,
+  .topbar-actions button:first-child {
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 0.85rem !important;
+    font-size: 0.84rem !important;
+    border-radius: 10px !important;
+    gap: 0.4rem !important;
+  }
+
+  /* Tablas responsivas con scroll horizontal suave y celdas compactas */
+  .table-container-card,
+  .table-responsive,
+  .table-wrapper,
+  .pedidos-table-container,
+  .ventas-table-container,
+  .products-table-view {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 10px !important;
+  }
+
+  table {
+    width: 100% !important;
+    min-width: 580px;
+  }
+
+  th, td {
+    padding: 0.5rem 0.65rem !important;
+    font-size: 0.8rem !important;
+    white-space: nowrap !important;
+  }
+
+  /* Modales generales con botones fijos (Sticky Footer) */
+  .modal-card,
+  .modal-card-sm,
+  .modal-card-md,
+  .modal-card-lg,
+  .modal-card-large {
+    width: 96vw !important;
+    max-width: 96vw !important;
+    max-height: 90vh !important;
+    border-radius: 12px !important;
+  }
+
+  .modal-header {
+    padding: 0.85rem 1rem !important;
+  }
+
+  .modal-body {
+    padding: 0.85rem 1rem !important;
+  }
+
+  .modal-footer {
+    position: sticky !important;
+    bottom: 0 !important;
+    background: #161114 !important;
+    z-index: 10 !important;
+    padding: 0.65rem 1rem !important;
+    border-top: 1px solid rgba(244, 180, 200, 0.15) !important;
+  }
+}
+
+/* ========================================================
+   RESPONSIVE GLOBAL — TABLETS (641px a 1023px)
+   ======================================================== */
+@media (min-width: 641px) and (max-width: 1023px) {
+  .dashboard-content,
+  .main-content,
+  .app-content {
+    padding: 1rem !important;
+    gap: 1.25rem !important;
+  }
+
+  .card-glass,
+  .filters-card,
+  .table-container-card {
+    padding: 1rem !important;
+    border-radius: 12px !important;
+  }
+
+  h1, .page-title, .page-main-heading {
+    font-size: 1.4rem !important;
+  }
+
+  h2, .section-heading {
+    font-size: 1.15rem !important;
+  }
+
+  .table-container-card,
+  .table-responsive {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  th, td {
+    padding: 0.65rem 0.85rem !important;
+    font-size: 0.84rem !important;
+  }
 }
 
 

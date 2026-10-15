@@ -522,3 +522,150 @@
   font-size: 0.8rem;
   color: var(--text-muted);
 }
+
+/* ========================================================
+   FASE 2: RESPONSIVE VENTAS & PUNTO DE VENTA (POS) ÁGIL
+   (TABLET: 641px - 1023px | MOBILE: <= 640px)
+   ======================================================== */
+
+/* TABLET (641px - 1023px): Distribución balanceada */
+@media (min-width: 641px) and (max-width: 1023px) {
+  .pedidos-page-content,
+  .ventas-page-content {
+    padding: 1.25rem 1.25rem 2.5rem !important;
+    gap: 1.15rem !important;
+  }
+
+  .pos-layout-container,
+  .ventas-split-layout {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.85rem !important;
+  }
+
+  .form-row-grid {
+    gap: 0.85rem !important;
+  }
+}
+
+/* MÓVIL (<= 640px): Filas Delgadas (~60px) y Barra de Cobro Sticky */
+@media (max-width: 640px) {
+  .pedidos-page-content,
+  .ventas-page-content {
+    padding: 0.65rem 0.65rem 2rem !important;
+    gap: 0.75rem !important;
+  }
+
+  .module-header-banner {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.65rem !important;
+  }
+
+  .module-title {
+    font-size: 1.35rem !important;
+  }
+
+  .module-subtitle {
+    font-size: 0.78rem !important;
+  }
+
+  .pedidos-filters-bar,
+  .ventas-filters-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 0.65rem 0.75rem !important;
+    gap: 0.65rem !important;
+  }
+
+  .search-box-group {
+    max-width: 100% !important;
+    padding: 0.45rem 0.75rem !important;
+  }
+
+  /* 1. Ítems de Catálogo, Carrito y Detalle de Venta en Filas Delgadas (~60px) */
+  .pos-product-item,
+  .pos-cart-item,
+  .cart-item-row,
+  .order-item-card,
+  .catalogo-item-row,
+  .venta-detalle-item {
+    min-height: 62px !important;
+    padding: 0.45rem 0.6rem !important;
+    gap: 0.5rem !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    display: flex !important;
+    box-sizing: border-box !important;
+    border-radius: 8px !important;
+  }
+
+  .pos-layout-container,
+  .ventas-split-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Tabla de ventas compacta en móvil */
+  .orders-table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .orders-data-table th {
+    padding: 0.5rem 0.55rem !important;
+    font-size: 0.7rem !important;
+  }
+
+  .orders-data-table td {
+    padding: 0.55rem 0.55rem !important;
+    font-size: 0.8rem !important;
+  }
+
+  .btn-action-icon {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 6px !important;
+  }
+
+  .btn-action-icon svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+
+  /* 2. Barra Inferior Fija / Sticky para Resumen y Confirmar Venta / Cobro */
+  .pos-summary-bar,
+  .pos-cart-footer,
+  .ventas-checkout-bar,
+  .modal-actions-footer,
+  .modal-order-card form > div:last-child {
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 15 !important;
+    background: #161114 !important;
+    padding: 0.65rem !important;
+    border-top: 1px solid rgba(244, 180, 200, 0.2) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 0.65rem !important;
+    margin-top: auto !important;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .modal-actions-footer button,
+  .ventas-checkout-bar button {
+    padding: 0.55rem 0.95rem !important;
+    font-size: 0.82rem !important;
+  }
+
+  .form-row-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.55rem !important;
+  }
+
+  .form-order-modal {
+    gap: 0.75rem !important;
+  }
+}

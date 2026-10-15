@@ -142,4 +142,44 @@
   --color-alerta-ambar-bg: rgba(245, 158, 11, 0.14);
   --color-alerta-ambar-border: rgba(245, 158, 11, 0.35);
   --color-alerta-ambar-glow: 0 0 18px rgba(245, 158, 11, 0.35);
+
+  /* Tokens de Espaciado Global */
+  --spacing-container: 1.5rem;
+  --spacing-content: 2rem;
+  --spacing-card: 1.25rem;
+  --spacing-gap: 1.25rem;
+}
+
+/* ========================================================
+   RESPONSIVE TOKENS: MOBILE & TABLET
+   ======================================================== */
+@media (max-width: 640px) {
+  :root {
+    --sidebar-width: 100vw;
+    --topbar-height: 54px;
+    --radius-sm: 8px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-input: 8px;
+    --radius-card: 10px;
+    --spacing-container: 0.65rem;
+    --spacing-content: 0.65rem;
+    --spacing-card: 0.75rem;
+    --spacing-gap: 0.65rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  :root {
+    --sidebar-width: 240px;
+    --topbar-height: 60px;
+    --radius-sm: 10px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-card: 12px;
+    --spacing-container: 1rem;
+    --spacing-content: 1rem;
+    --spacing-card: 1rem;
+    --spacing-gap: 0.85rem;
+  }
 }

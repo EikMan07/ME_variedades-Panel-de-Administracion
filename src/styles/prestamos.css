@@ -548,9 +548,6 @@
     font-size: 0.68rem;
     margin-left: 0;
   }
-  .prestamos-kpis-grid {
-    grid-template-columns: 1fr;
-  }
   .prestamos-filters-bar {
     flex-direction: column;
     align-items: stretch;
@@ -632,5 +629,222 @@
 .autocomplete-tel {
   font-size: 0.72rem;
   color: var(--color-texto-apagado, #94a3b8);
+}
+
+/* ========================================================
+   FASE 3: RESPONSIVE PRÉSTAMOS ALTA DENSIDAD
+   (TABLET: 641px - 1023px | MOBILE: <= 640px)
+   ======================================================== */
+
+/* TABLET (641px - 1023px): Cuadrícula KPI en 3 o 4 columnas */
+@media (min-width: 641px) and (max-width: 1023px) {
+  .prestamos-kpis-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important;
+    gap: 0.75rem !important;
+  }
+
+  .prestamo-kpi-card {
+    padding: 0.85rem 1rem !important;
+  }
+
+  .prestamo-kpi-value {
+    font-size: 1.35rem !important;
+  }
+
+  .prestamos-filters-bar {
+    gap: 0.75rem !important;
+  }
+}
+
+/* MÓVIL (<= 640px): Paneles 2 Columnas y Filas Condensadas */
+@media (max-width: 640px) {
+  /* 1. Cuadrícula de KPIs en 2 Columnas Compactas */
+  .prestamos-kpis-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  .prestamo-kpi-card {
+    padding: 0.6rem 0.75rem !important;
+    gap: 0.5rem !important;
+    border-radius: 10px !important;
+    min-height: auto !important;
+  }
+
+  .prestamo-kpi-icon {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 8px !important;
+  }
+
+  .prestamo-kpi-icon svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .prestamo-kpi-label {
+    font-size: 0.68rem !important;
+    margin-bottom: 0.1rem !important;
+    letter-spacing: 0.04em !important;
+  }
+
+  .prestamo-kpi-value {
+    font-size: 1.15rem !important;
+    line-height: 1.15 !important;
+  }
+
+  .prestamo-kpi-sublabel {
+    font-size: 0.65rem !important;
+  }
+
+  /* 2. Filtros Compactos */
+  .prestamos-filters-bar {
+    gap: 0.55rem !important;
+    padding: 0.65rem !important;
+  }
+
+  .prestamos-filter-group {
+    min-width: 100% !important;
+  }
+
+  /* 3. Filas Condensadas de Préstamos */
+  .table-container-card {
+    border-radius: 12px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .data-table {
+    min-width: 580px !important;
+  }
+
+  .data-table tbody tr {
+    height: 66px !important;
+    min-height: 64px !important;
+    max-height: 70px !important;
+    box-sizing: border-box !important;
+  }
+
+  .data-table thead tr th {
+    padding: 0.45rem 0.5rem !important;
+    font-size: 0.7rem !important;
+  }
+
+  .data-table tbody tr td {
+    padding: 0.4rem 0.5rem !important;
+    font-size: 0.8rem !important;
+    vertical-align: middle !important;
+  }
+
+  .prestamo-beneficiario-cell {
+    gap: 0.45rem !important;
+    max-width: 140px !important;
+  }
+
+  .prestamo-avatar {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 0.72rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  .prestamo-nombre {
+    font-size: 0.78rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: block !important;
+    max-width: 105px !important;
+  }
+
+  .prestamo-tel {
+    font-size: 0.65rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: block !important;
+  }
+
+  .badge-beneficiario-tag {
+    font-size: 0.62rem !important;
+    padding: 0 4px !important;
+  }
+
+  /* Monto de Saldo Alineado a la Derecha */
+  .prestamo-saldo-amount {
+    font-size: 0.92rem !important;
+    font-weight: 700 !important;
+  }
+
+  /* Badge Compacto de 0.62rem */
+  .badge-prestamo {
+    font-size: 0.62rem !important;
+    padding: 0.15rem 0.45rem !important;
+    border-radius: 10px !important;
+  }
+
+  /* Botones de Acción de 28px x 28px */
+  .action-buttons-group {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.25rem !important;
+    justify-content: flex-end !important;
+  }
+
+  .btn-table-action,
+  .action-buttons-group .btn-table-action {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 6px !important;
+  }
+
+  .btn-table-action svg,
+  .action-buttons-group .btn-table-action svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+
+  /* 4. Barra Fija / Sticky para Acciones de Préstamos */
+  .prestamos-sticky-actions,
+  .modal-actions-footer {
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 15 !important;
+    background: #161114 !important;
+    padding: 0.65rem 1rem !important;
+    border-top: 1px solid rgba(244, 180, 200, 0.2) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 0.5rem !important;
+  }
+
+  .modal-actions-footer button {
+    padding: 0.5rem 0.85rem !important;
+    font-size: 0.82rem !important;
+  }
+
+  /* Modales de Préstamos e Inputs */
+  .input-form,
+  .form-input,
+  .input-currency {
+    height: 38px !important;
+    min-height: 38px !important;
+    font-size: 0.85rem !important;
+  }
+
+  .form-row-2col,
+  .calculator-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.55rem !important;
+  }
 }
 

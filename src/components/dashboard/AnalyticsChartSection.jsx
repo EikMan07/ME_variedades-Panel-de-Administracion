@@ -8,7 +8,7 @@ import { useVentas } from '../../context/VentasContext';
 // Registrar todos los componentes de Chart.js
 ChartJS.register(...registerables);
 
-export default function AnalyticsChartSection({ pedidos = [], metricas = {} }) {
+export default function AnalyticsChartSection({ pedidos = [], _metricas = {} }) {
   // 1. Obtener datos de los contextos con fallback defensivo
   const { metrics = {} } = useDashboard?.() || {};
   const { productos = [] } = useProducts?.() || {};

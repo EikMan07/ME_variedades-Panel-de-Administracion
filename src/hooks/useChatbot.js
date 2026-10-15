@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { consultarGemini, generarRespuestaLocal, obtenerContextoEnVivo } from '../services/geminiService';
+import { consultarGemini, obtenerContextoEnVivo } from '../services/geminiService';
 
 export function useChatbot() {
   const [isOpen, setIsOpen] = useState(() => {

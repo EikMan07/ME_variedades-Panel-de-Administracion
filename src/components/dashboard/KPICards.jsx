@@ -1,7 +1,7 @@
 import { useDashboard } from '../../context/DashboardContext';
 
 export default function KPICards() {
-  const { metrics = {}, isLoading = false } = useDashboard?.() || {};
+  const { metrics = {} } = useDashboard?.() || {};
 
   const totalStock = metrics?.totalStockUnidades ?? 0;
   const totalPedidos = metrics?.pedidosActivos ?? 0;

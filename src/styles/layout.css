@@ -1303,104 +1303,284 @@ header.app-header {
   background: rgba(239, 68, 68, 0.2) !important;
 }
 
-/* Responsividad Móvil */
-@media (max-width: 1024px) {
-  .app-sidebar {
-    position: fixed;
-    transform: translateX(-100%);
-    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
-  }
+/* ========================================================
+   RESPONSIVIDAD Y LAYOUT MULTI-DISPOSITIVO
+   ======================================================== */
 
-  .app-sidebar.open {
-    transform: translateX(0);
-  }
-
-  .sidebar-overlay.active {
-    display: block;
-  }
-
-  .btn-icon-mobile {
-    display: block;
-  }
-
-  .dashboard-content {
-    padding: 1.25rem;
-  }
-
-  .app-topbar {
-    padding: 0 1.25rem;
-  }
-
-  .notif-dropdown {
-    width: calc(100vw - 24px);
-    right: -60px;
-  }
-}
-
-/* ===================================================
-   RESPONSIVE MOBILE-FIRST: TOPBAR & NAVEGACIÓN
-   =================================================== */
+/* 1. MÓVILES (<= 640px) */
 @media (max-width: 640px) {
-  .app-topbar {
-    padding: 0 0.75rem !important;
-    gap: 0.5rem !important;
-    height: 60px !important;
-    min-height: 60px !important;
+  /* Contenedores principales ocupan 100% con padding compacto */
+  .app-main-wrapper {
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  .dashboard-content,
+  .main-content,
+  .app-content {
+    padding: 0.65rem !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Barra superior compacta a máximo 54px */
+  .app-topbar,
+  .topbar,
+  .dashboard-topbar,
+  header.app-header {
+    height: 54px !important;
+    min-height: 54px !important;
+    max-height: 54px !important;
+    padding: 0 0.65rem !important;
+    gap: 0.45rem !important;
   }
 
   .topbar-left {
-    gap: 0.5rem !important;
+    gap: 0.45rem !important;
     min-width: 0 !important;
     flex: 1 1 auto !important;
   }
 
-  /* Ocultar el prefijo de marca y separador en móvil para evitar texto truncado */
+  .btn-hamburger,
+  .btn-topbar-action,
+  .btn-sound-toggle {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    padding: 0 !important;
+    border-radius: 8px !important;
+  }
+
+  .breadcrumb-logo-circle {
+    width: 26px !important;
+    height: 26px !important;
+    border-width: 1px !important;
+  }
+
+  /* Ocultar elementos secundarios de topbar en móvil */
   .brand-prefix-text,
   .breadcrumb-brand,
-  .breadcrumb-separator {
-    display: none !important;
-  }
-
-  .current-module-title,
-  .breadcrumb-current {
-    font-size: 0.95rem !important;
-    max-width: 170px !important;
-    font-weight: 700 !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-  }
-
-  /* Ocultar la fecha en móvil para que el botón de acción y notificaciones no se corten */
+  .breadcrumb-separator,
   .date-badge,
   .topbar-date,
   #current-date-badge {
     display: none !important;
   }
 
+  .current-module-title,
+  .breadcrumb-current {
+    font-size: 0.88rem !important;
+    max-width: 140px !important;
+    font-weight: 700 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
   .topbar-right {
-    gap: 0.45rem !important;
+    gap: 0.4rem !important;
     flex-shrink: 0 !important;
   }
 
   .topbar-right .btn-primary-action,
   .topbar-right .btn-primary {
-    height: 38px !important;
-    min-height: 38px !important;
-    padding: 0 0.65rem !important;
-    font-size: 0.76rem !important;
-    gap: 0.35rem !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 0.6rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 8px !important;
+    gap: 0.3rem !important;
     white-space: nowrap !important;
-  }
-
-  .btn-topbar-action {
-    width: 38px !important;
-    height: 38px !important;
   }
 
   .notif-dropdown {
     width: calc(100vw - 16px) !important;
     right: -10px !important;
+  }
+
+  /* Menú de navegación móvil compacto sin desbordes */
+  .app-sidebar {
+    width: min(280px, 82vw) !important;
+    min-width: unset !important;
+    max-width: 82vw !important;
+    position: fixed !important;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1000 !important;
+    transform: translateX(-100%);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.6);
+  }
+
+  .app-sidebar.open,
+  .app-sidebar.active {
+    transform: translateX(0) !important;
+  }
+
+  .sidebar-overlay.active {
+    display: block !important;
+  }
+
+  .btn-icon-mobile {
+    display: block !important;
+  }
+
+  .sidebar-header {
+    padding: 0.85rem 1rem !important;
+  }
+
+  .brand-logo-circle {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .brand-title {
+    font-size: 1rem !important;
+  }
+
+  .sidebar-nav {
+    padding: 0.75rem 0.6rem !important;
+    gap: 0.25rem !important;
+  }
+
+  .nav-link {
+    padding: 0.55rem 0.75rem !important;
+    font-size: 0.82rem !important;
+    border-radius: 10px !important;
+  }
+
+  .nav-icon {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .sidebar-user {
+    padding: 0.65rem 0.85rem !important;
+  }
+
+  .user-avatar {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 0.8rem !important;
+  }
+
+  .user-name {
+    font-size: 0.8rem !important;
+  }
+
+  .sidebar-assistant-box {
+    padding: 0.5rem 0.65rem 0.45rem !important;
+  }
+
+  .app-footer {
+    padding: 0.65rem 0.85rem !important;
+    font-size: 0.72rem !important;
+    flex-direction: column !important;
+    gap: 0.35rem !important;
+    text-align: center !important;
+  }
+}
+
+/* 2. TABLETS (641px a 1023px) */
+@media (min-width: 641px) and (max-width: 1023px) {
+  /* Sidebar en modo compacto de 72px para maximizar área de trabajo */
+  .app-sidebar {
+    width: var(--sidebar-collapsed-width, 72px) !important;
+    min-width: var(--sidebar-collapsed-width, 72px) !important;
+    max-width: var(--sidebar-collapsed-width, 72px) !important;
+    position: relative !important;
+    transform: none !important;
+    overflow-x: hidden !important;
+    display: flex !important;
+  }
+
+  .app-sidebar.open {
+    width: 240px !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
+    position: fixed !important;
+    z-index: 1000 !important;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .app-sidebar:not(.open) .brand-text,
+  .app-sidebar:not(.open) .links_name,
+  .app-sidebar:not(.open) .nav-section-title,
+  .app-sidebar:not(.open) .badge-ai,
+  .app-sidebar:not(.open) .user-info {
+    display: none !important;
+  }
+
+  .app-sidebar:not(.open) .sidebar-header {
+    padding: 1rem 0.5rem !important;
+    justify-content: center !important;
+  }
+
+  .app-sidebar:not(.open) .brand-logo-circle {
+    margin: 0 auto !important;
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  .app-sidebar:not(.open) .nav-link {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    margin: 0.2rem auto !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+  }
+
+  .app-sidebar:not(.open) .nav-icon {
+    margin: 0 auto !important;
+  }
+
+  .app-sidebar:not(.open) .sidebar-user {
+    padding: 0.75rem 0.4rem !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+  }
+
+  .app-sidebar:not(.open) .user-card {
+    justify-content: center !important;
+  }
+
+  .app-sidebar:not(.open) .btn-logout {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  /* Barra superior en tablets */
+  .app-topbar,
+  .topbar,
+  .dashboard-topbar,
+  header.app-header {
+    height: 60px !important;
+    min-height: 60px !important;
+    padding: 0 1rem !important;
+  }
+
+  /* Área de trabajo con padding: 1rem */
+  .dashboard-content,
+  .main-content,
+  .app-content {
+    padding: 1rem !important;
+    gap: 1.25rem !important;
+    width: 100% !important;
+  }
+
+  .notif-dropdown {
+    width: 360px !important;
+    right: 0 !important;
   }
 }
 

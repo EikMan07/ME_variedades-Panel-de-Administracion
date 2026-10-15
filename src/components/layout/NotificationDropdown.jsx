@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../../context/NotificationContext';
 import { NotificationIcons } from './NotificationIcons';
@@ -16,10 +16,13 @@ export default function NotificationDropdown() {
     marcarTodasComoLeidas,
     eliminarNotificacion,
     vaciarHistorial,
+    probandoWhatsApp,
+    probarAlertaWhatsApp,
   } = useNotifications();
 
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const [testFeedback, setTestFeedback] = useState(null);
 
   // Cerrar al hacer clic fuera o presionar tecla Escape (Esc)
   useEffect(() => {
@@ -49,15 +52,34 @@ export default function NotificationDropdown() {
 
   if (!isOpen) return null;
 
+  const handleProbarWhatsApp = async () => {
+    setTestFeedback(null);
+    const resultado = await probarAlertaWhatsApp();
+    if (resultado.ok) {
+      setTestFeedback({
+        ok: true,
+        msg: '¡Alerta de prueba enviada a tu WhatsApp con éxito!'
+      });
+    } else {
+      setTestFeedback({
+        ok: false,
+        msg: resultado.error || 'No se pudo enviar. Verifica tus credenciales de CallMeBot.'
+      });
+    }
+    setTimeout(() => {
+      setTestFeedback(null);
+    }, 7000);
+  };
+
   const handleActionClick = (notif) => {
     marcarComoLeida(notif.id);
     if (notif.accion === 'whatsapp_cobro' && notif.linkWhatsApp) {
       window.open(notif.linkWhatsApp, '_blank');
-    } else if (notif.accion === 'whatsapp' && notif.telefono) {
-      const url = generarLinkWhatsApp(
+    } else if (notif.tipo === 'cumpleanos') {
+      const url = notif.linkWhatsApp || (notif.telefono ? generarLinkWhatsApp(
         notif.telefono,
-        'Estimado cliente, en ME Variedades le deseamos un feliz cumpleaños.'
-      );
+        `¡Hola ${notif.clienteNombre || 'estimado cliente'}! En ME Variedades te deseamos un muy feliz cumpleaños 🎉🎂`
+      ) : null);
       if (url && url !== '#') {
         window.open(url, '_blank');
       }
@@ -137,6 +159,56 @@ export default function NotificationDropdown() {
         </button>
       </div>
 
+      {/* Barra de Utilidad: Prueba Rápida de WhatsApp */}
+      <div className="notif-whatsapp-test-bar" style={{
+        padding: '0.45rem 0.85rem',
+        background: 'rgba(37, 211, 102, 0.06)',
+        borderBottom: '1px solid rgba(37, 211, 102, 0.15)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0.35rem'
+      }}>
+        <button
+          type="button"
+          onClick={handleProbarWhatsApp}
+          disabled={probandoWhatsApp}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.45rem',
+            width: '100%',
+            height: '32px',
+            background: 'linear-gradient(135deg, rgba(37, 211, 102, 0.2), rgba(18, 140, 126, 0.25))',
+            border: '1px solid rgba(37, 211, 102, 0.35)',
+            borderRadius: '6px',
+            color: '#4ade80',
+            fontSize: '0.78rem',
+            fontWeight: 600,
+            cursor: probandoWhatsApp ? 'wait' : 'pointer',
+            transition: 'all 0.2s ease',
+          }}
+          title="Envía una alerta de prueba inmediata a tu número de WhatsApp"
+        >
+          {NotificationIcons.whatsapp}
+          <span>{probandoWhatsApp ? 'Enviando alerta a WhatsApp...' : 'Probar alerta a mi WhatsApp'}</span>
+        </button>
+
+        {testFeedback && (
+          <div style={{
+            fontSize: '0.72rem',
+            padding: '0.3rem 0.5rem',
+            borderRadius: '4px',
+            background: testFeedback.ok ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+            border: `1px solid ${testFeedback.ok ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+            color: testFeedback.ok ? '#86efac' : '#fca5a5',
+            lineHeight: 1.3
+          }}>
+            {testFeedback.msg}
+          </div>
+        )}
+      </div>
+
       {/* Contenido de la Lista */}
       <div className="notif-dropdown-body custom-scrollbar">
         {/* Pestaña: PENDIENTES */}
@@ -184,6 +256,7 @@ export default function NotificationDropdown() {
 
                     <p>{item.mensaje}</p>
 
+                    {/* Acciones directas por tipo de alerta */}
                     {item.accion === 'whatsapp_cobro' && item.linkWhatsApp && (
                       <div className="notif-item-footer">
                         <a
@@ -203,18 +276,66 @@ export default function NotificationDropdown() {
                       </div>
                     )}
 
-                    {item.accion === 'whatsapp' && item.telefono && (
+                    {item.tipo === 'cumpleanos' && (
+                      <div className="notif-item-footer">
+                        <a
+                          href={item.linkWhatsApp || (item.telefono ? generarLinkWhatsApp(item.telefono, `¡Hola ${item.clienteNombre || 'estimado cliente'}! En ME Variedades te deseamos un muy feliz cumpleaños 🎉🎂`) : '#')}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="notif-action-link whatsapp notif-btn-felicitar"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            marcarComoLeida(item.id);
+                          }}
+                          title={`Felicitar por WhatsApp a ${item.clienteNombre || 'cliente'}`}
+                        >
+                          {NotificationIcons.whatsapp}
+                          <span>Felicitar por WhatsApp</span>
+                        </a>
+                      </div>
+                    )}
+
+                    {item.tipo === 'venta' && (
                       <div className="notif-item-footer">
                         <button
                           type="button"
-                          className="notif-action-link whatsapp"
+                          className="notif-action-link"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleActionClick(item);
                           }}
                         >
-                          {NotificationIcons.whatsapp}
-                          <span>Enviar felicitación</span>
+                          <span>Ver en Ventas →</span>
+                        </button>
+                      </div>
+                    )}
+
+                    {item.tipo === 'pago' && (
+                      <div className="notif-item-footer">
+                        <button
+                          type="button"
+                          className="notif-action-link"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleActionClick(item);
+                          }}
+                        >
+                          <span>Ver en Pagos →</span>
+                        </button>
+                      </div>
+                    )}
+
+                    {(item.tipo === 'stock_bajo' || item.tipo === 'stock_agotado') && (
+                      <div className="notif-item-footer">
+                        <button
+                          type="button"
+                          className="notif-action-link"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleActionClick(item);
+                          }}
+                        >
+                          <span>Ver Inventario →</span>
                         </button>
                       </div>
                     )}

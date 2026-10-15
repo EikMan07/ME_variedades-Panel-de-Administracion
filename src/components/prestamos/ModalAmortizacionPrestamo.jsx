@@ -7,7 +7,7 @@ import {
   getProgressClass
 } from './prestamosUtils';
 import Modal from '../common/Modal';
-import { calcularMoratoriaElemento, formatearMoneda } from '../../utils/utils';
+import { calcularMoratoriaElemento } from '../../utils/utils';
 
 /**
  * Modal para ver la tabla de amortización, términos e historial de abonos de un préstamo.

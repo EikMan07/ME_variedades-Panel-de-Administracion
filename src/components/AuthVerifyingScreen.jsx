@@ -1,1 +1,3 @@
-export { AuthVerifyingScreen, default } from './biometrics/AuthVerifyingScreen';
+import AuthVerifyingScreen from './biometrics/AuthVerifyingScreen';
+export { AuthVerifyingScreen };
+export default AuthVerifyingScreen;

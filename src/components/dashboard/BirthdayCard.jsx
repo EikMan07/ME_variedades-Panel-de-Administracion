@@ -64,7 +64,6 @@ export default function BirthdayCard() {
             const diaCliente = Number(c.dia_cumpleanos || c.dia_cumple || c.dia);
             const esHoy = diaCliente === diaActual;
             const inicial = c.nombre_completo ? c.nombre_completo.charAt(0).toUpperCase() : 'A';
-            const phoneClean = (c.telefono || '').replace(/\D/g, '');
 
             return (
               <div key={c.id} className={`birthday-command-item ${esHoy ? 'is-today' : ''}`}>
@@ -94,7 +93,7 @@ export default function BirthdayCard() {
 
                 {/* Botón de acción para felicitar / contactar */}
                 <a
-                  href={generarLinkWhatsApp(c.telefono, `¡Hola ${c.nombre_completo}! En ME Variedades te deseamos un muy feliz cumpleaños.`)}
+                  href={generarLinkWhatsApp(c.telefono, `¡Hola ${c.nombre_completo}! En ME Variedades te deseamos un muy feliz cumpleaños 🎉🎂 Esperamos que pases un día increíble.`)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-birthday-congratulate"

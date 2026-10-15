@@ -1256,13 +1256,13 @@ export async function getDashboardMetrics() {
 
   try {
     // 1. Conteo total de clientes y lista de clientes
-    const { count: totalClientes, data: listaClientes, error: errClientes } = await supabase
+    const { count: totalClientes, data: listaClientes } = await supabase
       .from('clientes')
       .select('*', { count: 'exact' })
       .order('created_at', { ascending: false });
 
     // 2. Pedidos activos y lista de pedidos
-    const { count: totalPedidos, data: listaPedidos, error: errPedidos } = await supabase
+    const { data: listaPedidos } = await supabase
       .from('pedidos')
       .select(`
         *,
@@ -1272,7 +1272,7 @@ export async function getDashboardMetrics() {
       .order('created_at', { ascending: false });
 
     // 3. Cuentas por cobrar y pagos
-    const { data: listaPagos, error: errPagos } = await supabase
+    const { data: listaPagos } = await supabase
       .from('pagos')
       .select(`
         *,
@@ -1281,7 +1281,7 @@ export async function getDashboardMetrics() {
       .order('created_at', { ascending: false });
 
     // 4. Préstamos activos y saldo por recuperar
-    const { data: listaPrestamos, error: errPrestamos } = await supabase
+    const { data: listaPrestamos } = await supabase
       .from('prestamos')
       .select(`
         *,
@@ -1290,14 +1290,14 @@ export async function getDashboardMetrics() {
       .order('created_at', { ascending: false });
 
     // 5. Total de unidades en stock y catálogo de productos
-    const { data: listaProductos, error: errProd } = await supabase
+    const { data: listaProductos } = await supabase
       .from('productos')
       .select('*')
       .order('id', { ascending: true });
 
     // 6. Cumpleañeros del mes actual
     const mesActual = new Date().getMonth() + 1; // 1 a 12
-    const { data: cumpleaneros, error: errCumple } = await supabase
+    const { data: cumpleaneros } = await supabase
       .from('clientes')
       .select('*')
       .eq('mes_cumpleanos', mesActual)

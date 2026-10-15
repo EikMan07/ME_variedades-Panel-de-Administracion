@@ -397,3 +397,182 @@
   color: #ffffff;
 }
 
+/* ========================================================
+   FASE 3: RESPONSIVE ESTADO DE CUENTA
+   (TABLET: 641px - 1023px | MOBILE: <= 640px)
+   ======================================================== */
+
+/* TABLET (641px - 1023px): 3 Columnas Proporcionadas */
+@media (min-width: 641px) and (max-width: 1023px) {
+  .estado-cuenta-content {
+    padding: 1.25rem 1.25rem 2.5rem !important;
+    gap: 1.15rem !important;
+  }
+
+  .edc-summary-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.85rem !important;
+  }
+
+  .edc-summary-card {
+    padding: 0.85rem 1rem !important;
+  }
+
+  .edc-summary-value {
+    font-size: 1.25rem !important;
+  }
+
+  .edc-selector-card {
+    padding: 1rem 1.25rem !important;
+  }
+}
+
+/* MÓVIL (<= 640px): Paneles 2 Columnas y Movimientos Condensados */
+@media (max-width: 640px) {
+  .estado-cuenta-content {
+    padding: 0.65rem 0.65rem 2rem !important;
+    gap: 0.75rem !important;
+  }
+
+  .page-header {
+    margin-bottom: 0.75rem !important;
+  }
+
+  .page-header h1,
+  .text-2xl.font-bold.text-white {
+    font-size: 1.35rem !important;
+  }
+
+  .page-header p,
+  .text-gray-400.text-sm {
+    font-size: 0.78rem !important;
+  }
+
+  /* 1. Selector de Cliente Compacto */
+  .edc-selector-card {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 0.75rem !important;
+    gap: 0.65rem !important;
+    border-radius: 12px !important;
+  }
+
+  .edc-client-search {
+    min-width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .edc-search-input {
+    height: 40px !important;
+    font-size: 0.85rem !important;
+    padding: 0.5rem 2rem 0.5rem 0.75rem !important;
+  }
+
+  .edc-selector-actions {
+    width: 100% !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.5rem !important;
+  }
+
+  .edc-client-meta-badges {
+    gap: 0.5rem !important;
+    justify-content: flex-start !important;
+  }
+
+  .badge-edc-id {
+    font-size: 0.75rem !important;
+    padding: 0.25rem 0.6rem !important;
+  }
+
+  .edc-meta-phone,
+  .edc-meta-count {
+    font-size: 0.75rem !important;
+  }
+
+  /* Botón de Exportar PDF */
+  .btn-edc-pdf {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 0.55rem 1rem !important;
+    font-size: 0.82rem !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* 2. Paneles de Resumen en Cuadrícula 2 Columnas */
+  .edc-summary-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  .edc-summary-card {
+    padding: 0.6rem 0.75rem !important;
+    gap: 0.5rem !important;
+    border-radius: 10px !important;
+  }
+
+  /* El tercer card (Saldo Neto) ocupa 2 columnas si es necesario para balance */
+  .edc-summary-card:nth-child(3) {
+    grid-column: span 2 !important;
+  }
+
+  .edc-summary-icon {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 8px !important;
+  }
+
+  .edc-summary-icon svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .edc-summary-label {
+    font-size: 0.66rem !important;
+  }
+
+  .edc-summary-value {
+    font-size: 1.1rem !important;
+    line-height: 1.15 !important;
+  }
+
+  /* 3. Tabla y Movimientos Contables Condensados */
+  .edc-table-card {
+    border-radius: 12px !important;
+  }
+
+  .edc-table-header {
+    padding: 0.65rem 0.75rem !important;
+    gap: 0.4rem !important;
+  }
+
+  .edc-table-title {
+    font-size: 0.95rem !important;
+  }
+
+  .edc-table-card table thead th {
+    padding: 0.45rem 0.5rem !important;
+    font-size: 0.68rem !important;
+  }
+
+  .edc-table-card table tbody td {
+    padding: 0.45rem 0.55rem !important;
+    font-size: 0.78rem !important;
+  }
+
+  .edc-folio-badge {
+    padding: 2px 6px !important;
+    font-size: 0.74rem !important;
+  }
+
+  /* Badges de Estado Compactos (0.62rem) */
+  .badge-edc-liquidado,
+  .badge-edc-pendiente,
+  .badge-edc-activo {
+    font-size: 0.62rem !important;
+    padding: 0.15rem 0.45rem !important;
+    border-radius: 10px !important;
+  }
+}
+

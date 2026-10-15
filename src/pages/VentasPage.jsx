@@ -5,7 +5,7 @@ import Modal from '../components/common/Modal';
 import { useVentas } from '../context/VentasContext';
 import { useClients } from '../context/ClientContext';
 import { useProducts } from '../context/ProductContext';
-import { calcularMoratoriaElemento, formatearMoneda } from '../utils/utils';
+import { calcularMoratoriaElemento } from '../utils/utils';
 
 export default function VentasPage() {
   const { ventas, eliminarVenta } = useVentas();

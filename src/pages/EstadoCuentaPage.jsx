@@ -65,8 +65,8 @@ export default function EstadoCuentaPage() {
       const esContado = (v.modalidad || v.tipo_venta || '').toLowerCase() === 'contado';
       const montoOriginal = Number(v.precio_venta_real ?? v.total ?? v.costo_total ?? 0);
 
-      let totalPagado = 0;
-      let saldoRestante = 0;
+      let totalPagado;
+      let saldoRestante;
 
       if (esContado) {
         totalPagado = montoOriginal;

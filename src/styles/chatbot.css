@@ -376,3 +376,191 @@
   background: var(--color-rosa-empolvado-hover);
   transform: scale(1.05);
 }
+
+/* ===================================================
+   RESPONSIVE TABLET: CHATBOT (641px - 1023px)
+   =================================================== */
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  .chatbot-floating-wrapper {
+    bottom: 20px;
+    right: 20px;
+  }
+
+  .chatbot-window {
+    width: 350px !important;
+    max-width: 350px !important;
+    height: 520px !important;
+    max-height: 520px !important;
+    bottom: 85px !important;
+    right: 20px !important;
+  }
+}
+
+/* ===================================================
+   RESPONSIVE MOBILE: CHATBOT BOTTOM SHEET (<= 640px)
+   =================================================== */
+
+@media (max-width: 640px) {
+  /* Botón disparador FAB compacto que no estorba */
+  .chatbot-floating-wrapper {
+    bottom: 14px !important;
+    right: 14px !important;
+  }
+
+  .btn-chatbot-trigger {
+    width: 46px !important;
+    height: 46px !important;
+    outline-width: 2px !important;
+  }
+
+  .btn-chatbot-trigger .trigger-icon {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .btn-chatbot-trigger .trigger-badge {
+    font-size: 8px !important;
+    padding: 2px 4px !important;
+    top: -2px !important;
+    right: -2px !important;
+  }
+
+  /* Ventana de Chat en formato Hoja Inferior (Bottom Sheet) */
+  .chatbot-window {
+    position: fixed !important;
+    width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 16px) !important;
+    left: 8px !important;
+    right: 8px !important;
+    bottom: 8px !important;
+    height: 78dvh !important;
+    max-height: 78dvh !important;
+    border-radius: 14px !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+    z-index: 1002 !important;
+  }
+
+  /* Cabecera delgada de 48px */
+  .chat-header {
+    height: 48px !important;
+    min-height: 48px !important;
+    padding: 0 0.75rem !important;
+  }
+
+  .chat-header-info {
+    gap: 0.5rem !important;
+  }
+
+  .chat-bot-avatar {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .chat-bot-avatar svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  .chat-bot-name {
+    font-size: 0.82rem !important;
+  }
+
+  .chat-bot-status {
+    font-size: 0.65rem !important;
+  }
+
+  .chat-header-actions {
+    gap: 0.25rem !important;
+  }
+
+  .btn-chat-action,
+  .btn-chat-settings,
+  .btn-chat-close {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 6px !important;
+  }
+
+  .btn-chat-action svg,
+  .btn-chat-settings svg,
+  .btn-chat-close svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  /* Drawer de API en mobile */
+  .chat-api-drawer {
+    padding: 0.65rem 0.85rem !important;
+  }
+
+  .chat-api-row {
+    flex-direction: column !important;
+    gap: 0.4rem !important;
+  }
+
+  .chat-api-save-btn {
+    width: 100% !important;
+    height: 36px !important;
+  }
+
+  /* Contenedor de mensajes y burbujas compactas */
+  .chat-messages-container {
+    padding: 0.75rem 0.65rem !important;
+    gap: 0.65rem !important;
+  }
+
+  .chat-msg {
+    max-width: 90% !important;
+  }
+
+  .msg-bubble {
+    font-size: 0.84rem !important;
+    padding: 0.5rem 0.75rem !important;
+    line-height: 1.4 !important;
+    border-radius: 10px !important;
+  }
+
+  .msg-timestamp {
+    font-size: 0.6rem !important;
+  }
+
+  /* Sugerencias Rápidas compactas */
+  .chat-quick-prompts {
+    padding: 0.35rem 0.65rem !important;
+    gap: 0.35rem !important;
+  }
+
+  .btn-quick-prompt {
+    padding: 0.25rem 0.55rem !important;
+    font-size: 0.68rem !important;
+  }
+
+  /* Barra de escritura fija en la base de 44px */
+  .chat-input-form {
+    height: 44px !important;
+    min-height: 44px !important;
+    padding: 0.3rem 0.65rem !important;
+    gap: 0.4rem !important;
+  }
+
+  .chat-input-form input {
+    height: 34px !important;
+    padding: 0 0.65rem !important;
+    font-size: 0.82rem !important;
+    border-radius: 8px !important;
+  }
+
+  .btn-chat-send {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 8px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .btn-chat-send svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+}
+
